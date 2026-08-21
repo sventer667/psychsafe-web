@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+/* Connexus brand: light canvas, navy/teal, geometric sans headings. A
+   deliberate departure from the dark/gold, serif-headed look of the
+   reference site (psychosocialguard.com.au) this app was originally
+   prototyped against, to make the two visually and editorially distinct. */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: #F6F7F9;
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #EEF1F5;
+  --color-border: #DCE1E8;
+  --color-ink: #16213A;
+  --color-muted: #64748B;
+  --color-accent: #0E7C66;
+  --color-accent-dim: #0B6350;
+  --color-accent-contrast: #FFFFFF;
+  --color-navy: #0B1830;
+  --color-navy-contrast: #F5F7FA;
+  --color-destructive: #DC2626;
+  --color-success: #16A34A;
+  --color-alert: #D97706;
+}
+
+@layer base {
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+  }
+  h1, h2, h3 {
+    @apply font-serif;
+  }
+}
