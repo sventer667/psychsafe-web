@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { Layout } from './components/Layout'
 import { ComingSoon } from './pages/ComingSoon'
+import { PreviewUnlock, PREVIEW_ACCESS_KEY } from './pages/PreviewUnlock'
 import { Home } from './pages/Home'
 import { SectorGuide } from './pages/SectorGuide'
 import { Legal } from './pages/Legal'
@@ -25,11 +26,25 @@ import { Security } from './pages/Security'
 // bring the real app back. No route changes needed either way.
 const MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
+// Secret demo bypass: visiting this exact path once (see PreviewUnlock.tsx)
+// unlocks the real app in that browser even while maintenance mode is on,
+// so it can be demoed without redeploying. Keep this out of any nav link.
+const PREVIEW_UNLOCK_PATH = '/preview/9zls-p0fe-ykf8'
+
+function hasPreviewAccess() {
+  try {
+    return window.localStorage.getItem(PREVIEW_ACCESS_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
 export default function App() {
-  if (MAINTENANCE_MODE) {
+  if (MAINTENANCE_MODE && !hasPreviewAccess()) {
     return (
       <BrowserRouter>
         <Routes>
+          <Route path={PREVIEW_UNLOCK_PATH} element={<PreviewUnlock />} />
           <Route path="*" element={<ComingSoon />} />
         </Routes>
       </BrowserRouter>
