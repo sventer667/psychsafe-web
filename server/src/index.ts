@@ -26,6 +26,26 @@ const app = express()
 
 app.use(cors())
 
+// Pre-launch gate: mirrors the frontend's "coming soon" placeholder (see the
+// client's App.tsx / lib/previewAccess.ts) so the API can't be used
+// directly, e.g. by curling the signup endpoint, while the public site is
+// hidden. Blocks every request except the health check (Render's health
+// monitor needs this to keep the service up) and requests carrying the same
+// preview secret the frontend attaches once someone has unlocked the demo.
+// To bring the API back for real launch, remove MAINTENANCE_MODE (or set it
+// to anything other than "true") in the Render env vars, no code change or
+// redeploy of this logic needed.
+const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true'
+const PREVIEW_ACCESS_SECRET = process.env.PREVIEW_ACCESS_SECRET || ''
+
+if (MAINTENANCE_MODE) {
+  app.use((req, res, next) => {
+    if (req.path === '/api/health') return next()
+    if (PREVIEW_ACCESS_SECRET && req.get('X-Preview-Access') === PREVIEW_ACCESS_SECRET) return next()
+    res.status(503).json({ error: 'Service temporarily unavailable' })
+  })
+}
+
 // Stripe webhooks need the raw body for signature verification, so this is
 // mounted before express.json() and excluded from JSON parsing.
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeWebhookRouter)
