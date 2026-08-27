@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { Layout } from './components/Layout'
 import { ComingSoon } from './pages/ComingSoon'
-import { PREVIEW_ACCESS_KEY } from './pages/PreviewUnlock'
+import { hasPreviewAccess } from './lib/previewAccess'
 import { Home } from './pages/Home'
 import { SectorGuide } from './pages/SectorGuide'
 import { Legal } from './pages/Legal'
@@ -25,27 +25,6 @@ import { Security } from './pages/Security'
 // homepage, resolving to it. Unset it (or set to "false") and redeploy to
 // bring the real app back. No route changes needed either way.
 const MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
-
-// Secret demo bypass: loading the site with ?unlock=<this value> anywhere in
-// the query string unlocks the real app in that browser even while
-// maintenance mode is on, so it can be demoed without redeploying. Uses a
-// query param rather than a path because the static host 404s on any path
-// other than "/" for a direct request, before the app ever loads to handle
-// client-side routing. Not a nav link, don't add one anywhere.
-const PREVIEW_SECRET = '9zls-p0fe-ykf8'
-
-function hasPreviewAccess() {
-  try {
-    if (window.localStorage.getItem(PREVIEW_ACCESS_KEY) === 'true') return true
-    if (new URLSearchParams(window.location.search).get('unlock') === PREVIEW_SECRET) {
-      window.localStorage.setItem(PREVIEW_ACCESS_KEY, 'true')
-      return true
-    }
-    return false
-  } catch {
-    return false
-  }
-}
 
 export default function App() {
   if (MAINTENANCE_MODE && !hasPreviewAccess()) {
