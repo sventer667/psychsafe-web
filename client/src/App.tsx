@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { Layout } from './components/Layout'
+import { ComingSoon } from './pages/ComingSoon'
 import { Home } from './pages/Home'
 import { SectorGuide } from './pages/SectorGuide'
 import { Legal } from './pages/Legal'
@@ -17,7 +18,24 @@ import { Billing } from './pages/Billing'
 import { Team } from './pages/Team'
 import { Security } from './pages/Security'
 
+// Pre-launch switch. Set VITE_MAINTENANCE_MODE=true as a build-time env var
+// on the connexus-app Render service (then redeploy) to take the whole site
+// behind the "coming soon" placeholder, with every route, not just the
+// homepage, resolving to it. Unset it (or set to "false") and redeploy to
+// bring the real app back. No route changes needed either way.
+const MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
+
 export default function App() {
+  if (MAINTENANCE_MODE) {
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route path="*" element={<ComingSoon />} />
+        </Routes>
+      </BrowserRouter>
+    )
+  }
+
   return (
     <BrowserRouter>
       <AuthProvider>
