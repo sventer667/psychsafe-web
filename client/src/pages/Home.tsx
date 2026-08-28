@@ -50,7 +50,7 @@ const FEATURES = [
     icon: FileLock2,
     title: 'Tamper-evident sealing',
     description:
-      'Closing an assessment locks every hazard, action, and consultation record and fingerprints them with a SHA-256 hash, independently timestamped by a third-party RFC 3161 authority. If a rating or record is ever challenged, you can prove exactly what it said and when.',
+      'Closing an assessment locks every hazard, action, and consultation record and fingerprints them with a SHA-256 hash, independently timestamped by a third-party RFC 3161 authority.',
   },
   {
     icon: FileOutput,
