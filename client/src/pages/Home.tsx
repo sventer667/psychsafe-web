@@ -26,7 +26,7 @@ const FEATURES = [
     icon: ClipboardList,
     title: 'Hazard register with a built-in library',
     description:
-      'Pull from a reference library of psychosocial hazards aligned to state regulators'\n codes of practice, rate them with plain-English descriptions instead of a raw 1-5 scale, and get a staged pathway of controls for each one.',
+      'Pull from a reference library of psychosocial hazards aligned to state regulators\' codes of practice, rate them with plain-English descriptions instead of a raw 1-5 scale, and get a staged pathway of controls for each one.',
   },
   {
     icon: MapPin,
@@ -61,7 +61,7 @@ const FEATURES = [
 ]
 
 const STEPS = [
-  { title: 'Create your organisation', description: 'Sign up, and you\\'re in, no sales call required to start your 7-day free trial.' },
+  { title: 'Create your organisation', description: 'Sign up, and you\'re in, no sales call required to start your 7-day free trial.' },
   { title: 'Set your state and industry', description: 'A short profile drives which legislation citations show up everywhere else.' },
   { title: 'Run the assessment', description: 'Add hazards from the library, rate them, assign actions, and log consultations as you go.' },
   { title: 'Export and seal', description: 'Download a formatted PDF report, then close and seal the record with a verifiable timestamp.' },
