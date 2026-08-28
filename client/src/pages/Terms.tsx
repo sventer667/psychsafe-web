@@ -7,7 +7,7 @@ export function Terms() {
         <h2>1. Agreement</h2>
         <p>
           These terms govern access to and use of Connexus, provided by{' '}
-          <strong>[Insert registered business name], ABN [Insert ABN]</strong> ("Connexus", "we", "us"). By creating
+          <strong>Connexus OHS Consultants, ABN 80 423 515 887</strong> ("Connexus", "we", "us"). By creating
           an account, you agree to these terms on behalf of yourself and, if you're signing up for an organisation,
           on behalf of that organisation. If you don't agree, don't create an account or use the platform.
         </p>
@@ -125,9 +125,9 @@ export function Terms() {
       <section>
         <h2>12. Governing law and disputes</h2>
         <p>
-          These terms are governed by the laws of [Insert state/territory], Australia, and each party submits to the
-          non-exclusive jurisdiction of its courts. Before commencing formal proceedings, both parties agree to first
-          try to resolve a dispute in good faith by direct discussion.
+          These terms are governed by the laws of Australia, and each party submits to the non-exclusive
+          jurisdiction of Australian courts. Before commencing formal proceedings, both parties agree to first try
+          to resolve a dispute in good faith by direct discussion.
         </p>
       </section>
 
@@ -145,8 +145,8 @@ export function Terms() {
         <h2>14. Contact</h2>
         <p>
           <strong>Connexus</strong><br />
-          [Insert registered business name], ABN [Insert ABN]<br />
-          Email: [Insert support email]
+          Connexus OHS Consultants, ABN 80 423 515 887<br />
+          Email: contact@connexusohs.com.au
         </p>
       </section>
     </LegalLayout>
