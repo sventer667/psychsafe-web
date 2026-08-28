@@ -35,7 +35,7 @@ export function Signup() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-24 w-24 items-center justify-center p-3">
-            <img src={logo} alt="Connexus OHS Consultants" className="h-full w-full object-contain" />
+            <img src={logo} alt="Connexus OHS" className="h-full w-full object-contain" />
           </div>
           <p className="mt-2 text-sm text-muted">Create your account</p>
         </div>
