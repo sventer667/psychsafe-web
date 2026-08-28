@@ -38,11 +38,10 @@ export function Terms() {
         <h2>4. Plans, pricing, and billing</h2>
         <p>
           Connexus is offered on Starter, Growth, and Enterprise plans, billed per seat. Current pricing is shown on
-          our pricing page and may change; we'll give existing subscribers at least [Insert notice period, e.g. 30
-          days] notice before a price change takes effect on their account. Payment is processed by Stripe; we don't
-          store your card details. Subscriptions renew automatically for the same billing period unless cancelled
-          before the renewal date. Fees are non-refundable except where required by law or expressly stated
-          otherwise, [Insert refund policy specifics, if any].
+          our pricing page and may change; we'll give existing subscribers at least 30 days notice before a price
+          change takes effect on their account. Payment is processed by Stripe; we don't store your card details.
+          Subscriptions renew automatically for the same billing period unless cancelled before the renewal date.
+          Fees are non-refundable except where required by law.
         </p>
       </section>
 
