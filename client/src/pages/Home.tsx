@@ -48,9 +48,9 @@ const FEATURES = [
   },
   {
     icon: FileLock2,
-    title: 'Cryptographic sealing',
+    title: 'Tamper-evident sealing',
     description:
-      'Closing an assessment fingerprints every hazard, action, and consultation record with a SHA-256 hash and attempts to certify it against an independent RFC 3161 timestamp authority, so its integrity and timing can be checked without having to trust us.',
+      'Closing an assessment locks every hazard, action, and consultation record and fingerprints them with a SHA-256 hash, independently timestamped by a third-party RFC 3161 authority. If a rating or record is ever challenged, you can prove exactly what it said and when.',
   },
   {
     icon: FileOutput,
