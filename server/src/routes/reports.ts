@@ -27,6 +27,8 @@ function riskColor(rating: number) {
 }
 
 reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
+  const startedAt = Date.now()
+  try {
   const caseId = Number(req.params.id)
   if (!ownsCase(req.auth!.orgId, caseId)) return res.status(404).json({ error: 'Assessment not found' })
 
@@ -195,4 +197,9 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
   })
 
   doc.end()
+  console.log(`[reports] case ${caseId} generated in ${Date.now() - startedAt}ms`)
+  } catch (err) {
+    console.error(`[reports] failed after ${Date.now() - startedAt}ms:`, err)
+    if (!res.headersSent) res.status(500).json({ error: 'Report generation failed' })
+  }
 })
