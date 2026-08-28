@@ -84,7 +84,7 @@ export function SectorGuide() {
             <h3 className="font-serif text-lg text-ink">Run this as a structured assessment</h3>
             <p className="mt-1 text-sm text-muted">
               Start from the hazard register, rate the risks above for your organisation, and get a sealed,
-              boardroom-ready report.
+              ready-to-share report.
             </p>
           </div>
           <Button onClick={() => navigate(user ? '/dashboard' : '/signup')} className="shrink-0 px-5 py-2.5">
