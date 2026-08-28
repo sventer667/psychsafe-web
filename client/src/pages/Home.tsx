@@ -26,7 +26,7 @@ const FEATURES = [
     icon: ClipboardList,
     title: 'Hazard register with a built-in library',
     description:
-      'Pull from a reference library of psychosocial hazards aligned to state regulators\' codes of practice, rate them with plain-English descriptions instead of a raw 1-5 scale, and get a staged pathway of controls for each one.',
+      'Pull from a reference library of psychosocial hazards aligned to state regulators'\n codes of practice, rate them with plain-English descriptions instead of a raw 1-5 scale, and get a staged pathway of controls for each one.',
   },
   {
     icon: MapPin,
@@ -50,21 +50,21 @@ const FEATURES = [
     icon: FileLock2,
     title: 'Tamper-evident sealing',
     description:
-      'Closing an assessment locks every hazard, action, and consultation record and fingerprints them with a SHA-256 hash, independently timestamped by a third-party RFC 3161 authority.',
+      'Closing an assessment locks the hazard register, action plan, and consultation log together, generates a SHA-256 fingerprint of the record, and certifies the time with an independent RFC 3161 authority.',
   },
   {
     icon: FileOutput,
-    title: 'Boardroom-ready PDF export',
+    title: 'One-click compliance report',
     description:
-      'One click produces a report with a risk-level chart, an action plan ordered by urgency, the consultation log, and a compliance reference section, ready to hand to a board or regulator.',
+      'One click produces a report with a risk-level chart, an action plan ordered by urgency, the consultation log, and a compliance reference section, formatted for a board pack or regulator request.',
   },
 ]
 
 const STEPS = [
-  { title: 'Create your organisation', description: 'Sign up, and you\'re in, no sales call required to start your 7-day free trial.' },
+  { title: 'Create your organisation', description: 'Sign up, and you\\'re in, no sales call required to start your 7-day free trial.' },
   { title: 'Set your state and industry', description: 'A short profile drives which legislation citations show up everywhere else.' },
   { title: 'Run the assessment', description: 'Add hazards from the library, rate them, assign actions, and log consultations as you go.' },
-  { title: 'Export and seal', description: 'Download a boardroom-ready PDF, then close and cryptographically seal the record.' },
+  { title: 'Export and seal', description: 'Download a formatted PDF report, then close and seal the record with a verifiable timestamp.' },
 ]
 
 const TIERS = [
@@ -73,7 +73,7 @@ const TIERS = [
     price: '$89',
     seats: '1 seat',
     blurb: 'A single person running one assessment at a time.',
-    features: ['Full hazard register & action plans', 'Boardroom-ready PDF export', 'Cryptographic assessment sealing'],
+    features: ['Full hazard register & action plans', 'One-click compliance report', 'Cryptographic assessment sealing'],
   },
   {
     label: 'Growth',
@@ -139,8 +139,8 @@ export function Home() {
                 Reduce psychosocial risk before it escalates.
               </h1>
               <p className="mt-5 text-lg font-normal text-navy-contrast/70">
-                Turn your legal obligation to manage psychosocial hazards into a structured, auditable process, aligned
-                to WHS legislation in every Australian state and territory.
+                Log hazards, assign controls, and record consultation in one place, with the right WHS citation applied
+                automatically for wherever in Australia you operate.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 {user ? (
@@ -197,10 +197,10 @@ export function Home() {
       <section className="py-16">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-serif text-2xl text-ink sm:text-3xl">Sector-specific psychosocial risk guidance</h2>
+            <h2 className="font-serif text-2xl text-ink sm:text-3xl">How this looks in your industry</h2>
             <p className="mt-3 text-muted">
-              Every industry carries its own pattern of psychosocial hazards. Explore the risks most common in your
-              sector and how Australian WHS legislation applies to them.
+              Psychosocial hazards show up differently depending on what your business does. Pick your sector to see
+              the hazards that turn up most often there, and the WHS rules that apply.
             </p>
           </div>
           <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
