@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Card, Badge } from '../components/ui/Card'
 import { Label, Select, Textarea } from '../components/ui/Input'
-import { api, getToken, ApiError } from '../lib/api'
+import { api, API_BASE, getToken, ApiError } from '../lib/api'
 import type { Case, Hazard, HazardLibraryEntry, ActionItem, Consultation, ActionStatus } from '../lib/types'
 import { HazardRegisterTab } from '../components/case/HazardRegisterTab'
 import { ActionPlanTab } from '../components/case/ActionPlanTab'
@@ -160,7 +160,7 @@ export function CaseDetail() {
     if (!id) return
     setDownloading(true)
     try {
-      const res = await fetch(`/api/reports/case/${id}`, {
+      const res = await fetch(`${API_BASE}/reports/case/${id}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       })
       if (!res.ok) throw new Error('Failed to generate report')
