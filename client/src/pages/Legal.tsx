@@ -2,13 +2,13 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Legal() {
   return (
-    <LegalLayout title="Legal Disclaimer" version="0.2 (draft)" effectiveDate="[Insert date of publication]">
+    <LegalLayout title="Legal Disclaimer" version="0.2 (draft)" effectiveDate="August 2026">
       <section>
         <h2>1. What this page is</h2>
         <p>
           This Legal Disclaimer, together with our <a href="/terms">Terms &amp; Conditions</a> and{' '}
-          <a href="/privacy">Privacy Policy</a>, sets out the basis on which Connexus (<strong>Connexus OHS
-          Consultants, ABN 80 423 515 887</strong>) makes its platform available to you. If anything here conflicts
+          <a href="/privacy">Privacy Policy</a>, sets out the basis on which Connexus (<strong>Connexus OHS, ABN 80
+          423 515 887</strong>) makes its platform available to you. If anything here conflicts
           with the Terms &amp; Conditions, the Terms &amp; Conditions govern.
         </p>
       </section>
@@ -34,7 +34,7 @@ export function Legal() {
         <h2>3. What the platform does and doesn't do</h2>
         <p>Connexus gives you structured tools to:</p>
         <ul>
-          <li>Record hazards against a reference library aligned to the model Work Health and Safety Act 2011 and Safe Work Australia's Managing Psychosocial Hazards at Work Code of Practice, plus, for Victoria (which sits outside the harmonised model WHS scheme), the Occupational Health and Safety (Psychological Health) Regulations 2025 and the associated WorkSafe Victoria compliance code</li>
+          <li>Record hazards against a reference library aligned to the psychosocial hazard framework that applies in each Australian state and territory: the model Work Health and Safety Act 2011 and Safe Work Australia's Managing Psychosocial Hazards at Work Code of Practice, as adopted in New South Wales, Queensland, South Australia, Tasmania, the Australian Capital Territory, and the Northern Territory; Western Australia's own Work Health and Safety Act 2020 and its Code of Practice: Psychosocial Hazards in the Workplace; and Victoria's Occupational Health and Safety (Psychological Health) Regulations 2025 and associated WorkSafe Victoria compliance code, both of which sit outside the harmonised model scheme</li>
           <li>Track actions, owners, and due dates arising from those hazards, and rate a hazard's risk again after controls are applied</li>
           <li>Log worker consultation records</li>
           <li>Export a PDF report, and cryptographically fingerprint an assessment once you close it</li>
