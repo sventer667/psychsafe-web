@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button'
 import { Card, Badge } from '../components/ui/Card'
 import { Label, Select, Textarea } from '../components/ui/Input'
 import { api, API_BASE, getToken, ApiError } from '../lib/api'
+import { hasPreviewAccess, PREVIEW_SECRET } from '../lib/previewAccess'
 import type { Case, Hazard, HazardLibraryEntry, ActionItem, Consultation, ActionStatus } from '../lib/types'
 import { HazardRegisterTab } from '../components/case/HazardRegisterTab'
 import { ActionPlanTab } from '../components/case/ActionPlanTab'
@@ -161,7 +162,10 @@ export function CaseDetail() {
     setDownloading(true)
     try {
       const res = await fetch(`${API_BASE}/reports/case/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          ...(hasPreviewAccess() ? { 'X-Preview-Access': PREVIEW_SECRET } : {}),
+        },
       })
       if (!res.ok) throw new Error('Failed to generate report')
       const blob = await res.blob()
