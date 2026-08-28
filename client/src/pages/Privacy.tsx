@@ -2,11 +2,11 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Privacy() {
   return (
-    <LegalLayout title="Privacy Policy" version="0.1 (draft)" effectiveDate="[Insert date of publication]">
+    <LegalLayout title="Privacy Policy" version="0.1 (draft)" effectiveDate="August 2026">
       <section>
         <h2>1. Scope</h2>
         <p>
-          This policy explains how Connexus (<strong>[Insert registered business name], ABN [Insert ABN]</strong>)
+          This policy explains how Connexus (<strong>Connexus OHS, ABN 80 423 515 887</strong>)
           collects, holds, uses, and discloses personal information through our website and platform. It's written
           to comply with the Australian Privacy Principles (APPs) under the Privacy Act 1988 (Cth). Nothing here
           limits any right you have under the Privacy Act or the Australian Consumer Law that can't lawfully be
@@ -187,7 +187,7 @@ export function Privacy() {
       <section>
         <h2>11. Complaints</h2>
         <p>
-          If you think we've mishandled your personal information, email <strong>[Insert support email]</strong> with
+          If you think we've mishandled your personal information, email <strong>contact@connexusohs.com.au</strong> with
           details. We'll acknowledge your complaint within 5 business days and aim to resolve it within 30 days. If
           you're not satisfied with our response, you can complain to the OAIC at oaic.gov.au, free of charge.
         </p>
@@ -205,8 +205,8 @@ export function Privacy() {
         <h2>13. Contact</h2>
         <p>
           <strong>Connexus</strong><br />
-          [Insert registered business name], ABN [Insert ABN]<br />
-          Email: [Insert support email]
+          Connexus OHS, ABN 80 423 515 887<br />
+          Email: contact@connexusohs.com.au
         </p>
       </section>
     </LegalLayout>
