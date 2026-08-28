@@ -60,7 +60,7 @@ export function Login() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-48 w-48 items-center justify-center p-6">
-            <img src={logo} alt="Connexus OHS Consultants" className="h-full w-full object-contain" />
+            <img src={logo} alt="Connexus OHS" className="h-full w-full object-contain" />
           </div>
           <p className="mt-2 text-sm text-muted">
             {pendingToken ? `Welcome back, ${pendingName}` : 'Sign in to your account'}
