@@ -2,7 +2,7 @@ import { hasPreviewAccess, PREVIEW_SECRET } from './previewAccess'
 
 // In dev this stays empty and requests go through the Vite proxy (see vite.config.ts).
 // In production, set VITE_API_URL to your deployed backend, e.g. https://api.example.com/api
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+export const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 const TOKEN_KEY = 'connexus_token'
 
