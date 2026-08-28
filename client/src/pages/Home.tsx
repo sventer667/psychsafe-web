@@ -85,7 +85,7 @@ const TIERS = [
   },
   {
     label: 'Enterprise',
-    price: '$399',
+    price: '$599',
     seats: 'Up to 10 seats',
     blurb: 'A larger organisation with a dedicated WHS function.',
     features: ['Everything in Growth', 'Dedicated onboarding', 'Priority support SLA'],
