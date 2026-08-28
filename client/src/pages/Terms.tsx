@@ -2,12 +2,12 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Terms() {
   return (
-    <LegalLayout title="Terms & Conditions" version="0.1 (draft)" effectiveDate="[Insert date of publication]">
+    <LegalLayout title="Terms & Conditions" version="0.1 (draft)" effectiveDate="August 2026">
       <section>
         <h2>1. Agreement</h2>
         <p>
           These terms govern access to and use of Connexus, provided by{' '}
-          <strong>Connexus OHS Consultants, ABN 80 423 515 887</strong> ("Connexus", "we", "us"). By creating
+          <strong>Connexus OHS, ABN 80 423 515 887</strong> ("Connexus", "we", "us"). By creating
           an account, you agree to these terms on behalf of yourself and, if you're signing up for an organisation,
           on behalf of that organisation. If you don't agree, don't create an account or use the platform.
         </p>
@@ -145,7 +145,7 @@ export function Terms() {
         <h2>14. Contact</h2>
         <p>
           <strong>Connexus</strong><br />
-          Connexus OHS Consultants, ABN 80 423 515 887<br />
+          Connexus OHS, ABN 80 423 515 887<br />
           Email: contact@connexusohs.com.au
         </p>
       </section>
