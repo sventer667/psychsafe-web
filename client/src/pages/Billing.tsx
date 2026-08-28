@@ -15,7 +15,7 @@ const TIERS: { id: PlanTier; label: string; price: string; seats: string; blurb:
     price: '$89/mo',
     seats: '1 seat',
     blurb: 'A single person running one assessment at a time.',
-    features: ['Full hazard register & action plans', 'Boardroom-ready PDF export', 'Cryptographic case sealing'],
+    features: ['Full hazard register & action plans', 'One-click compliance report', 'Cryptographic case sealing'],
   },
   {
     id: 'growth',
