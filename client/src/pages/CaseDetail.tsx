@@ -322,10 +322,9 @@ export function CaseDetail() {
                 complete first, closing locks the assessment from further edits.
               </p>
               <p className="mb-4 text-sm text-muted">
-                Closing fingerprints every hazard, action item, and consultation record in this assessment with a
-                SHA-256 hash, then attempts to lodge that fingerprint with a third-party RFC 3161 timestamping
-                service, so the record's integrity and timing can be checked independently, without having to
-                trust Connexus itself. The assessment can't be edited once sealed.
+                Closing locks the hazard register, action plan, and consultation log together, generates a SHA-256
+                fingerprint of the record, and certifies the time with an independent RFC 3161 authority. The
+                assessment can't be edited once sealed.
               </p>
               <Button onClick={closeCase} disabled={busy}>
                 {busy ? 'Sealing…' : 'Close and seal assessment'}
@@ -404,7 +403,7 @@ export function CaseDetail() {
                       </div>
                     )}
                   </div>
-                ))}
+              ))}
               </div>
             </Card>
           )}
