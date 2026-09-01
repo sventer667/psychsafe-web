@@ -28,7 +28,7 @@ const TIERS: { id: PlanTier; label: string; price: string; seats: string; blurb:
   {
     id: 'enterprise',
     label: 'Enterprise',
-    price: '$399/mo',
+    price: '$599/mo',
     seats: 'Up to 10 seats',
     blurb: 'A larger organisation with a dedicated WHS function.',
     features: ['Everything in Growth', 'Dedicated onboarding', 'Priority support SLA'],
