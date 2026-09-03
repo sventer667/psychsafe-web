@@ -19,7 +19,7 @@ const STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'] as const
 
 const LEGISLATION_BASE: Record<(typeof STATES)[number], string> = {
   NSW: 'WHS Regulation 2017 (NSW) cl 55; Managing psychosocial hazards at work, Code of Practice 2021 (NSW)',
-  VIC: 'Occupational Health and Safety Act 2004 (Vic); WorkSafe Victoria psychological health guidance',
+  VIC: 'Occupational Health and Safety Act 2004 (Vic); Occupational Health and Safety (Psychological Health) Regulations 2025 (Vic), in effect from 1 December 2025',
   QLD: 'WHS Regulation 2011 (Qld) cl 55; Managing the risk of psychosocial hazards at work, Code of Practice 2022 (Qld)',
   WA: 'Work Health and Safety Act 2020 (WA); WHS (General) Regulations 2022 (WA) Part 3.2',
   SA: 'WHS Regulations 2012 (SA) cl 55; SafeWork SA psychosocial hazard guidance',
