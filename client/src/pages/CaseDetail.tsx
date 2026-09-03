@@ -41,6 +41,7 @@ export function CaseDetail() {
   const [showReopenForm, setShowReopenForm] = useState(false)
   const [reopenReason, setReopenReason] = useState('')
   const [reopenError, setReopenError] = useState('')
+  const [closeError, setCloseError] = useState('')
 
   async function load() {
     if (!id) return
@@ -132,10 +133,13 @@ export function CaseDetail() {
 
   async function closeCase() {
     if (!id) return
+    setCloseError('')
     setBusy(true)
     try {
       const c = await api<Case>(`/cases/${id}/close`, { method: 'POST' })
       setCaseFile(c)
+    } catch (err) {
+      setCloseError(err instanceof ApiError ? err.message : 'Something went wrong')
     } finally {
       setBusy(false)
     }
@@ -326,9 +330,20 @@ export function CaseDetail() {
                 fingerprint of the record, and certifies the time with an independent RFC 3161 authority. The
                 assessment can't be edited once sealed.
               </p>
+              {(hazards.length === 0 || consultations.length === 0) && (
+                <p className="mb-3 flex items-center gap-2 text-sm text-alert">
+                  <ShieldAlert size={14} />
+                  {hazards.length === 0 && consultations.length === 0
+                    ? 'Add at least one hazard and record at least one consultation before sealing.'
+                    : hazards.length === 0
+                    ? 'Add at least one hazard before sealing.'
+                    : 'Record at least one consultation before sealing.'}
+                </p>
+              )}
               <Button onClick={closeCase} disabled={busy}>
                 {busy ? 'Sealing…' : 'Close and seal assessment'}
               </Button>
+              {closeError && <p className="mt-2 text-sm text-destructive">{closeError}</p>}
             </Card>
           ) : (
             <Card>
@@ -403,7 +418,7 @@ export function CaseDetail() {
                       </div>
                     )}
                   </div>
-              ))}
+                ))}
               </div>
             </Card>
           )}
