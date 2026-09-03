@@ -4,6 +4,7 @@ import { Card, Badge } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { Label, Select } from '../ui/Input'
 import type { ActionItem, ActionStatus, Hazard, HazardLibraryEntry } from '../../lib/types'
+import { ApiError } from '../../lib/api'
 
 const ACTION_STATUS_LABEL: Record<ActionStatus, string> = {
   pending: 'Pending',
@@ -83,10 +84,12 @@ export function HazardRegisterTab({
   const [residualLikelihood, setResidualLikelihood] = useState(3)
   const [residualConsequence, setResidualConsequence] = useState(3)
   const [savingResidual, setSavingResidual] = useState(false)
+  const [residualError, setResidualError] = useState('')
 
   function toggleExpanded(h: Hazard) {
     const expanding = expandedHazard !== h.id
     setExpandedHazard(expanding ? h.id : null)
+    setResidualError('')
     if (expanding) {
       setResidualLikelihood(h.residualLikelihood ?? h.likelihood)
       setResidualConsequence(h.residualConsequence ?? h.consequence)
@@ -95,8 +98,11 @@ export function HazardRegisterTab({
 
   async function confirmResidual(h: Hazard) {
     setSavingResidual(true)
+    setResidualError('')
     try {
       await onSetResidual(h, residualLikelihood, residualConsequence)
+    } catch (err) {
+      setResidualError(err instanceof ApiError ? err.message : 'Something went wrong')
     } finally {
       setSavingResidual(false)
     }
@@ -267,7 +273,7 @@ export function HazardRegisterTab({
                       <ClipboardList size={12} /> {linkedActions.length} action{linkedActions.length === 1 ? '' : 's'}
                     </span>
                   )}
-                  <Badge tone={ratingTone(h.riskRating)}>Inherent {h.riskRating}</Badge>
+                  <Badge tone={ratingTone(h.riskRating)}>Current {h.riskRating}</Badge>
                   {h.residualRiskRating !== null && (
                     <Badge tone={ratingTone(h.residualRiskRating)}>Residual {h.residualRiskRating}</Badge>
                   )}
@@ -333,58 +339,74 @@ export function HazardRegisterTab({
                     <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
                       Residual risk (after controls)
                     </div>
-                    {h.residualRatedAt ? (
-                      <p className="mb-2 text-sm text-muted">
-                        Last re-rated {new Date(h.residualRatedAt).toLocaleDateString()}. Update it below if the
-                        situation has changed.
-                      </p>
-                    ) : (
-                      <p className="mb-2 text-sm text-muted">
-                        Not yet re-rated. Until you do, this hazard counts at its inherent score on the dashboard's
-                        residual risk gauge.
-                      </p>
-                    )}
-                    {!readOnly && (
-                      <div className="space-y-3 rounded-xl border border-border p-3">
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                          <div>
-                            <Label htmlFor={`rl-${h.id}`}>How likely is it now, with controls in place?</Label>
-                            <Select
-                              id={`rl-${h.id}`}
-                              value={residualLikelihood}
-                              onChange={(e) => setResidualLikelihood(Number(e.target.value))}
-                            >
-                              {LIKELIHOOD_OPTIONS.map((o) => (
-                                <option key={o.value} value={o.value}>{o.label}</option>
-                              ))}
-                            </Select>
-                          </div>
-                          <div>
-                            <Label htmlFor={`rc-${h.id}`}>How serious would the impact be now?</Label>
-                            <Select
-                              id={`rc-${h.id}`}
-                              value={residualConsequence}
-                              onChange={(e) => setResidualConsequence(Number(e.target.value))}
-                            >
-                              {CONSEQUENCE_OPTIONS.map((o) => (
-                                <option key={o.value} value={o.value}>{o.label}</option>
-                              ))}
-                            </Select>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between pt-1">
-                          <div className="flex items-center gap-2 text-sm text-muted">
-                            Residual risk:
-                            <Badge tone={ratingTone(residualLikelihood * residualConsequence)}>
-                              {ratingLabel(residualLikelihood * residualConsequence)} ({residualLikelihood * residualConsequence})
-                            </Badge>
-                          </div>
-                          <Button onClick={() => confirmResidual(h)} disabled={savingResidual}>
-                            {savingResidual ? 'Saving…' : 'Save residual rating'}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
+                    {(() => {
+                      const hasVerifiedControl = linkedActions.some((a) => a.status === 'complete' || a.status === 'closed')
+                      return (
+                        <>
+                          {h.residualRatedAt && (
+                            <p className="mb-2 text-sm text-muted">
+                              Last re-rated {new Date(h.residualRatedAt).toLocaleDateString()}. Update it below if the
+                              situation has changed.
+                            </p>
+                          )}
+                          {!h.residualRatedAt && hasVerifiedControl && (
+                            <p className="mb-2 text-sm text-muted">
+                              Not yet re-rated. Until you do, this hazard counts at its current-risk score on the
+                              dashboard's residual risk gauge.
+                            </p>
+                          )}
+                          {!hasVerifiedControl && (
+                            <p className="mb-2 text-sm text-muted">
+                              Re-rating unlocks once at least one linked action for this hazard has been marked
+                              Complete, so residual risk reflects a control that's actually been implemented, not
+                              just planned.
+                            </p>
+                          )}
+                          {!readOnly && hasVerifiedControl && (
+                            <div className="space-y-3 rounded-xl border border-border p-3">
+                              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <div>
+                                  <Label htmlFor={`rl-${h.id}`}>How likely is it now, with controls in place?</Label>
+                                  <Select
+                                    id={`rl-${h.id}`}
+                                    value={residualLikelihood}
+                                    onChange={(e) => setResidualLikelihood(Number(e.target.value))}
+                                  >
+                                    {LIKELIHOOD_OPTIONS.map((o) => (
+                                      <option key={o.value} value={o.value}>{o.label}</option>
+                                    ))}
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label htmlFor={`rc-${h.id}`}>How serious would the impact be now?</Label>
+                                  <Select
+                                    id={`rc-${h.id}`}
+                                    value={residualConsequence}
+                                    onChange={(e) => setResidualConsequence(Number(e.target.value))}
+                                  >
+                                    {CONSEQUENCE_OPTIONS.map((o) => (
+                                      <option key={o.value} value={o.value}>{o.label}</option>
+                                    ))}
+                                  </Select>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between pt-1">
+                                <div className="flex items-center gap-2 text-sm text-muted">
+                                  Residual risk:
+                                  <Badge tone={ratingTone(residualLikelihood * residualConsequence)}>
+                                    {ratingLabel(residualLikelihood * residualConsequence)} ({residualLikelihood * residualConsequence})
+                                  </Badge>
+                                </div>
+                                <Button onClick={() => confirmResidual(h)} disabled={savingResidual}>
+                                  {savingResidual ? 'Saving…' : 'Save residual rating'}
+                                </Button>
+                              </div>
+                              {residualError && <p className="text-sm text-destructive">{residualError}</p>}
+                            </div>
+                          )}
+                        </>
+                      )
+                    })()}
                   </div>
 
                   {libEntry && (
