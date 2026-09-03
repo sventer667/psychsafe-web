@@ -190,11 +190,38 @@ function recordSealEvent(
   )
 }
 
+// Minimum bar for what counts as a complete assessment: at least one hazard
+// has actually been logged, and at least one consultation has been recorded
+// (WHS consultation is a legislative requirement, not an optional extra).
+// This doesn't attempt to judge the *quality* of the assessment, just catch
+// the case of someone sealing an essentially empty record.
+function closeReadinessErrors(caseId: number | string): string[] {
+  const errors: string[] = []
+  const hazardCount = (
+    db.prepare('SELECT COUNT(*) as n FROM hazards WHERE caseId = ?').get(caseId) as { n: number }
+  ).n
+  if (hazardCount === 0) {
+    errors.push('Add at least one hazard to the Hazard Register before sealing this assessment')
+  }
+  const consultationCount = (
+    db.prepare('SELECT COUNT(*) as n FROM consultations WHERE caseId = ?').get(caseId) as { n: number }
+  ).n
+  if (consultationCount === 0) {
+    errors.push('Record at least one consultation before sealing this assessment')
+  }
+  return errors
+}
+
 casesRouter.post('/:id/close', async (req: AuthedRequest, res) => {
   if (!ownsCase(req.auth!.orgId, req.params.id)) return res.status(404).json({ error: 'Assessment not found' })
   const c = db.prepare('SELECT * FROM cases WHERE id = ?').get(req.params.id) as { status: string } | undefined
   if (!c) return res.status(404).json({ error: 'Assessment not found' })
   if (c.status === 'closed') return res.status(400).json({ error: 'Assessment is already closed' })
+
+  const readinessErrors = closeReadinessErrors(req.params.id)
+  if (readinessErrors.length > 0) {
+    return res.status(400).json({ error: readinessErrors.join('. ') })
+  }
 
   try {
     const seal = await sealCase(Number(req.params.id))
