@@ -236,6 +236,20 @@ db.exec(`
     'Managing the risk of psychosocial hazards at work, Code of Practice 2022 (Qld)')
 `)
 
+// Backfill: Victoria's psychosocial hazard citation was seeded referencing
+// only the general OHS Act, before the Occupational Health and Safety
+// (Psychological Health) Regulations 2025 (Vic) took effect on 1 December
+// 2025. Rewrites the already-seeded rows in place rather than relying on a
+// re-seed, since hazard_library is only ever seeded once per database.
+db.exec(`
+  UPDATE hazard_library
+  SET legislation = REPLACE(
+    legislation,
+    'Occupational Health and Safety Act 2004 (Vic); WorkSafe Victoria psychological health guidance',
+    'Occupational Health and Safety Act 2004 (Vic); Occupational Health and Safety (Psychological Health) Regulations 2025 (Vic), in effect from 1 December 2025'
+  )
+`)
+
 // Defensive migration: a database created before residual (post-control) risk
 // ratings existed has a `hazards` table without these columns.
 for (const stmt of [
