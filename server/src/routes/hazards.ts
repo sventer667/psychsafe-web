@@ -53,6 +53,21 @@ hazardsRouter.patch('/:id', (req: AuthedRequest, res) => {
     db.prepare('UPDATE hazards SET status = ? WHERE id = ?').run(status, req.params.id)
   }
   if (residualLikelihood !== undefined && residualConsequence !== undefined) {
+    // Residual risk is meant to reflect risk *after* a control has actually
+    // been implemented, not just planned or logged. Require at least one
+    // action item linked to this hazard to be marked complete/closed before
+    // accepting a re-rating, so the residual gauge can't be improved just by
+    // typing in a lower number.
+    const verifiedControl = db
+      .prepare(
+        `SELECT 1 FROM action_items WHERE hazardId = ? AND status IN ('complete', 'closed') LIMIT 1`
+      )
+      .get(req.params.id)
+    if (!verifiedControl) {
+      return res.status(400).json({
+        error: 'Mark at least one linked action item as complete before re-rating residual risk for this hazard',
+      })
+    }
     const rl = Number(residualLikelihood) || 1
     const rc = Number(residualConsequence) || 1
     db.prepare(
