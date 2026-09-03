@@ -90,8 +90,9 @@ export function RiskGauges({ data }: { data: RiskGaugesData }) {
       <Card>
         <h2 className="mb-1 font-serif text-lg text-ink">Psychosocial risk rating</h2>
         <p className="text-sm text-muted">
-          These gauges fill in once you've logged hazards against an open assessment: one for the inherent risk you
-          rated at the time, and one for the residual risk once you've re-rated a hazard after applying controls.
+          These gauges fill in once you've logged hazards against an open assessment: one for the current risk you
+          rated at the time (with whatever controls were already in place), and one for the residual risk once
+          you've re-rated a hazard after implementing an additional control.
         </p>
       </Card>
     )
@@ -104,13 +105,14 @@ export function RiskGauges({ data }: { data: RiskGaugesData }) {
         <p className="text-sm text-muted">Average risk score across every open hazard in your open assessments</p>
       </div>
       <div className="flex flex-col gap-6 sm:flex-row">
-        <Gauge title="Inherent Psychosocial Risk Rating" pct={data.inherentPct} score={data.inherentScore} hazardCount={data.hazardCount} />
+        <Gauge title="Current Psychosocial Risk Rating" pct={data.inherentPct} score={data.inherentScore} hazardCount={data.hazardCount} />
         <Gauge title="Residual Psychosocial Risk Rating" pct={data.residualPct} score={data.residualScore} hazardCount={data.hazardCount} />
       </div>
       <p className="mt-3 text-xs text-muted">
-        Inherent reflects the rating given when each hazard was logged. Residual reflects the rating after controls,
-        for hazards that have been re-rated, other hazards count at their inherent score until re-rated from the
-        Hazard Register.
+        Current reflects the rating given when each hazard was logged, as it stands with whatever controls were
+        already in place. Residual reflects the rating after an additional control has been implemented and
+        verified, for hazards that have been re-rated, other hazards count at their current-risk score until
+        re-rated from the Hazard Register.
       </p>
     </Card>
   )
