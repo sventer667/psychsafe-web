@@ -68,14 +68,20 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
   doc.fontSize(10).fillColor(MUTED)
   doc.text(`Assessment: ${caseRow.name}`)
   doc.text(`Status: ${caseRow.status}${caseRow.status === 'closed' ? ` (sealed ${caseRow.sealTimestampTime ?? ''})` : ''}`)
-  doc.text(`Industry: ${org.industry || '—'}    State/Territory: ${caseRow.state || org.state || '—'}`)
+  doc.text(`Industry: ${org.industry || 'â'}    State/Territory: ${caseRow.state || org.state || 'â'}`)
   if (org.consultantName) doc.text(`Prepared by: ${org.consultantName}${org.consultantCredential ? ` (${org.consultantCredential})` : ''}`)
   doc.text(`Report generated: ${new Date().toLocaleString()}`)
+
+  if (caseRow.scope) {
+    doc.moveDown(0.5)
+    doc.fontSize(10).fillColor(MUTED).text('Scope of this assessment:', { continued: false })
+    doc.fontSize(10).fillColor(INK).text(caseRow.scope, { width: 495 })
+  }
 
   if (caseRow.sealHash) {
     doc.moveDown(1)
     doc.fontSize(9).fillColor(MUTED).text(`SHA-256 seal: ${caseRow.sealHash}`)
-    doc.text(`Timestamp authority: ${caseRow.sealTimestampAuthority ?? '—'}`)
+    doc.text(`Timestamp authority: ${caseRow.sealTimestampAuthority ?? 'â'}`)
   }
 
   // A case that's been reopened and resealed no longer shows its full history
@@ -90,11 +96,11 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
     reopenEvents.forEach((e) => {
       doc.moveDown(0.3)
       doc.fontSize(9).fillColor(INK).text(
-        `${new Date(e.createdAt).toLocaleString()} — reopened by ${e.userName || 'a team member'}: "${e.reason}"`,
+        `${new Date(e.createdAt).toLocaleString()} â reopened by ${e.userName || 'a team member'}: "${e.reason}"`,
         { width: 495 }
       )
       if (e.sealHash) {
-        doc.fontSize(8).fillColor(MUTED).text(`Broke seal: ${e.sealHash} (sealed ${e.sealTimestampTime ? new Date(e.sealTimestampTime).toLocaleString() : '—'})`, { width: 495 })
+        doc.fontSize(8).fillColor(MUTED).text(`Broke seal: ${e.sealHash} (sealed ${e.sealTimestampTime ? new Date(e.sealTimestampTime).toLocaleString() : 'â'})`, { width: 495 })
       }
     })
   }
@@ -123,17 +129,69 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
     doc.y = y + barHeight + barGap
   })
 
+  const hazardIds = hazards.map((h) => h.id)
+  const existingControlsByHazard = new Map<number, any[]>()
+  if (hazardIds.length > 0) {
+    const placeholders = hazardIds.map(() => '?').join(',')
+    const controlRows = db
+      .prepare(`SELECT * FROM existing_controls WHERE hazardId IN (${placeholders}) ORDER BY createdAt ASC`)
+      .all(...hazardIds) as any[]
+    for (const c of controlRows) {
+      const list = existingControlsByHazard.get(c.hazardId) ?? []
+      list.push(c)
+      existingControlsByHazard.set(c.hazardId, list)
+    }
+  }
+  const EFFECTIVENESS_LABEL: Record<string, string> = {
+    not_evaluated: 'not yet evaluated',
+    not_effective: 'not effective',
+    partially_effective: 'partially effective',
+    effective: 'effective',
+  }
+
   doc.x = chartLeft
   doc.moveDown(1)
   hazards.forEach((h) => {
-    if (doc.y > 700) doc.addPage()
+    if (doc.y > 680) doc.addPage()
     doc.x = chartLeft
     doc.fontSize(11).fillColor(INK).text(h.title, chartLeft, doc.y, { width: 495 })
     doc.x = chartLeft
-    doc.fontSize(9).fillColor(MUTED).text(`${h.category} · Risk score ${h.riskRating} · ${h.status}`, chartLeft, doc.y, { width: 495 })
+    doc.fontSize(9).fillColor(MUTED).text(`${h.category} Â· Risk score ${h.riskRating} Â· ${h.status}`, chartLeft, doc.y, { width: 495 })
     if (h.description) {
       doc.x = chartLeft
       doc.fontSize(9).fillColor(INK).text(h.description, chartLeft, doc.y, { width: 495 })
+    }
+    // Evidence/exposure/affected-worker fields document the reasoning behind
+    // the rating rather than leaving a reader to take the score on faith.
+    if (h.evidence || h.exposureDetail || h.affectedWorkers) {
+      doc.moveDown(0.3)
+      if (h.evidence) {
+        doc.x = chartLeft
+        doc.fontSize(8).fillColor(MUTED).text(`Evidence: ${h.evidence}`, chartLeft, doc.y, { width: 495 })
+      }
+      if (h.exposureDetail) {
+        doc.x = chartLeft
+        doc.fontSize(8).fillColor(MUTED).text(`Exposure: ${h.exposureDetail}`, chartLeft, doc.y, { width: 495 })
+      }
+      if (h.affectedWorkers) {
+        doc.x = chartLeft
+        doc.fontSize(8).fillColor(MUTED).text(`Affected workers: ${h.affectedWorkers}`, chartLeft, doc.y, { width: 495 })
+      }
+    }
+    const controls = existingControlsByHazard.get(h.id) ?? []
+    if (controls.length > 0) {
+      doc.moveDown(0.3)
+      doc.x = chartLeft
+      doc.fontSize(8).fillColor(MUTED).text('Existing controls already in place:', chartLeft, doc.y, { width: 495 })
+      controls.forEach((c) => {
+        doc.x = chartLeft
+        doc.fontSize(8).fillColor(INK).text(
+          `- ${c.description} (${EFFECTIVENESS_LABEL[c.effectiveness] || 'not yet evaluated'})`,
+          chartLeft,
+          doc.y,
+          { width: 495 }
+        )
+      })
     }
     doc.moveDown(0.75)
   })
@@ -150,7 +208,7 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
     const overdue = a.dueDate && !['complete', 'closed'].includes(a.status) && new Date(a.dueDate) < today
     doc.fontSize(11).fillColor(overdue ? DESTRUCTIVE : INK).text(`${overdue ? '[OVERDUE] ' : ''}${a.title}`)
     doc.fontSize(9).fillColor(MUTED).text(
-      `Owner: ${a.ownerName || '—'}    Due: ${a.dueDate || '—'}    Status: ${a.status.replace('_', ' ')}`
+      `Owner: ${a.ownerName || 'â'}    Due: ${a.dueDate || 'â'}    Status: ${a.status.replace('_', ' ')}`
     )
     if (a.description) doc.fontSize(9).fillColor(INK).text(a.description, { width: 495 })
     doc.moveDown(0.6)
@@ -164,7 +222,7 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
   consultations.forEach((c) => {
     if (doc.y > 720) doc.addPage()
     doc.fontSize(11).fillColor(INK).text(`${c.date}, ${c.method || 'Consultation'}`)
-    doc.fontSize(9).fillColor(MUTED).text(`Attendees: ${c.attendees || '—'}`)
+    doc.fontSize(9).fillColor(MUTED).text(`Attendees: ${c.attendees || 'â'}`)
     if (c.summary) doc.fontSize(9).fillColor(INK).text(c.summary, { width: 495 })
     doc.moveDown(0.6)
   })
