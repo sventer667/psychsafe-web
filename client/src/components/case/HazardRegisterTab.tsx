@@ -1,10 +1,24 @@
 import { useState } from 'react'
-import { Plus, ChevronDown, ChevronUp, ClipboardList } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp, ClipboardList, X } from 'lucide-react'
 import { Card, Badge } from '../ui/Card'
 import { Button } from '../ui/Button'
-import { Label, Select } from '../ui/Input'
-import type { ActionItem, ActionStatus, Hazard, HazardLibraryEntry } from '../../lib/types'
+import { Label, Select, Textarea } from '../ui/Input'
+import type { ActionItem, ActionStatus, ControlEffectiveness, Hazard, HazardLibraryEntry } from '../../lib/types'
 import { ApiError } from '../../lib/api'
+
+const EFFECTIVENESS_LABEL: Record<ControlEffectiveness, string> = {
+  not_evaluated: 'Not yet evaluated',
+  not_effective: 'Not effective',
+  partially_effective: 'Partially effective',
+  effective: 'Effective',
+}
+
+const EFFECTIVENESS_TONE: Record<ControlEffectiveness, 'default' | 'accent' | 'destructive' | 'success' | 'alert'> = {
+  not_evaluated: 'default',
+  not_effective: 'destructive',
+  partially_effective: 'alert',
+  effective: 'success',
+}
 
 const ACTION_STATUS_LABEL: Record<ActionStatus, string> = {
   pending: 'Pending',
@@ -62,6 +76,9 @@ export function HazardRegisterTab({
   onAdd,
   onAddAction,
   onSetResidual,
+  onUpdateBasis,
+  onAddExistingControl,
+  onDeleteExistingControl,
   highlightCategory = '',
 }: {
   hazards: Hazard[]
@@ -69,9 +86,20 @@ export function HazardRegisterTab({
   actionItems: ActionItem[]
   assessmentState: string
   readOnly: boolean
-  onAdd: (entry: HazardLibraryEntry, likelihood: number, consequence: number) => Promise<void>
+  onAdd: (
+    entry: HazardLibraryEntry,
+    likelihood: number,
+    consequence: number,
+    basis: { evidence: string; exposureDetail: string; affectedWorkers: string }
+  ) => Promise<void>
   onAddAction: (hazard: Hazard, title: string) => Promise<void>
   onSetResidual: (hazard: Hazard, residualLikelihood: number, residualConsequence: number) => Promise<void>
+  onUpdateBasis: (
+    hazard: Hazard,
+    basis: { evidence: string; exposureDetail: string; affectedWorkers: string }
+  ) => Promise<void>
+  onAddExistingControl: (hazard: Hazard, description: string, effectiveness: string) => Promise<void>
+  onDeleteExistingControl: (hazard: Hazard, controlId: number) => Promise<void>
   highlightCategory?: string
 }) {
   const [showLibrary, setShowLibrary] = useState(!!highlightCategory)
@@ -79,20 +107,37 @@ export function HazardRegisterTab({
   const [pickerId, setPickerId] = useState<number | null>(null)
   const [likelihood, setLikelihood] = useState(3)
   const [consequence, setConsequence] = useState(3)
+  const [evidence, setEvidence] = useState('')
+  const [exposureDetail, setExposureDetail] = useState('')
+  const [affectedWorkers, setAffectedWorkers] = useState('')
   const [busy, setBusy] = useState(false)
   const [addingAction, setAddingAction] = useState<string | null>(null)
   const [residualLikelihood, setResidualLikelihood] = useState(3)
   const [residualConsequence, setResidualConsequence] = useState(3)
   const [savingResidual, setSavingResidual] = useState(false)
   const [residualError, setResidualError] = useState('')
+  const [basisEvidence, setBasisEvidence] = useState('')
+  const [basisExposure, setBasisExposure] = useState('')
+  const [basisAffected, setBasisAffected] = useState('')
+  const [savingBasis, setSavingBasis] = useState(false)
+  const [basisSaved, setBasisSaved] = useState(false)
+  const [newControlDesc, setNewControlDesc] = useState('')
+  const [newControlEffectiveness, setNewControlEffectiveness] = useState<string>('not_evaluated')
+  const [savingControl, setSavingControl] = useState(false)
 
   function toggleExpanded(h: Hazard) {
     const expanding = expandedHazard !== h.id
     setExpandedHazard(expanding ? h.id : null)
     setResidualError('')
+    setBasisSaved(false)
     if (expanding) {
       setResidualLikelihood(h.residualLikelihood ?? h.likelihood)
       setResidualConsequence(h.residualConsequence ?? h.consequence)
+      setBasisEvidence(h.evidence || '')
+      setBasisExposure(h.exposureDetail || '')
+      setBasisAffected(h.affectedWorkers || '')
+      setNewControlDesc('')
+      setNewControlEffectiveness('not_evaluated')
     }
   }
 
@@ -108,6 +153,29 @@ export function HazardRegisterTab({
     }
   }
 
+  async function saveBasis(h: Hazard) {
+    setSavingBasis(true)
+    setBasisSaved(false)
+    try {
+      await onUpdateBasis(h, { evidence: basisEvidence, exposureDetail: basisExposure, affectedWorkers: basisAffected })
+      setBasisSaved(true)
+    } finally {
+      setSavingBasis(false)
+    }
+  }
+
+  async function confirmAddControl(h: Hazard) {
+    if (!newControlDesc.trim()) return
+    setSavingControl(true)
+    try {
+      await onAddExistingControl(h, newControlDesc.trim(), newControlEffectiveness)
+      setNewControlDesc('')
+      setNewControlEffectiveness('not_evaluated')
+    } finally {
+      setSavingControl(false)
+    }
+  }
+
   const addedLibraryIds = new Set(hazards.map((h) => h.hazardLibraryId).filter(Boolean))
   const byCategory = library.reduce<Record<string, HazardLibraryEntry[]>>((acc, e) => {
     ;(acc[e.category] ??= []).push(e)
@@ -117,10 +185,13 @@ export function HazardRegisterTab({
   async function confirmAdd(entry: HazardLibraryEntry) {
     setBusy(true)
     try {
-      await onAdd(entry, likelihood, consequence)
+      await onAdd(entry, likelihood, consequence, { evidence, exposureDetail, affectedWorkers })
       setPickerId(null)
       setLikelihood(3)
       setConsequence(3)
+      setEvidence('')
+      setExposureDetail('')
+      setAffectedWorkers('')
     } finally {
       setBusy(false)
     }
@@ -131,7 +202,7 @@ export function HazardRegisterTab({
     try {
       // Recommended-control text is often a full sentence with an "Eliminate: ..."
       // style prefix, so trim it to a sensible action-item title.
-      const title = controlText.length > 90 ? controlText.slice(0, 87) + '…' : controlText
+      const title = controlText.length > 90 ? controlText.slice(0, 87) + 'â¦' : controlText
       await onAddAction(hazard, title)
     } finally {
       setAddingAction(null)
@@ -223,6 +294,43 @@ export function HazardRegisterTab({
                                 </p>
                               </div>
                             </div>
+                            <div className="space-y-2 border-t border-border pt-3">
+                              <p className="text-xs text-muted">
+                                Optional, but this is what turns a rating into something you can defend to a
+                                regulator or the board: what told you this is a risk here, how workers actually
+                                encounter it, and who.
+                              </p>
+                              <div>
+                                <Label htmlFor={`ev-${entry.id}`}>Evidence (what told you this is a risk here?)</Label>
+                                <Textarea
+                                  id={`ev-${entry.id}`}
+                                  rows={2}
+                                  value={evidence}
+                                  onChange={(e) => setEvidence(e.target.value)}
+                                  placeholder="e.g. Staff survey results, exit interview themes, WHS incident reports, consultation feedback"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`ex-${entry.id}`}>Exposure (how and when are workers exposed?)</Label>
+                                <Textarea
+                                  id={`ex-${entry.id}`}
+                                  rows={2}
+                                  value={exposureDetail}
+                                  onChange={(e) => setExposureDetail(e.target.value)}
+                                  placeholder="e.g. Daily during peak shift, ongoing for the duration of a project, one-off during restructure"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`aw-${entry.id}`}>Affected workers (who, and how many?)</Label>
+                                <Textarea
+                                  id={`aw-${entry.id}`}
+                                  rows={2}
+                                  value={affectedWorkers}
+                                  onChange={(e) => setAffectedWorkers(e.target.value)}
+                                  placeholder="e.g. All 12 warehouse pickers on night shift, or the finance team of 4"
+                                />
+                              </div>
+                            </div>
                             <div className="flex items-center justify-between pt-1">
                               <div className="flex items-center gap-2 text-sm text-muted">
                                 Estimated risk:
@@ -231,7 +339,7 @@ export function HazardRegisterTab({
                                 </Badge>
                               </div>
                               <Button onClick={() => confirmAdd(entry)} disabled={busy}>
-                                {busy ? 'Adding…' : 'Confirm'}
+                                {busy ? 'Addingâ¦' : 'Confirm'}
                               </Button>
                             </div>
                           </div>
@@ -284,6 +392,104 @@ export function HazardRegisterTab({
 
               {expanded && (
                 <div className="mt-4 space-y-4 border-t border-border pt-4">
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+                      Assessment basis
+                    </div>
+                    {readOnly ? (
+                      <div className="space-y-2 text-sm">
+                        <div><span className="text-muted">Evidence:</span> <span className="text-ink">{h.evidence || 'Not recorded'}</span></div>
+                        <div><span className="text-muted">Exposure:</span> <span className="text-ink">{h.exposureDetail || 'Not recorded'}</span></div>
+                        <div><span className="text-muted">Affected workers:</span> <span className="text-ink">{h.affectedWorkers || 'Not recorded'}</span></div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 rounded-xl border border-border p-3">
+                        <div>
+                          <Label htmlFor={`bev-${h.id}`}>Evidence (what told you this is a risk here?)</Label>
+                          <Textarea id={`bev-${h.id}`} rows={2} value={basisEvidence} onChange={(e) => setBasisEvidence(e.target.value)} />
+                        </div>
+                        <div>
+                          <Label htmlFor={`bex-${h.id}`}>Exposure (how and when are workers exposed?)</Label>
+                          <Textarea id={`bex-${h.id}`} rows={2} value={basisExposure} onChange={(e) => setBasisExposure(e.target.value)} />
+                        </div>
+                        <div>
+                          <Label htmlFor={`baw-${h.id}`}>Affected workers (who, and how many?)</Label>
+                          <Textarea id={`baw-${h.id}`} rows={2} value={basisAffected} onChange={(e) => setBasisAffected(e.target.value)} />
+                        </div>
+                        <div className="flex items-center justify-end gap-2 pt-1">
+                          {basisSaved && !savingBasis && <span className="text-xs text-success">Saved</span>}
+                          <Button variant="secondary" onClick={() => saveBasis(h)} disabled={savingBasis}>
+                            {savingBasis ? 'Savingâ¦' : 'Save assessment basis'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+                      Existing controls (already in place, before this assessment)
+                    </div>
+                    {h.existingControls.length > 0 ? (
+                      <div className="mb-3 space-y-1.5">
+                        {h.existingControls.map((c) => (
+                          <div key={c.id} className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm">
+                            <span className="text-ink">{c.description}</span>
+                            <div className="flex shrink-0 items-center gap-2">
+                              <Badge tone={EFFECTIVENESS_TONE[c.effectiveness]}>{EFFECTIVENESS_LABEL[c.effectiveness]}</Badge>
+                              {!readOnly && (
+                                <button
+                                  onClick={() => onDeleteExistingControl(h, c.id)}
+                                  className="text-muted hover:text-destructive"
+                                  aria-label="Remove existing control"
+                                >
+                                  <X size={14} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mb-3 text-sm text-muted">
+                        Nothing logged yet. Recording what's already in place, and how well it's actually working,
+                        shows a reviewer this rating accounts for existing controls rather than treating the hazard
+                        as if nothing has been done.
+                      </p>
+                    )}
+                    {!readOnly && (
+                      <div className="space-y-2 rounded-xl border border-border p-3">
+                        <div>
+                          <Label htmlFor={`nc-${h.id}`}>Add an existing control</Label>
+                          <Textarea
+                            id={`nc-${h.id}`}
+                            rows={2}
+                            value={newControlDesc}
+                            onChange={(e) => setNewControlDesc(e.target.value)}
+                            placeholder="e.g. Fortnightly 1:1 check-ins between team leads and direct reports"
+                          />
+                        </div>
+                        <div className="flex items-end justify-between gap-3">
+                          <div className="flex-1">
+                            <Label htmlFor={`nce-${h.id}`}>How effective is it?</Label>
+                            <Select
+                              id={`nce-${h.id}`}
+                              value={newControlEffectiveness}
+                              onChange={(e) => setNewControlEffectiveness(e.target.value)}
+                            >
+                              {(Object.keys(EFFECTIVENESS_LABEL) as ControlEffectiveness[]).map((v) => (
+                                <option key={v} value={v}>{EFFECTIVENESS_LABEL[v]}</option>
+                              ))}
+                            </Select>
+                          </div>
+                          <Button onClick={() => confirmAddControl(h)} disabled={savingControl || !newControlDesc.trim()}>
+                            {savingControl ? 'Addingâ¦' : 'Add control'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   {libEntry && (
                     <div>
                       <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
@@ -291,7 +497,7 @@ export function HazardRegisterTab({
                       </div>
                       <ol className="list-decimal space-y-2 pl-5 text-sm text-ink">
                         {libEntry.controls.map((c, i) => {
-                          const alreadyLinked = existingActionTitles.has(c) || existingActionTitles.has(c.slice(0, 87) + '…')
+                          const alreadyLinked = existingActionTitles.has(c) || existingActionTitles.has(c.slice(0, 87) + 'â¦')
                           return (
                             <li key={i} className="flex items-start justify-between gap-3">
                               <span>{c}</span>
@@ -304,7 +510,7 @@ export function HazardRegisterTab({
                                     disabled={addingAction === c}
                                     className="shrink-0 whitespace-nowrap text-xs font-medium text-accent hover:underline disabled:opacity-50"
                                   >
-                                    {addingAction === c ? 'Adding…' : '+ Add to action plan'}
+                                    {addingAction === c ? 'Addingâ¦' : '+ Add to action plan'}
                                   </button>
                                 ))}
                             </li>
@@ -398,7 +604,7 @@ export function HazardRegisterTab({
                                   </Badge>
                                 </div>
                                 <Button onClick={() => confirmResidual(h)} disabled={savingResidual}>
-                                  {savingResidual ? 'Saving…' : 'Save residual rating'}
+                                  {savingResidual ? 'Savingâ¦' : 'Save residual rating'}
                                 </Button>
                               </div>
                               {residualError && <p className="text-sm text-destructive">{residualError}</p>}
