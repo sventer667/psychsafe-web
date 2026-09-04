@@ -144,9 +144,12 @@ casesRouter.patch('/:id', (req: AuthedRequest, res) => {
   if (!c) return res.status(404).json({ error: 'Assessment not found' })
   if (c.status === 'closed') return res.status(400).json({ error: 'This assessment is sealed and cannot be edited' })
 
-  const { state } = req.body as Record<string, any>
+  const { state, scope } = req.body as Record<string, any>
   if (state !== undefined) {
     db.prepare('UPDATE cases SET state = ? WHERE id = ?').run(state, req.params.id)
+  }
+  if (scope !== undefined) {
+    db.prepare('UPDATE cases SET scope = ? WHERE id = ?').run(scope, req.params.id)
   }
   res.json(db.prepare('SELECT * FROM cases WHERE id = ?').get(req.params.id))
 })
