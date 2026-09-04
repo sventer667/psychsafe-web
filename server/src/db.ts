@@ -83,11 +83,16 @@ CREATE TABLE IF NOT EXISTS hazard_library (
 -- an org with sites in more than one state can run one assessment per site
 -- and get the right legislation citations for each, instead of being limited
 -- to a single org-wide state.
+-- scope records the work area, roles, or group of workers this assessment
+-- covers (e.g. "All warehouse pickers, night shift, Dandenong DC"), free text
+-- since organisations describe their own structure very differently. Blank
+-- by default since there's no sensible value to infer, unlike state.
 CREATE TABLE IF NOT EXISTS cases (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   orgId INTEGER NOT NULL REFERENCES organizations(id),
   name TEXT NOT NULL,
   state TEXT DEFAULT '',
+  scope TEXT DEFAULT '',
   status TEXT NOT NULL DEFAULT 'open',
   createdAt TEXT NOT NULL DEFAULT (datetime('now')),
   closedAt TEXT,
@@ -104,6 +109,13 @@ CREATE TABLE IF NOT EXISTS cases (
 -- the hazard was first logged. Left NULL until someone re-rates it, so the
 -- dashboard gauges can honestly fall back to the inherent score rather than
 -- assume an unproven risk reduction.
+--
+-- evidence/exposureDetail/affectedWorkers document the reasoning behind a
+-- rating rather than just the number: what told you this hazard is present
+-- (a survey, incident reports, consultation feedback), how and when workers
+-- are actually exposed to it, and who or how many of them. All optional free
+-- text, since the point is to capture whatever reasoning the assessor
+-- actually has rather than force a rigid structure.
 CREATE TABLE IF NOT EXISTS hazards (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   caseId INTEGER NOT NULL REFERENCES cases(id),
@@ -111,6 +123,9 @@ CREATE TABLE IF NOT EXISTS hazards (
   title TEXT NOT NULL,
   category TEXT NOT NULL,
   description TEXT DEFAULT '',
+  evidence TEXT DEFAULT '',
+  exposureDetail TEXT DEFAULT '',
+  affectedWorkers TEXT DEFAULT '',
   likelihood INTEGER NOT NULL,
   consequence INTEGER NOT NULL,
   riskRating INTEGER NOT NULL,
@@ -119,6 +134,19 @@ CREATE TABLE IF NOT EXISTS hazards (
   residualRiskRating INTEGER,
   residualRatedAt TEXT,
   status TEXT NOT NULL DEFAULT 'open',
+  createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Controls already in place for a hazard *before* any new action item, each
+-- with an assessor's rating of how well it's actually working. Kept distinct
+-- from action_items, which track new controls being implemented going
+-- forward, so a sealed assessment shows both what was already there and what
+-- changed as a result of the assessment.
+CREATE TABLE IF NOT EXISTS existing_controls (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  hazardId INTEGER NOT NULL REFERENCES hazards(id),
+  description TEXT NOT NULL,
+  effectiveness TEXT NOT NULL DEFAULT 'not_evaluated',
   createdAt TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -265,6 +293,44 @@ for (const stmt of [
     // database this migration already ran against.
   }
 }
+
+// Defensive migration: a database created before the assessment scope field
+// existed has a `cases` table without this column.
+try {
+  db.exec("ALTER TABLE cases ADD COLUMN scope TEXT DEFAULT ''")
+} catch {
+  // Column already exists, either a fresh DB (created with it above) or a
+  // database this migration already ran against.
+}
+
+// Defensive migration: a database created before evidence/exposure/affected
+// worker fields existed has a `hazards` table without these columns.
+for (const stmt of [
+  "ALTER TABLE hazards ADD COLUMN evidence TEXT DEFAULT ''",
+  "ALTER TABLE hazards ADD COLUMN exposureDetail TEXT DEFAULT ''",
+  "ALTER TABLE hazards ADD COLUMN affectedWorkers TEXT DEFAULT ''",
+]) {
+  try {
+    db.exec(stmt)
+  } catch {
+    // Column already exists, either a fresh DB (created with it above) or a
+    // database this migration already ran against.
+  }
+}
+
+// Defensive migration: a database created before the existing-controls log
+// existed doesn't have this table (CREATE TABLE IF NOT EXISTS above only
+// takes effect for genuinely new databases created after this point, but is
+// harmless to repeat here since it's idempotent).
+db.exec(`
+  CREATE TABLE IF NOT EXISTS existing_controls (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    hazardId INTEGER NOT NULL REFERENCES hazards(id),
+    description TEXT NOT NULL,
+    effectiveness TEXT NOT NULL DEFAULT 'not_evaluated',
+    createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`)
 
 if (isNew) {
   console.log(`Created new SQLite database at ${DB_PATH}`)
