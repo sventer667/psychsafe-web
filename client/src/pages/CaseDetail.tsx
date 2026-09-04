@@ -38,6 +38,9 @@ export function CaseDetail() {
   const [downloading, setDownloading] = useState(false)
   const [savingState, setSavingState] = useState(false)
   const [stateSaved, setStateSaved] = useState(false)
+  const [scopeDraft, setScopeDraft] = useState('')
+  const [savingScope, setSavingScope] = useState(false)
+  const [scopeSaved, setScopeSaved] = useState(false)
   const [showReopenForm, setShowReopenForm] = useState(false)
   const [reopenReason, setReopenReason] = useState('')
   const [reopenError, setReopenError] = useState('')
@@ -53,6 +56,7 @@ export function CaseDetail() {
       api<Consultation[]>(`/consultations?caseId=${id}`),
     ])
     setCaseFile(c)
+    setScopeDraft(c.scope || '')
     setHazards(h)
     setLibrary(lib)
     setActionItems(actions)
@@ -64,7 +68,12 @@ export function CaseDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  async function addHazardFromLibrary(entry: HazardLibraryEntry, likelihood: number, consequence: number) {
+  async function addHazardFromLibrary(
+    entry: HazardLibraryEntry,
+    likelihood: number,
+    consequence: number,
+    basis: { evidence: string; exposureDetail: string; affectedWorkers: string }
+  ) {
     if (!id) return
     await api('/hazards', {
       method: 'POST',
@@ -76,6 +85,7 @@ export function CaseDetail() {
         description: entry.description,
         likelihood,
         consequence,
+        ...basis,
       },
     })
     await load()
@@ -86,6 +96,24 @@ export function CaseDetail() {
       method: 'PATCH',
       body: { residualLikelihood, residualConsequence },
     })
+    await load()
+  }
+
+  async function updateHazardBasis(
+    hazard: Hazard,
+    basis: { evidence: string; exposureDetail: string; affectedWorkers: string }
+  ) {
+    await api(`/hazards/${hazard.id}`, { method: 'PATCH', body: basis })
+    await load()
+  }
+
+  async function addExistingControl(hazard: Hazard, description: string, effectiveness: string) {
+    await api(`/hazards/${hazard.id}/controls`, { method: 'POST', body: { description, effectiveness } })
+    await load()
+  }
+
+  async function deleteExistingControl(hazard: Hazard, controlId: number) {
+    await api(`/hazards/${hazard.id}/controls/${controlId}`, { method: 'DELETE' })
     await load()
   }
 
@@ -128,6 +156,19 @@ export function CaseDetail() {
       setStateSaved(true)
     } finally {
       setSavingState(false)
+    }
+  }
+
+  async function saveCaseScope() {
+    if (!id) return
+    setSavingScope(true)
+    setScopeSaved(false)
+    try {
+      const c = await api<Case>(`/cases/${id}`, { method: 'PATCH', body: { scope: scopeDraft } })
+      setCaseFile(c)
+      setScopeSaved(true)
+    } finally {
+      setSavingScope(false)
     }
   }
 
@@ -184,14 +225,14 @@ export function CaseDetail() {
     }
   }
 
-  if (!caseFile) return <p className="text-sm text-muted">Loading assessment…</p>
+  if (!caseFile) return <p className="text-sm text-muted">Loading assessmentâ¦</p>
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
           <button onClick={() => navigate('/cases')} className="text-sm text-muted hover:text-ink">
-            ← Assessments
+            â Assessments
           </button>
           <h1 className="font-serif text-2xl text-ink">{caseFile.name}</h1>
         </div>
@@ -226,6 +267,9 @@ export function CaseDetail() {
             onAdd={addHazardFromLibrary}
             onAddAction={addActionFromHazard}
             onSetResidual={setResidualRating}
+            onUpdateBasis={updateHazardBasis}
+            onAddExistingControl={addExistingControl}
+            onDeleteExistingControl={deleteExistingControl}
             highlightCategory={highlightCategory}
           />
           <NextStepButton onClick={() => setTab('Action Plan')} label="Action Plan" />
@@ -267,7 +311,7 @@ export function CaseDetail() {
               </p>
             )}
             <Button onClick={downloadReport} disabled={downloading}>
-              <Download size={16} /> {downloading ? 'Generating…' : 'Download PDF report'}
+              <Download size={16} /> {downloading ? 'Generatingâ¦' : 'Download PDF report'}
             </Button>
           </Card>
           <NextStepButton onClick={() => setTab('Details')} label="Details, to close & seal" />
@@ -300,7 +344,7 @@ export function CaseDetail() {
                 disabled={caseFile.status === 'closed' || savingState}
                 onChange={(e) => updateCaseState(e.target.value)}
               >
-                <option value="">Select state…</option>
+                <option value="">Select stateâ¦</option>
                 {STATES.map((s) => (
                   <option key={s} value={s}>{s}</option>
                 ))}
@@ -310,8 +354,27 @@ export function CaseDetail() {
                 organisation has sites in more than one state, set each assessment to the state that site is in
                 (your organisation's own default state is set on the Billing page).
               </p>
-              {savingState && <p className="mt-1 text-xs text-muted">Saving…</p>}
+              {savingState && <p className="mt-1 text-xs text-muted">Savingâ¦</p>}
               {stateSaved && !savingState && <p className="mt-1 text-xs text-success">Saved</p>}
+            </div>
+            <div className="mt-4 max-w-md">
+              <Label htmlFor="caseScope">Scope: work area, roles, or group being assessed</Label>
+              <Textarea
+                id="caseScope"
+                rows={2}
+                value={scopeDraft}
+                disabled={caseFile.status === 'closed'}
+                onChange={(e) => setScopeDraft(e.target.value)}
+                onBlur={() => { if (scopeDraft !== (caseFile.scope || '')) saveCaseScope() }}
+                placeholder="e.g. All warehouse pickers, night shift, Dandenong distribution centre"
+              />
+              <p className="mt-1 text-xs text-muted">
+                Describes who and what this assessment actually covers, shown on the PDF report so a reader knows
+                the boundaries of what was and wasn't assessed. Leave it broader (e.g. "All staff, head office") if
+                the assessment is organisation-wide.
+              </p>
+              {savingScope && <p className="mt-1 text-xs text-muted">Savingâ¦</p>}
+              {scopeSaved && !savingScope && <p className="mt-1 text-xs text-success">Saved</p>}
             </div>
           </Card>
 
@@ -341,7 +404,7 @@ export function CaseDetail() {
                 </p>
               )}
               <Button onClick={closeCase} disabled={busy}>
-                {busy ? 'Sealing…' : 'Close and seal assessment'}
+                {busy ? 'Sealingâ¦' : 'Close and seal assessment'}
               </Button>
               {closeError && <p className="mt-2 text-sm text-destructive">{closeError}</p>}
             </Card>
@@ -383,7 +446,7 @@ export function CaseDetail() {
                       Cancel
                     </Button>
                     <Button onClick={reopenCase} disabled={busy || !reopenReason.trim()}>
-                      {busy ? 'Reopening…' : 'Confirm reopen'}
+                      {busy ? 'Reopeningâ¦' : 'Confirm reopen'}
                     </Button>
                   </div>
                 </div>
