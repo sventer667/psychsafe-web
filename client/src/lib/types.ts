@@ -68,6 +68,7 @@ export interface Case {
   orgId: number
   name: string
   state: string
+  scope: string
   status: 'open' | 'closed'
   createdAt: string
   closedAt: string | null
@@ -88,6 +89,16 @@ export interface HazardLibraryEntry {
   legislation: Record<string, string>
 }
 
+export type ControlEffectiveness = 'not_evaluated' | 'not_effective' | 'partially_effective' | 'effective'
+
+export interface ExistingControl {
+  id: number
+  hazardId: number
+  description: string
+  effectiveness: ControlEffectiveness
+  createdAt: string
+}
+
 export interface Hazard {
   id: number
   caseId: number
@@ -95,6 +106,9 @@ export interface Hazard {
   title: string
   category: string
   description: string
+  evidence: string
+  exposureDetail: string
+  affectedWorkers: string
   likelihood: number
   consequence: number
   riskRating: number
@@ -104,6 +118,7 @@ export interface Hazard {
   residualRatedAt: string | null
   status: 'open' | 'controlled' | 'closed'
   createdAt: string
+  existingControls: ExistingControl[]
 }
 
 export type ActionStatus = 'pending' | 'in_progress' | 'verification_pending' | 'complete' | 'closed'
