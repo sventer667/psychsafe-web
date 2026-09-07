@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { FileLock2, AlertTriangle, Plus } from 'lucide-react'
+import { FileLock2, AlertTriangle, Plus, CalendarClock } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { Card, Badge } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { HeatMap } from '../components/HeatMap'
 import { RiskGauges } from '../components/RiskGauges'
 import { api } from '../lib/api'
+import { reviewStatus } from '../lib/reassessment'
 import type { Case, ActionItem, Heatmap, RiskGauges as RiskGaugesData } from '../lib/types'
 
 export function Dashboard() {
@@ -40,6 +41,7 @@ export function Dashboard() {
   const openCases = cases.filter((c) => c.status === 'open').length
   const overdue = actionItems.filter((a) => a.isOverdue).length
   const openActions = actionItems.filter((a) => a.status !== 'complete' && a.status !== 'closed').length
+  const { status: reviewDueStatus, dueDate: reviewDueDate } = reviewStatus(cases, org)
 
   return (
     <div>
@@ -57,6 +59,36 @@ export function Dashboard() {
             </div>
             <Button variant="secondary" onClick={() => navigate('/billing')}>
               Set it now
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {(reviewDueStatus === 'overdue' || reviewDueStatus === 'due_soon') && reviewDueDate && (
+        <Card
+          className={`mb-6 ${
+            reviewDueStatus === 'overdue' ? 'border-destructive/40 bg-destructive/5' : 'border-alert/40 bg-alert/5'
+          }`}
+        >
+          <div className="flex items-start gap-3">
+            <CalendarClock
+              size={18}
+              className={`mt-0.5 shrink-0 ${reviewDueStatus === 'overdue' ? 'text-destructive' : 'text-alert'}`}
+            />
+            <div className="flex-1">
+              <div className="text-sm font-medium text-ink">
+                {reviewDueStatus === 'overdue' ? 'Reassessment overdue' : 'Reassessment due soon'}
+              </div>
+              <p className="mt-1 text-sm text-muted">
+                {reviewDueStatus === 'overdue'
+                  ? `Based on your ${org?.reviewFrequencyMonths}-month reassessment cadence, a new assessment was due on ${reviewDueDate.toLocaleDateString()}. Psychosocial risk changes over time, an assessment that's gone stale can't be relied on to reflect current conditions.`
+                  : `Based on your ${org?.reviewFrequencyMonths}-month reassessment cadence, a new assessment is due by ${reviewDueDate.toLocaleDateString()}.`}{' '}
+                Change the cadence on the{' '}
+                <Link to="/billing" className="text-accent hover:underline">Billing &amp; Organisation</Link> page.
+              </p>
+            </div>
+            <Button variant="secondary" onClick={() => navigate('/cases')}>
+              Start new assessment
             </Button>
           </div>
         </Card>
