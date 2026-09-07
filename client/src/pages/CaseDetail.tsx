@@ -7,7 +7,7 @@ import { Card, Badge } from '../components/ui/Card'
 import { Label, Select, Textarea } from '../components/ui/Input'
 import { api, API_BASE, getToken, ApiError } from '../lib/api'
 import { hasPreviewAccess, PREVIEW_SECRET } from '../lib/previewAccess'
-import type { Case, Hazard, HazardLibraryEntry, ActionItem, Consultation, ActionStatus } from '../lib/types'
+import type { Case, Hazard, HazardHistoryEntry, HazardLibraryEntry, ActionItem, Consultation, ActionStatus } from '../lib/types'
 import { HazardRegisterTab } from '../components/case/HazardRegisterTab'
 import { ActionPlanTab } from '../components/case/ActionPlanTab'
 import { ConsultationsTab } from '../components/case/ConsultationsTab'
@@ -34,6 +34,7 @@ export function CaseDetail() {
   const [library, setLibrary] = useState<HazardLibraryEntry[]>([])
   const [actionItems, setActionItems] = useState<ActionItem[]>([])
   const [consultations, setConsultations] = useState<Consultation[]>([])
+  const [hazardHistory, setHazardHistory] = useState<HazardHistoryEntry[]>([])
   const [busy, setBusy] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [savingState, setSavingState] = useState(false)
@@ -48,12 +49,13 @@ export function CaseDetail() {
 
   async function load() {
     if (!id) return
-    const [c, h, lib, actions, cons] = await Promise.all([
+    const [c, h, lib, actions, cons, history] = await Promise.all([
       api<Case>(`/cases/${id}`),
       api<Hazard[]>(`/hazards?caseId=${id}`),
       api<HazardLibraryEntry[]>('/hazard-library'),
       api<ActionItem[]>(`/action-items?caseId=${id}`),
       api<Consultation[]>(`/consultations?caseId=${id}`),
+      api<HazardHistoryEntry[]>(`/hazards/history?caseId=${id}`),
     ])
     setCaseFile(c)
     setScopeDraft(c.scope || '')
@@ -61,6 +63,7 @@ export function CaseDetail() {
     setLibrary(lib)
     setActionItems(actions)
     setConsultations(cons)
+    setHazardHistory(history)
   }
 
   useEffect(() => {
@@ -225,14 +228,14 @@ export function CaseDetail() {
     }
   }
 
-  if (!caseFile) return <p className="text-sm text-muted">Loading assessmentâ¦</p>
+  if (!caseFile) return <p className="text-sm text-muted">Loading assessment…</p>
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
           <button onClick={() => navigate('/cases')} className="text-sm text-muted hover:text-ink">
-            â Assessments
+            ← Assessments
           </button>
           <h1 className="font-serif text-2xl text-ink">{caseFile.name}</h1>
         </div>
@@ -264,6 +267,7 @@ export function CaseDetail() {
             actionItems={actionItems}
             assessmentState={caseFile.state || ''}
             readOnly={caseFile.status === 'closed'}
+            hazardHistory={hazardHistory}
             onAdd={addHazardFromLibrary}
             onAddAction={addActionFromHazard}
             onSetResidual={setResidualRating}
@@ -311,7 +315,7 @@ export function CaseDetail() {
               </p>
             )}
             <Button onClick={downloadReport} disabled={downloading}>
-              <Download size={16} /> {downloading ? 'Generatingâ¦' : 'Download PDF report'}
+              <Download size={16} /> {downloading ? 'Generating…' : 'Download PDF report'}
             </Button>
           </Card>
           <NextStepButton onClick={() => setTab('Details')} label="Details, to close & seal" />
@@ -344,7 +348,7 @@ export function CaseDetail() {
                 disabled={caseFile.status === 'closed' || savingState}
                 onChange={(e) => updateCaseState(e.target.value)}
               >
-                <option value="">Select stateâ¦</option>
+                <option value="">Select state…</option>
                 {STATES.map((s) => (
                   <option key={s} value={s}>{s}</option>
                 ))}
@@ -354,7 +358,7 @@ export function CaseDetail() {
                 organisation has sites in more than one state, set each assessment to the state that site is in
                 (your organisation's own default state is set on the Billing page).
               </p>
-              {savingState && <p className="mt-1 text-xs text-muted">Savingâ¦</p>}
+              {savingState && <p className="mt-1 text-xs text-muted">Saving…</p>}
               {stateSaved && !savingState && <p className="mt-1 text-xs text-success">Saved</p>}
             </div>
             <div className="mt-4 max-w-md">
@@ -373,7 +377,7 @@ export function CaseDetail() {
                 the boundaries of what was and wasn't assessed. Leave it broader (e.g. "All staff, head office") if
                 the assessment is organisation-wide.
               </p>
-              {savingScope && <p className="mt-1 text-xs text-muted">Savingâ¦</p>}
+              {savingScope && <p className="mt-1 text-xs text-muted">Saving…</p>}
               {scopeSaved && !savingScope && <p className="mt-1 text-xs text-success">Saved</p>}
             </div>
           </Card>
@@ -404,7 +408,7 @@ export function CaseDetail() {
                 </p>
               )}
               <Button onClick={closeCase} disabled={busy}>
-                {busy ? 'Sealingâ¦' : 'Close and seal assessment'}
+                {busy ? 'Sealing…' : 'Close and seal assessment'}
               </Button>
               {closeError && <p className="mt-2 text-sm text-destructive">{closeError}</p>}
             </Card>
@@ -446,7 +450,7 @@ export function CaseDetail() {
                       Cancel
                     </Button>
                     <Button onClick={reopenCase} disabled={busy || !reopenReason.trim()}>
-                      {busy ? 'Reopeningâ¦' : 'Confirm reopen'}
+                      {busy ? 'Reopening…' : 'Confirm reopen'}
                     </Button>
                   </div>
                 </div>
