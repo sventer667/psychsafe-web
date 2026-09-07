@@ -3,7 +3,7 @@ import { Plus, ChevronDown, ChevronUp, ClipboardList, X } from 'lucide-react'
 import { Card, Badge } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { Label, Select, Textarea } from '../ui/Input'
-import type { ActionItem, ActionStatus, ControlEffectiveness, Hazard, HazardLibraryEntry } from '../../lib/types'
+import type { ActionItem, ActionStatus, ControlEffectiveness, Hazard, HazardHistoryEntry, HazardLibraryEntry } from '../../lib/types'
 import { ApiError } from '../../lib/api'
 
 const EFFECTIVENESS_LABEL: Record<ControlEffectiveness, string> = {
@@ -73,6 +73,7 @@ export function HazardRegisterTab({
   actionItems,
   assessmentState,
   readOnly,
+  hazardHistory = [],
   onAdd,
   onAddAction,
   onSetResidual,
@@ -86,6 +87,7 @@ export function HazardRegisterTab({
   actionItems: ActionItem[]
   assessmentState: string
   readOnly: boolean
+  hazardHistory?: HazardHistoryEntry[]
   onAdd: (
     entry: HazardLibraryEntry,
     likelihood: number,
@@ -177,6 +179,7 @@ export function HazardRegisterTab({
   }
 
   const addedLibraryIds = new Set(hazards.map((h) => h.hazardLibraryId).filter(Boolean))
+  const historyByLibraryId = new Map(hazardHistory.map((h) => [h.hazardLibraryId, h]))
   const byCategory = library.reduce<Record<string, HazardLibraryEntry[]>>((acc, e) => {
     ;(acc[e.category] ??= []).push(e)
     return acc
@@ -202,7 +205,7 @@ export function HazardRegisterTab({
     try {
       // Recommended-control text is often a full sentence with an "Eliminate: ..."
       // style prefix, so trim it to a sensible action-item title.
-      const title = controlText.length > 90 ? controlText.slice(0, 87) + 'â¦' : controlText
+      const title = controlText.length > 90 ? controlText.slice(0, 87) + '…' : controlText
       await onAddAction(hazard, title)
     } finally {
       setAddingAction(null)
@@ -258,6 +261,18 @@ export function HazardRegisterTab({
                         </div>
                         {pickerId === entry.id && (
                           <div className="mt-3 space-y-3 border-t border-border pt-3">
+                            {historyByLibraryId.has(entry.id) && (
+                              <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs text-muted">
+                                <span>
+                                  Last rated{' '}
+                                  <Badge tone={ratingTone(historyByLibraryId.get(entry.id)!.riskRating)}>
+                                    {ratingLabel(historyByLibraryId.get(entry.id)!.riskRating)} ({historyByLibraryId.get(entry.id)!.riskRating})
+                                  </Badge>{' '}
+                                  on {new Date(historyByLibraryId.get(entry.id)!.ratedAt).toLocaleDateString()} in "
+                                  {historyByLibraryId.get(entry.id)!.caseName}".
+                                </span>
+                              </div>
+                            )}
                             <p className="text-xs text-muted">
                               Rate this hazard as it stands today, with whatever controls are already in place. No prior
                               risk-assessment experience needed, just pick the description that fits best.
@@ -339,7 +354,7 @@ export function HazardRegisterTab({
                                 </Badge>
                               </div>
                               <Button onClick={() => confirmAdd(entry)} disabled={busy}>
-                                {busy ? 'Addingâ¦' : 'Confirm'}
+                                {busy ? 'Adding…' : 'Confirm'}
                               </Button>
                             </div>
                           </div>
@@ -419,7 +434,7 @@ export function HazardRegisterTab({
                         <div className="flex items-center justify-end gap-2 pt-1">
                           {basisSaved && !savingBasis && <span className="text-xs text-success">Saved</span>}
                           <Button variant="secondary" onClick={() => saveBasis(h)} disabled={savingBasis}>
-                            {savingBasis ? 'Savingâ¦' : 'Save assessment basis'}
+                            {savingBasis ? 'Saving…' : 'Save assessment basis'}
                           </Button>
                         </div>
                       </div>
@@ -483,7 +498,7 @@ export function HazardRegisterTab({
                             </Select>
                           </div>
                           <Button onClick={() => confirmAddControl(h)} disabled={savingControl || !newControlDesc.trim()}>
-                            {savingControl ? 'Addingâ¦' : 'Add control'}
+                            {savingControl ? 'Adding…' : 'Add control'}
                           </Button>
                         </div>
                       </div>
@@ -497,7 +512,7 @@ export function HazardRegisterTab({
                       </div>
                       <ol className="list-decimal space-y-2 pl-5 text-sm text-ink">
                         {libEntry.controls.map((c, i) => {
-                          const alreadyLinked = existingActionTitles.has(c) || existingActionTitles.has(c.slice(0, 87) + 'â¦')
+                          const alreadyLinked = existingActionTitles.has(c) || existingActionTitles.has(c.slice(0, 87) + '…')
                           return (
                             <li key={i} className="flex items-start justify-between gap-3">
                               <span>{c}</span>
@@ -510,7 +525,7 @@ export function HazardRegisterTab({
                                     disabled={addingAction === c}
                                     className="shrink-0 whitespace-nowrap text-xs font-medium text-accent hover:underline disabled:opacity-50"
                                   >
-                                    {addingAction === c ? 'Addingâ¦' : '+ Add to action plan'}
+                                    {addingAction === c ? 'Adding…' : '+ Add to action plan'}
                                   </button>
                                 ))}
                             </li>
@@ -604,7 +619,7 @@ export function HazardRegisterTab({
                                   </Badge>
                                 </div>
                                 <Button onClick={() => confirmResidual(h)} disabled={savingResidual}>
-                                  {savingResidual ? 'Savingâ¦' : 'Save residual rating'}
+                                  {savingResidual ? 'Saving…' : 'Save residual rating'}
                                 </Button>
                               </div>
                               {residualError && <p className="text-sm text-destructive">{residualError}</p>}
