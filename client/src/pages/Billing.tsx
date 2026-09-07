@@ -53,12 +53,20 @@ const INDUSTRIES = [
 
 const STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT']
 
+const REVIEW_FREQUENCIES = [
+  { value: 3, label: 'Every 3 months' },
+  { value: 6, label: 'Every 6 months' },
+  { value: 12, label: 'Every 12 months' },
+  { value: 24, label: 'Every 24 months' },
+]
+
 export function Billing() {
   const { org, refresh } = useAuth()
   const [busy, setBusy] = useState(false)
   const [industry, setIndustry] = useState('')
   const [state, setState] = useState('')
   const [businessUnit, setBusinessUnit] = useState('')
+  const [reviewFrequencyMonths, setReviewFrequencyMonths] = useState(12)
   const [savingOrg, setSavingOrg] = useState(false)
   const [savedOrg, setSavedOrg] = useState(false)
   const [consultantName, setConsultantName] = useState('')
@@ -72,6 +80,7 @@ export function Billing() {
     setIndustry(org?.industry || '')
     setState(org?.state || '')
     setBusinessUnit(org?.businessUnit || '')
+    setReviewFrequencyMonths(org?.reviewFrequencyMonths || 12)
     setConsultantName(org?.consultantName || '')
     setConsultantCredential(org?.consultantCredential || '')
   }, [org])
@@ -81,7 +90,7 @@ export function Billing() {
     setSavingOrg(true)
     setSavedOrg(false)
     try {
-      await api('/auth/org', { method: 'PATCH', body: { industry, state, businessUnit } })
+      await api('/auth/org', { method: 'PATCH', body: { industry, state, businessUnit, reviewFrequencyMonths } })
       await refresh()
       setSavedOrg(true)
     } finally {
@@ -208,6 +217,22 @@ export function Billing() {
               value={businessUnit}
               onChange={(e) => setBusinessUnit(e.target.value)}
             />
+          </div>
+          <div>
+            <Label htmlFor="reviewFrequency">Reassessment cadence</Label>
+            <Select
+              id="reviewFrequency"
+              value={reviewFrequencyMonths}
+              onChange={(e) => setReviewFrequencyMonths(Number(e.target.value))}
+            >
+              {REVIEW_FREQUENCIES.map((f) => (
+                <option key={f.value} value={f.value}>{f.label}</option>
+              ))}
+            </Select>
+            <p className="mt-1 text-xs text-muted">
+              How often you plan to re-run a psychosocial risk assessment. Drives the reassessment reminder on your
+              dashboard, counted from when your most recent assessment was opened.
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <Button type="submit" disabled={savingOrg}>
