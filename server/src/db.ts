@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS organizations (
   stripeSubscriptionId TEXT,
   consultantName TEXT DEFAULT '',
   consultantCredential TEXT DEFAULT '',
+  reviewFrequencyMonths INTEGER NOT NULL DEFAULT 12,
   createdAt TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -338,6 +339,17 @@ if (isNew) {
 } else {
   const row = db.prepare('SELECT COUNT(*) as n FROM hazard_library').get() as { n: number }
   if (row.n === 0) seedHazardLibrary(db)
+}
+
+// Defensive migration: a database created before the reassessment-cadence
+// feature existed has an `organizations` table without this column. The
+// DEFAULT 12 on the ALTER itself backfills existing rows to a 12-month
+// cadence, so no separate UPDATE statement is needed here.
+try {
+  db.exec('ALTER TABLE organizations ADD COLUMN reviewFrequencyMonths INTEGER NOT NULL DEFAULT 12')
+} catch {
+  // Column already exists, either a fresh DB (created with it above) or a
+  // database this migration already ran against.
 }
 
 // Backfill: hazard_library rows seeded before the hierarchy-of-controls text
