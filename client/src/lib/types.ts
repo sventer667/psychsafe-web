@@ -21,6 +21,7 @@ export interface Organization {
   stripeCustomerId: string | null
   consultantName: string
   consultantCredential: string
+  reviewFrequencyMonths: number
 }
 
 export interface TeamMember {
@@ -166,4 +167,15 @@ export interface RiskGauges {
   residualScore: number
   inherentPct: number
   residualPct: number
+}
+
+// Most recent prior rating of a hazard from an earlier assessment cycle for
+// this org, keyed by hazardLibraryId. Used to show "last rated X" context
+// when re-adding a hazard from the library rather than starting blank.
+export interface HazardHistoryEntry {
+  hazardLibraryId: number
+  riskRating: number
+  residualRiskRating: number | null
+  ratedAt: string
+  caseName: string
 }
