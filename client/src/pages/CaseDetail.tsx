@@ -7,7 +7,7 @@ import { Card, Badge } from '../components/ui/Card'
 import { Label, Select, Textarea } from '../components/ui/Input'
 import { api, API_BASE, getToken, ApiError } from '../lib/api'
 import { hasPreviewAccess, PREVIEW_SECRET } from '../lib/previewAccess'
-import type { Case, Hazard, HazardHistoryEntry, HazardLibraryEntry, ActionItem, Consultation, ActionStatus } from '../lib/types'
+import type { Case, Hazard, HazardHistoryEntry, HazardLibraryEntry, ActionItem, Consultation, ActionStatus, TeamData, TeamMember } from '../lib/types'
 import { HazardRegisterTab } from '../components/case/HazardRegisterTab'
 import { ActionPlanTab } from '../components/case/ActionPlanTab'
 import { ConsultationsTab } from '../components/case/ConsultationsTab'
@@ -35,6 +35,7 @@ export function CaseDetail() {
   const [actionItems, setActionItems] = useState<ActionItem[]>([])
   const [consultations, setConsultations] = useState<Consultation[]>([])
   const [hazardHistory, setHazardHistory] = useState<HazardHistoryEntry[]>([])
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [busy, setBusy] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [savingState, setSavingState] = useState(false)
@@ -49,13 +50,14 @@ export function CaseDetail() {
 
   async function load() {
     if (!id) return
-    const [c, h, lib, actions, cons, history] = await Promise.all([
+    const [c, h, lib, actions, cons, history, team] = await Promise.all([
       api<Case>(`/cases/${id}`),
       api<Hazard[]>(`/hazards?caseId=${id}`),
       api<HazardLibraryEntry[]>('/hazard-library'),
       api<ActionItem[]>(`/action-items?caseId=${id}`),
       api<Consultation[]>(`/consultations?caseId=${id}`),
       api<HazardHistoryEntry[]>(`/hazards/history?caseId=${id}`),
+      api<TeamData>('/team'),
     ])
     setCaseFile(c)
     setScopeDraft(c.scope || '')
@@ -64,6 +66,7 @@ export function CaseDetail() {
     setActionItems(actions)
     setConsultations(cons)
     setHazardHistory(history)
+    setTeamMembers(team.users)
   }
 
   useEffect(() => {
@@ -120,11 +123,11 @@ export function CaseDetail() {
     await load()
   }
 
-  async function addActionItem(input: { title: string; description: string; ownerName: string; dueDate: string; hazardId: number | '' }) {
+  async function addActionItem(input: { title: string; description: string; ownerId: number | ''; dueDate: string; hazardId: number | '' }) {
     if (!id) return
     await api('/action-items', {
       method: 'POST',
-      body: { caseId: Number(id), ...input, hazardId: input.hazardId || undefined },
+      body: { caseId: Number(id), ...input, ownerId: input.ownerId || undefined, hazardId: input.hazardId || undefined },
     })
     await load()
   }
@@ -133,13 +136,18 @@ export function CaseDetail() {
     if (!id) return
     await api('/action-items', {
       method: 'POST',
-      body: { caseId: Number(id), title, description: '', ownerName: '', dueDate: '', hazardId: hazard.id },
+      body: { caseId: Number(id), title, description: '', dueDate: '', hazardId: hazard.id },
     })
     await load()
   }
 
   async function updateActionStatus(actionId: number, status: ActionStatus) {
     await api(`/action-items/${actionId}`, { method: 'PATCH', body: { status } })
+    await load()
+  }
+
+  async function updateActionOwner(actionId: number, ownerId: number | '') {
+    await api(`/action-items/${actionId}`, { method: 'PATCH', body: { ownerId: ownerId || null } })
     await load()
   }
 
@@ -285,9 +293,11 @@ export function CaseDetail() {
           <ActionPlanTab
             actionItems={actionItems}
             hazards={hazards}
+            teamMembers={teamMembers}
             readOnly={caseFile.status === 'closed'}
             onAdd={addActionItem}
             onStatusChange={updateActionStatus}
+            onOwnerChange={updateActionOwner}
           />
           <NextStepButton onClick={() => setTab('Consultations')} label="Consultations" />
         </div>
