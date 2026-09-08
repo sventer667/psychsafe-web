@@ -100,6 +100,29 @@ export interface ExistingControl {
   createdAt: string
 }
 
+// The four kinds of source material an assessor can cite as the specific
+// evidence backing a hazard's rating. 'other' covers anything that doesn't
+// fit the three named WHS-standard sources (a consultation note, a media
+// report, an auditor's finding, etc).
+export type EvidenceType = 'incident_report' | 'exit_interview' | 'survey_result' | 'other'
+
+// A single structured, citable piece of evidence for a hazard: a title, an
+// optional date the source material relates to, an optional link to where
+// the real document actually lives (the app doesn't store files itself), and
+// a short note on what it shows. Distinct from Hazard.evidence, which stays
+// a single free-text summary/basis statement; this is the itemized log
+// behind it.
+export interface HazardEvidence {
+  id: number
+  hazardId: number
+  type: EvidenceType
+  title: string
+  sourceDate: string | null
+  link: string
+  description: string
+  createdAt: string
+}
+
 export interface Hazard {
   id: number
   caseId: number
@@ -120,6 +143,7 @@ export interface Hazard {
   status: 'open' | 'controlled' | 'closed'
   createdAt: string
   existingControls: ExistingControl[]
+  evidenceItems: HazardEvidence[]
 }
 
 export type ActionStatus = 'pending' | 'in_progress' | 'verification_pending' | 'complete' | 'closed'
