@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS hazard_library (
 
 -- A Case is one psychosocial risk assessment engagement for the organization.
 -- An organization can have multiple cases over time (e.g. annual reassessments,
--- or separate assessments per business unit/site). Each case carries its own
+-- or separate cases per business unit/site). Each case carries its own
 -- state/territory (defaulted from the org's at creation, editable after), so
 -- an org with sites in more than one state can run one assessment per site
 -- and get the right legislation citations for each, instead of being limited
@@ -116,7 +116,9 @@ CREATE TABLE IF NOT EXISTS cases (
 -- (a survey, incident reports, consultation feedback), how and when workers
 -- are actually exposed to it, and who or how many of them. All optional free
 -- text, since the point is to capture whatever reasoning the assessor
--- actually has rather than force a rigid structure.
+-- actually has rather than force a rigid structure. The hazard_evidence table
+-- below supplements this with itemized, typed, linkable records for anyone
+-- who wants to cite specific sources rather than a single summary paragraph.
 CREATE TABLE IF NOT EXISTS hazards (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   caseId INTEGER NOT NULL REFERENCES cases(id),
@@ -151,11 +153,26 @@ CREATE TABLE IF NOT EXISTS existing_controls (
   createdAt TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- ownerId links an action to a real user account on the org, so "who is
--- accountable for this" is an enforceable fact rather than free text anyone
--- could type. ownerName is kept only as a legacy display fallback for rows
--- created before this column existed; new rows are always assigned via
--- ownerId and have their display name resolved by joining to users.
+-- Itemized, typed evidence backing a hazard's rating: an incident report, an
+-- exit interview theme, a survey result, or something else, each recorded
+-- with a title, an optional date the source material relates to, an optional
+-- link to where the actual document lives (the app doesn't store files
+-- itself), and a short note on what it shows. This is deliberately separate
+-- from the single free-text `evidence` field on hazards above: that field
+-- stays a short summary/basis statement, while this table lets an assessor
+-- cite as many specific sources as they actually have, each traceable back
+-- to where it came from, which is what actually holds up under review.
+CREATE TABLE IF NOT EXISTS hazard_evidence (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  hazardId INTEGER NOT NULL REFERENCES hazards(id),
+  type TEXT NOT NULL DEFAULT 'other',
+  title TEXT NOT NULL,
+  sourceDate TEXT,
+  link TEXT DEFAULT '',
+  description TEXT DEFAULT '',
+  createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS action_items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   caseId INTEGER NOT NULL REFERENCES cases(id),
@@ -163,7 +180,6 @@ CREATE TABLE IF NOT EXISTS action_items (
   title TEXT NOT NULL,
   description TEXT DEFAULT '',
   ownerName TEXT DEFAULT '',
-  ownerId INTEGER REFERENCES users(id),
   dueDate TEXT,
   status TEXT NOT NULL DEFAULT 'pending',
   createdAt TEXT NOT NULL DEFAULT (datetime('now')),
@@ -339,6 +355,21 @@ db.exec(`
   )
 `)
 
+// Defensive migration: a database created before the structured hazard
+// evidence log existed doesn't have this table.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS hazard_evidence (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    hazardId INTEGER NOT NULL REFERENCES hazards(id),
+    type TEXT NOT NULL DEFAULT 'other',
+    title TEXT NOT NULL,
+    sourceDate TEXT,
+    link TEXT DEFAULT '',
+    description TEXT DEFAULT '',
+    createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`)
+
 if (isNew) {
   console.log(`Created new SQLite database at ${DB_PATH}`)
   seedHazardLibrary(db)
@@ -369,17 +400,4 @@ try {
   for (const [name, controls] of Object.entries(HAZARD_CONTROLS)) {
     updateControls.run(JSON.stringify(controls), name)
   }
-}
-
-// Defensive migration: a database created before action items had a linked
-// owner has an `action_items` table without this column. ownerId is how
-// accountability is actually enforced (assigned to a real user account,
-// pickable only from the org's own team), rather than the legacy free-text
-// ownerName column, which is kept around only so pre-migration action items
-// still show whoever was typed in at the time.
-try {
-  db.exec('ALTER TABLE action_items ADD COLUMN ownerId INTEGER REFERENCES users(id)')
-} catch {
-  // Column already exists, either a fresh DB (created with it above) or a
-  // database this migration already ran against.
 }
