@@ -1,9 +1,17 @@
 import { useState } from 'react'
-import { Plus, ChevronDown, ChevronUp, ClipboardList, X } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp, ClipboardList, X, Link as LinkIcon } from 'lucide-react'
 import { Card, Badge } from '../ui/Card'
 import { Button } from '../ui/Button'
-import { Label, Select, Textarea } from '../ui/Input'
-import type { ActionItem, ActionStatus, ControlEffectiveness, Hazard, HazardHistoryEntry, HazardLibraryEntry } from '../../lib/types'
+import { Input, Label, Select, Textarea } from '../ui/Input'
+import type {
+  ActionItem,
+  ActionStatus,
+  ControlEffectiveness,
+  EvidenceType,
+  Hazard,
+  HazardHistoryEntry,
+  HazardLibraryEntry,
+} from '../../lib/types'
 import { ApiError } from '../../lib/api'
 
 const EFFECTIVENESS_LABEL: Record<ControlEffectiveness, string> = {
@@ -34,6 +42,23 @@ const ACTION_STATUS_TONE: Record<ActionStatus, 'default' | 'accent' | 'destructi
   verification_pending: 'alert',
   complete: 'success',
   closed: 'default',
+}
+
+// The structured evidence types an assessor can cite as a specific source
+// behind a hazard's rating, distinct from the free-text "Assessment basis"
+// summary above it.
+const EVIDENCE_TYPE_LABEL: Record<EvidenceType, string> = {
+  incident_report: 'Incident report',
+  exit_interview: 'Exit interview theme',
+  survey_result: 'Survey result',
+  other: 'Other',
+}
+
+const EVIDENCE_TYPE_TONE: Record<EvidenceType, 'default' | 'accent' | 'destructive' | 'success' | 'alert'> = {
+  incident_report: 'destructive',
+  exit_interview: 'alert',
+  survey_result: 'accent',
+  other: 'default',
 }
 
 function ratingTone(rating: number) {
@@ -80,6 +105,8 @@ export function HazardRegisterTab({
   onUpdateBasis,
   onAddExistingControl,
   onDeleteExistingControl,
+  onAddEvidence,
+  onDeleteEvidence,
   highlightCategory = '',
 }: {
   hazards: Hazard[]
@@ -102,6 +129,11 @@ export function HazardRegisterTab({
   ) => Promise<void>
   onAddExistingControl: (hazard: Hazard, description: string, effectiveness: string) => Promise<void>
   onDeleteExistingControl: (hazard: Hazard, controlId: number) => Promise<void>
+  onAddEvidence: (
+    hazard: Hazard,
+    input: { type: string; title: string; sourceDate: string; link: string; description: string }
+  ) => Promise<void>
+  onDeleteEvidence: (hazard: Hazard, evidenceId: number) => Promise<void>
   highlightCategory?: string
 }) {
   const [showLibrary, setShowLibrary] = useState(!!highlightCategory)
@@ -126,6 +158,12 @@ export function HazardRegisterTab({
   const [newControlDesc, setNewControlDesc] = useState('')
   const [newControlEffectiveness, setNewControlEffectiveness] = useState<string>('not_evaluated')
   const [savingControl, setSavingControl] = useState(false)
+  const [newEvidenceType, setNewEvidenceType] = useState<EvidenceType>('incident_report')
+  const [newEvidenceTitle, setNewEvidenceTitle] = useState('')
+  const [newEvidenceDate, setNewEvidenceDate] = useState('')
+  const [newEvidenceLink, setNewEvidenceLink] = useState('')
+  const [newEvidenceDescription, setNewEvidenceDescription] = useState('')
+  const [savingEvidence, setSavingEvidence] = useState(false)
 
   function toggleExpanded(h: Hazard) {
     const expanding = expandedHazard !== h.id
@@ -140,6 +178,11 @@ export function HazardRegisterTab({
       setBasisAffected(h.affectedWorkers || '')
       setNewControlDesc('')
       setNewControlEffectiveness('not_evaluated')
+      setNewEvidenceType('incident_report')
+      setNewEvidenceTitle('')
+      setNewEvidenceDate('')
+      setNewEvidenceLink('')
+      setNewEvidenceDescription('')
     }
   }
 
@@ -175,6 +218,27 @@ export function HazardRegisterTab({
       setNewControlEffectiveness('not_evaluated')
     } finally {
       setSavingControl(false)
+    }
+  }
+
+  async function confirmAddEvidence(h: Hazard) {
+    if (!newEvidenceTitle.trim()) return
+    setSavingEvidence(true)
+    try {
+      await onAddEvidence(h, {
+        type: newEvidenceType,
+        title: newEvidenceTitle.trim(),
+        sourceDate: newEvidenceDate,
+        link: newEvidenceLink.trim(),
+        description: newEvidenceDescription.trim(),
+      })
+      setNewEvidenceType('incident_report')
+      setNewEvidenceTitle('')
+      setNewEvidenceDate('')
+      setNewEvidenceLink('')
+      setNewEvidenceDescription('')
+    } finally {
+      setSavingEvidence(false)
     }
   }
 
@@ -313,7 +377,8 @@ export function HazardRegisterTab({
                               <p className="text-xs text-muted">
                                 Optional, but this is what turns a rating into something you can defend to a
                                 regulator or the board: what told you this is a risk here, how workers actually
-                                encounter it, and who.
+                                encounter it, and who. Once the hazard is added, you can attach specific incident
+                                reports, exit interview themes, or survey results below as itemized evidence.
                               </p>
                               <div>
                                 <Label htmlFor={`ev-${entry.id}`}>Evidence (what told you this is a risk here?)</Label>
@@ -435,6 +500,115 @@ export function HazardRegisterTab({
                           {basisSaved && !savingBasis && <span className="text-xs text-success">Saved</span>}
                           <Button variant="secondary" onClick={() => saveBasis(h)} disabled={savingBasis}>
                             {savingBasis ? 'Saving…' : 'Save assessment basis'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+                      Evidence log (incident reports, exit interview themes, survey results)
+                    </div>
+                    {h.evidenceItems.length > 0 ? (
+                      <div className="mb-3 space-y-1.5">
+                        {h.evidenceItems.map((ev) => (
+                          <div key={ev.id} className="flex items-start justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm">
+                            <div className="min-w-0">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Badge tone={EVIDENCE_TYPE_TONE[ev.type]}>{EVIDENCE_TYPE_LABEL[ev.type]}</Badge>
+                                <span className="font-medium text-ink">{ev.title}</span>
+                                {ev.sourceDate && (
+                                  <span className="text-xs text-muted">{new Date(ev.sourceDate).toLocaleDateString()}</span>
+                                )}
+                              </div>
+                              {ev.description && <p className="mt-1 text-sm text-muted">{ev.description}</p>}
+                              {ev.link && (
+                                <a
+                                  href={ev.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-1 flex items-center gap-1 text-xs text-accent hover:underline"
+                                >
+                                  <LinkIcon size={12} /> View source
+                                </a>
+                              )}
+                            </div>
+                            {!readOnly && (
+                              <button
+                                onClick={() => onDeleteEvidence(h, ev.id)}
+                                className="shrink-0 text-muted hover:text-destructive"
+                                aria-label="Remove evidence item"
+                              >
+                                <X size={14} />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mb-3 text-sm text-muted">
+                        Nothing logged yet. Citing specific incident reports, exit interview themes, or survey
+                        results here, each traceable back to where it came from, is what turns the evidence summary
+                        above into something a reviewer can actually check.
+                      </p>
+                    )}
+                    {!readOnly && (
+                      <div className="space-y-2 rounded-xl border border-border p-3">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <div>
+                            <Label htmlFor={`net-${h.id}`}>Type</Label>
+                            <Select
+                              id={`net-${h.id}`}
+                              value={newEvidenceType}
+                              onChange={(e) => setNewEvidenceType(e.target.value as EvidenceType)}
+                            >
+                              {(Object.keys(EVIDENCE_TYPE_LABEL) as EvidenceType[]).map((v) => (
+                                <option key={v} value={v}>{EVIDENCE_TYPE_LABEL[v]}</option>
+                              ))}
+                            </Select>
+                          </div>
+                          <div>
+                            <Label htmlFor={`ned-${h.id}`}>Date (optional)</Label>
+                            <Input
+                              id={`ned-${h.id}`}
+                              type="date"
+                              value={newEvidenceDate}
+                              onChange={(e) => setNewEvidenceDate(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor={`nti-${h.id}`}>Title *</Label>
+                          <Input
+                            id={`nti-${h.id}`}
+                            value={newEvidenceTitle}
+                            onChange={(e) => setNewEvidenceTitle(e.target.value)}
+                            placeholder="e.g. Incident #4521, Q3 2025 engagement survey, June exit interviews"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`nli-${h.id}`}>Link (optional)</Label>
+                          <Input
+                            id={`nli-${h.id}`}
+                            type="url"
+                            value={newEvidenceLink}
+                            onChange={(e) => setNewEvidenceLink(e.target.value)}
+                            placeholder="Link to where the actual document lives, e.g. your HR system or SharePoint"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`ndesc-${h.id}`}>What does it show? (optional)</Label>
+                          <Textarea
+                            id={`ndesc-${h.id}`}
+                            rows={2}
+                            value={newEvidenceDescription}
+                            onChange={(e) => setNewEvidenceDescription(e.target.value)}
+                          />
+                        </div>
+                        <div className="flex justify-end pt-1">
+                          <Button onClick={() => confirmAddEvidence(h)} disabled={savingEvidence || !newEvidenceTitle.trim()}>
+                            {savingEvidence ? 'Adding…' : 'Add evidence'}
                           </Button>
                         </div>
                       </div>
