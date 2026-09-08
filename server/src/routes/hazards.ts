@@ -32,6 +32,26 @@ function existingControlsByHazard(hazardIds: number[]): Map<number, any[]> {
   return byHazard
 }
 
+// Structured evidence items (incident reports, exit interview themes, survey
+// results, or other sources) backing a hazard's rating, fetched in the same
+// batched way as existing controls above.
+function evidenceByHazard(hazardIds: number[]): Map<number, any[]> {
+  const byHazard = new Map<number, any[]>()
+  if (hazardIds.length === 0) return byHazard
+  const placeholders = hazardIds.map(() => '?').join(',')
+  const rows = db
+    .prepare(
+      `SELECT * FROM hazard_evidence WHERE hazardId IN (${placeholders}) ORDER BY COALESCE(sourceDate, createdAt) ASC`
+    )
+    .all(...hazardIds) as { hazardId: number }[]
+  for (const row of rows) {
+    const list = byHazard.get(row.hazardId) ?? []
+    list.push(row)
+    byHazard.set(row.hazardId, list)
+  }
+  return byHazard
+}
+
 hazardsRouter.get('/', (req: AuthedRequest, res) => {
   const caseId = Number(req.query.caseId)
   if (!caseId || !ownsCase(req.auth!.orgId, caseId)) {
@@ -41,7 +61,14 @@ hazardsRouter.get('/', (req: AuthedRequest, res) => {
     id: number
   }[]
   const controlsByHazard = existingControlsByHazard(rows.map((r) => r.id))
-  res.json(rows.map((r) => ({ ...r, existingControls: controlsByHazard.get(r.id) ?? [] })))
+  const evidenceByHazardMap = evidenceByHazard(rows.map((r) => r.id))
+  res.json(
+    rows.map((r) => ({
+      ...r,
+      existingControls: controlsByHazard.get(r.id) ?? [],
+      evidenceItems: evidenceByHazardMap.get(r.id) ?? [],
+    }))
+  )
 })
 
 // Most recent rating per hazardLibraryId across this org's *other* assessments
@@ -115,7 +142,7 @@ hazardsRouter.post('/', (req: AuthedRequest, res) => {
     )
 
   const created = db.prepare('SELECT * FROM hazards WHERE id = ?').get(result.lastInsertRowid)
-  res.json({ ...(created as object), existingControls: [] })
+  res.json({ ...(created as object), existingControls: [], evidenceItems: [] })
 })
 
 hazardsRouter.patch('/:id', (req: AuthedRequest, res) => {
@@ -192,5 +219,46 @@ hazardsRouter.delete('/:id/controls/:controlId', (req: AuthedRequest, res) => {
   }
   if (isCaseClosed(hazard.caseId)) return res.status(400).json(SEALED_ERROR)
   db.prepare('DELETE FROM existing_controls WHERE id = ? AND hazardId = ?').run(req.params.controlId, req.params.id)
+  res.json({ ok: true })
+})
+
+const EVIDENCE_TYPES = ['incident_report', 'exit_interview', 'survey_result', 'other']
+
+// Structured evidence backing a hazard's rating: an incident report, an exit
+// interview theme, a survey result, or something else. The app doesn't store
+// files itself (no durable disk in the current deploy), so a source is
+// referenced by an optional link to wherever the real document lives rather
+// than uploaded, alongside a title, an optional date, and a short note.
+hazardsRouter.post('/:id/evidence', (req: AuthedRequest, res) => {
+  const hazard = db.prepare('SELECT * FROM hazards WHERE id = ?').get(req.params.id) as { caseId: number } | undefined
+  if (!hazard || !ownsCase(req.auth!.orgId, hazard.caseId)) {
+    return res.status(404).json({ error: 'Hazard not found' })
+  }
+  if (isCaseClosed(hazard.caseId)) return res.status(400).json(SEALED_ERROR)
+  const { type, title, sourceDate, link, description } = req.body as Record<string, any>
+  if (!title || !String(title).trim()) return res.status(400).json({ error: 'A title is required' })
+  const evidenceType = EVIDENCE_TYPES.includes(type) ? type : 'other'
+  const result = db
+    .prepare(
+      'INSERT INTO hazard_evidence (hazardId, type, title, sourceDate, link, description) VALUES (?, ?, ?, ?, ?, ?)'
+    )
+    .run(
+      req.params.id,
+      evidenceType,
+      String(title).trim(),
+      sourceDate || null,
+      (link || '').trim(),
+      (description || '').trim()
+    )
+  res.json(db.prepare('SELECT * FROM hazard_evidence WHERE id = ?').get(result.lastInsertRowid))
+})
+
+hazardsRouter.delete('/:id/evidence/:evidenceId', (req: AuthedRequest, res) => {
+  const hazard = db.prepare('SELECT * FROM hazards WHERE id = ?').get(req.params.id) as { caseId: number } | undefined
+  if (!hazard || !ownsCase(req.auth!.orgId, hazard.caseId)) {
+    return res.status(404).json({ error: 'Hazard not found' })
+  }
+  if (isCaseClosed(hazard.caseId)) return res.status(400).json(SEALED_ERROR)
+  db.prepare('DELETE FROM hazard_evidence WHERE id = ? AND hazardId = ?').run(req.params.evidenceId, req.params.id)
   res.json({ ok: true })
 })
