@@ -130,7 +130,9 @@ export interface ActionItem {
   hazardId: number | null
   title: string
   description: string
+  ownerId: number | null
   ownerName: string
+  ownerEmail: string | null
   dueDate: string | null
   status: ActionStatus
   createdAt: string
