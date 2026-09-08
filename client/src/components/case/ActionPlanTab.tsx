@@ -3,7 +3,7 @@ import { Plus, AlertTriangle } from 'lucide-react'
 import { Card, Badge } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { Input, Label, Select, Textarea } from '../ui/Input'
-import type { ActionItem, ActionStatus, Hazard } from '../../lib/types'
+import type { ActionItem, ActionStatus, Hazard, TeamMember } from '../../lib/types'
 
 const STATUSES: ActionStatus[] = ['pending', 'in_progress', 'verification_pending', 'complete', 'closed']
 
@@ -26,20 +26,24 @@ const STATUS_TONE: Record<ActionStatus, 'default' | 'accent' | 'destructive' | '
 export function ActionPlanTab({
   actionItems,
   hazards,
+  teamMembers,
   readOnly,
   onAdd,
   onStatusChange,
+  onOwnerChange,
 }: {
   actionItems: ActionItem[]
   hazards: Hazard[]
+  teamMembers: TeamMember[]
   readOnly: boolean
-  onAdd: (input: { title: string; description: string; ownerName: string; dueDate: string; hazardId: number | '' }) => Promise<void>
+  onAdd: (input: { title: string; description: string; ownerId: number | ''; dueDate: string; hazardId: number | '' }) => Promise<void>
   onStatusChange: (actionId: number, status: ActionStatus) => Promise<void>
+  onOwnerChange: (actionId: number, ownerId: number | '') => Promise<void>
 }) {
   const [showForm, setShowForm] = useState(false)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [ownerName, setOwnerName] = useState('')
+  const [ownerId, setOwnerId] = useState<number | ''>('')
   const [dueDate, setDueDate] = useState('')
   const [hazardId, setHazardId] = useState<number | ''>('')
   const [busy, setBusy] = useState(false)
@@ -55,11 +59,11 @@ export function ActionPlanTab({
     e.preventDefault()
     setBusy(true)
     try {
-      await onAdd({ title, description, ownerName, dueDate, hazardId })
+      await onAdd({ title, description, ownerId, dueDate, hazardId })
       setShowForm(false)
       setTitle('')
       setDescription('')
-      setOwnerName('')
+      setOwnerId('')
       setDueDate('')
       setHazardId('')
     } finally {
@@ -94,7 +98,20 @@ export function ActionPlanTab({
             </div>
             <div>
               <Label htmlFor="actOwner">Owner</Label>
-              <Input id="actOwner" value={ownerName} onChange={(e) => setOwnerName(e.target.value)} />
+              <Select
+                id="actOwner"
+                value={ownerId}
+                onChange={(e) => setOwnerId(e.target.value ? Number(e.target.value) : '')}
+              >
+                <option value="">Unassigned</option>
+                {teamMembers.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </Select>
+              <p className="mt-1 text-xs text-muted">
+                Assigned to a real member of your team, not a free-text name, so accountability is actually
+                enforceable. Invite people on the Team page if who you need isn't listed.
+              </p>
             </div>
             <div>
               <Label htmlFor="actDue">Due date</Label>
@@ -142,7 +159,7 @@ export function ActionPlanTab({
                   </div>
                   {item.description && <p className="mt-1 text-sm text-muted">{item.description}</p>}
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
-                    {item.ownerName && <span>Owner: {item.ownerName}</span>}
+                    <span>Owner: {item.ownerName || 'Unassigned'}</span>
                     {item.dueDate && <span>Due: {new Date(item.dueDate).toLocaleDateString()}</span>}
                     {hazard && <span>Hazard: {hazard.title}</span>}
                   </div>
@@ -150,15 +167,27 @@ export function ActionPlanTab({
                 <div className="flex flex-col items-end gap-2">
                   <Badge tone={STATUS_TONE[item.status]}>{STATUS_LABEL[item.status]}</Badge>
                   {!readOnly && (
-                    <Select
-                      className="w-44"
-                      value={item.status}
-                      onChange={(e) => onStatusChange(item.id, e.target.value as ActionStatus)}
-                    >
-                      {STATUSES.map((s) => (
-                        <option key={s} value={s}>{STATUS_LABEL[s]}</option>
-                      ))}
-                    </Select>
+                    <>
+                      <Select
+                        className="w-44"
+                        value={item.ownerId ?? ''}
+                        onChange={(e) => onOwnerChange(item.id, e.target.value ? Number(e.target.value) : '')}
+                      >
+                        <option value="">Unassigned</option>
+                        {teamMembers.map((m) => (
+                          <option key={m.id} value={m.id}>{m.name}</option>
+                        ))}
+                      </Select>
+                      <Select
+                        className="w-44"
+                        value={item.status}
+                        onChange={(e) => onStatusChange(item.id, e.target.value as ActionStatus)}
+                      >
+                        {STATUSES.map((s) => (
+                          <option key={s} value={s}>{STATUS_LABEL[s]}</option>
+                        ))}
+                      </Select>
+                    </>
                   )}
                 </div>
               </div>
