@@ -123,6 +123,19 @@ export function CaseDetail() {
     await load()
   }
 
+  async function addHazardEvidence(
+    hazard: Hazard,
+    input: { type: string; title: string; sourceDate: string; link: string; description: string }
+  ) {
+    await api(`/hazards/${hazard.id}/evidence`, { method: 'POST', body: input })
+    await load()
+  }
+
+  async function deleteHazardEvidence(hazard: Hazard, evidenceId: number) {
+    await api(`/hazards/${hazard.id}/evidence/${evidenceId}`, { method: 'DELETE' })
+    await load()
+  }
+
   async function addActionItem(input: { title: string; description: string; ownerId: number | ''; dueDate: string; hazardId: number | '' }) {
     if (!id) return
     await api('/action-items', {
@@ -282,6 +295,8 @@ export function CaseDetail() {
             onUpdateBasis={updateHazardBasis}
             onAddExistingControl={addExistingControl}
             onDeleteExistingControl={deleteExistingControl}
+            onAddEvidence={addHazardEvidence}
+            onDeleteEvidence={deleteHazardEvidence}
             highlightCategory={highlightCategory}
           />
           <NextStepButton onClick={() => setTab('Action Plan')} label="Action Plan" />
