@@ -151,6 +151,11 @@ CREATE TABLE IF NOT EXISTS existing_controls (
   createdAt TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- ownerId links an action to a real user account on the org, so "who is
+-- accountable for this" is an enforceable fact rather than free text anyone
+-- could type. ownerName is kept only as a legacy display fallback for rows
+-- created before this column existed; new rows are always assigned via
+-- ownerId and have their display name resolved by joining to users.
 CREATE TABLE IF NOT EXISTS action_items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   caseId INTEGER NOT NULL REFERENCES cases(id),
@@ -158,6 +163,7 @@ CREATE TABLE IF NOT EXISTS action_items (
   title TEXT NOT NULL,
   description TEXT DEFAULT '',
   ownerName TEXT DEFAULT '',
+  ownerId INTEGER REFERENCES users(id),
   dueDate TEXT,
   status TEXT NOT NULL DEFAULT 'pending',
   createdAt TEXT NOT NULL DEFAULT (datetime('now')),
@@ -363,4 +369,17 @@ try {
   for (const [name, controls] of Object.entries(HAZARD_CONTROLS)) {
     updateControls.run(JSON.stringify(controls), name)
   }
+}
+
+// Defensive migration: a database created before action items had a linked
+// owner has an `action_items` table without this column. ownerId is how
+// accountability is actually enforced (assigned to a real user account,
+// pickable only from the org's own team), rather than the legacy free-text
+// ownerName column, which is kept around only so pre-migration action items
+// still show whoever was typed in at the time.
+try {
+  db.exec('ALTER TABLE action_items ADD COLUMN ownerId INTEGER REFERENCES users(id)')
+} catch {
+  // Column already exists, either a fresh DB (created with it above) or a
+  // database this migration already ran against.
 }
