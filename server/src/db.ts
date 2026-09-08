@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS existing_controls (
 -- with a title, an optional date the source material relates to, an optional
 -- link to where the actual document lives (the app doesn't store files
 -- itself), and a short note on what it shows. This is deliberately separate
--- from the single free-text `evidence` field on hazards above: that field
+-- from the single free-text 'evidence' field on hazards above: that field
 -- stays a short summary/basis statement, while this table lets an assessor
 -- cite as many specific sources as they actually have, each traceable back
 -- to where it came from, which is what actually holds up under review.
