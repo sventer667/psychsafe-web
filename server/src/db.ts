@@ -180,6 +180,7 @@ CREATE TABLE IF NOT EXISTS action_items (
   title TEXT NOT NULL,
   description TEXT DEFAULT '',
   ownerName TEXT DEFAULT '',
+  ownerId INTEGER REFERENCES users(id),
   dueDate TEXT,
   status TEXT NOT NULL DEFAULT 'pending',
   createdAt TEXT NOT NULL DEFAULT (datetime('now')),
@@ -369,6 +370,17 @@ db.exec(`
     createdAt TEXT NOT NULL DEFAULT (datetime('now'))
   )
 `)
+
+// Defensive migration: a database created before action items could be
+// assigned to a specific team member has an `action_items` table without
+// this column (CREATE TABLE IF NOT EXISTS above is a no-op against an
+// existing table).
+try {
+  db.exec('ALTER TABLE action_items ADD COLUMN ownerId INTEGER REFERENCES users(id)')
+} catch {
+  // Column already exists, either a fresh DB (created with it above) or a
+  // database this migration already ran against.
+}
 
 if (isNew) {
   console.log(`Created new SQLite database at ${DB_PATH}`)
