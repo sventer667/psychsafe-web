@@ -217,6 +217,28 @@ CREATE TABLE IF NOT EXISTS case_seal_events (
   sealTimestampTime TEXT,
   createdAt TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Leads captured by the public, pre-signup "psychosocial risk gap check"
+-- quiz (see routes/gapCheck.ts). Deliberately its own table rather than
+-- reusing organizations/users, since a gap-check respondent hasn't created
+-- an account and may never sign up at all. answers stores the six yes/no
+-- answers as a JSON array so the PDF/email can be regenerated on demand
+-- (GET /api/gap-check/:id/pdf) without asking the visitor to fill the quiz
+-- out twice. tier is computed server-side at submission time and stored
+-- rather than recomputed from answers on every read, so a later change to
+-- the tiering logic doesn't retroactively rewrite what an earlier visitor
+-- was actually told.
+CREATE TABLE IF NOT EXISTS gap_check_leads (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL,
+  firstName TEXT DEFAULT '',
+  state TEXT NOT NULL,
+  industry TEXT NOT NULL,
+  orgSize TEXT NOT NULL,
+  answers TEXT NOT NULL,
+  tier TEXT NOT NULL,
+  createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+);
 `)
 
 // Defensive migration: a database created before the trial-lockout feature
@@ -276,15 +298,15 @@ db.exec(`
 // Backfill: rewrite two hazard_library entries seeded before a copy pass
 // removed em dashes from user-facing text, and the matching legislation
 // citation strings (stored per-row, so every row needs the same replace).
-db.exec(`UPDATE hazard_library SET name = 'Poor supervisor support' WHERE name = 'Poor support — supervisor'`)
-db.exec(`UPDATE hazard_library SET name = 'Poor peer support' WHERE name = 'Poor support — peer'`)
+db.exec(`UPDATE hazard_library SET name = 'Poor supervisor support' WHERE name = 'Poor support â supervisor'`)
+db.exec(`UPDATE hazard_library SET name = 'Poor peer support' WHERE name = 'Poor support â peer'`)
 db.exec(`
   UPDATE hazard_library
   SET legislation = REPLACE(
     REPLACE(legislation,
-      'Managing psychosocial hazards at work — Code of Practice 2021 (NSW)',
+      'Managing psychosocial hazards at work â Code of Practice 2021 (NSW)',
       'Managing psychosocial hazards at work, Code of Practice 2021 (NSW)'),
-    'Managing the risk of psychosocial hazards at work — Code of Practice 2022 (Qld)',
+    'Managing the risk of psychosocial hazards at work â Code of Practice 2022 (Qld)',
     'Managing the risk of psychosocial hazards at work, Code of Practice 2022 (Qld)')
 `)
 
@@ -377,6 +399,31 @@ db.exec(`
 // existing table).
 try {
   db.exec('ALTER TABLE action_items ADD COLUMN ownerId INTEGER REFERENCES users(id)')
+} catch {
+  // Column already exists, either a fresh DB (created with it above) or a
+  // database this migration already ran against.
+}
+
+// Defensive migration: a database created before the public gap-check quiz
+// existed doesn't have this table.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS gap_check_leads (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    firstName TEXT DEFAULT '',
+    state TEXT NOT NULL,
+    industry TEXT NOT NULL,
+    orgSize TEXT NOT NULL,
+    answers TEXT NOT NULL,
+    tier TEXT NOT NULL,
+    createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`)
+
+// Defensive migration: a database created before firstName was added to the
+// gap-check leads table doesn't have this column.
+try {
+  db.exec("ALTER TABLE gap_check_leads ADD COLUMN firstName TEXT DEFAULT ''")
 } catch {
   // Column already exists, either a fresh DB (created with it above) or a
   // database this migration already ran against.
