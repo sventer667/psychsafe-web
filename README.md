@@ -7,7 +7,8 @@ of practice in its own state or territory. Built as two separate projects:
 
 - `client/` — React 18 + TypeScript + Vite + Tailwind v4 + React Router + lucide-react
 - `server/` — Express + TypeScript + SQLite (Node's built-in `node:sqlite`) + JWT auth +
-  `node-forge` (RFC 3161 timestamping) + `pdfkit` (PDF reports) + Stripe
+  `node-forge` (RFC 3161 timestamping) + `pdfkit` (PDF reports) + Stripe + Resend (transactional
+  email)
 
 ## Live app
 
@@ -41,6 +42,10 @@ signs up is the organisation being assessed.
   organisation, plus a nudge to complete the organisation profile if the state/territory is unset.
 - **Billing** — Stripe Checkout + Billing Portal, plus the organisation profile and report
   preparer fields.
+- **Gap check** (`/gap-check`, public, no login) — a free, self-serve lead-gen quiz for visitors
+  who haven't signed up yet. Answers six yes/no questions, gets an instant on-screen tier result,
+  and can email themselves a personalised PDF breakdown with hazards and legislation for their
+  state/industry. Stays reachable even while the rest of the site is behind the coming-soon gate.
 
 ## Running it locally
 
@@ -49,7 +54,7 @@ Requires Node 22+ (uses the built-in `node:sqlite` module — no native build st
 ```bash
 # 1. Backend
 cd server
-cp .env.example .env      # edit JWT_SECRET; add Stripe keys later if you want billing live
+cp .env.example .env      # edit JWT_SECRET; add Stripe/Resend keys later if you want those live
 npm install
 npm run dev                # http://localhost:4000
 
@@ -84,6 +89,26 @@ test the Team page's invite flow) and are independent of the "Subscribe — $X/m
 create a real Stripe Checkout session. There's no upgrade/downgrade-while-subscribed flow yet —
 switching tiers while already paying currently needs the Stripe customer portal or a manual
 subscription update.
+
+## Enabling the gap-check tool's email
+
+`POST /api/gap-check` always works (it stores the lead and returns a tier + a PDF link
+immediately), but the results email won't actually send until Resend is configured — until then
+`server/src/email.ts` logs a warning and no-ops rather than failing the request:
+
+1. Create a Resend account and add `connexusohs.com.au` as a sending domain. Resend gives you
+   SPF, DKIM, and DMARC DNS records to add at your domain registrar — this is a manual step only
+   someone with access to the domain's DNS can do, and can take a few hours to verify.
+2. Once the domain is verified, create an API key in Resend and set `RESEND_API_KEY` in
+   `server/.env` (or the Render dashboard for `connexus-api`).
+3. Set `EMAIL_FROM` to a verified address on that domain, e.g.
+   `EMAIL_FROM="Connexus <hello@connexusohs.com.au>"`. If unset, it falls back to Resend's own
+   `onboarding@resend.dev` sender, which works for testing but shouldn't be used for real leads.
+4. Redeploy the backend. No code change is needed either way — `sendEmail()` picks up the new env
+   vars automatically.
+
+Resend's free tier covers 3,000 emails/month (capped at 100/day), which comfortably covers the
+gap-check tool until volume justifies the paid plan.
 
 ## RFC 3161 timestamping
 
