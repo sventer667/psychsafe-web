@@ -298,15 +298,15 @@ db.exec(`
 // Backfill: rewrite two hazard_library entries seeded before a copy pass
 // removed em dashes from user-facing text, and the matching legislation
 // citation strings (stored per-row, so every row needs the same replace).
-db.exec(`UPDATE hazard_library SET name = 'Poor supervisor support' WHERE name = 'Poor support â supervisor'`)
-db.exec(`UPDATE hazard_library SET name = 'Poor peer support' WHERE name = 'Poor support â peer'`)
+db.exec(`UPDATE hazard_library SET name = 'Poor supervisor support' WHERE name = 'Poor support — supervisor'`)
+db.exec(`UPDATE hazard_library SET name = 'Poor peer support' WHERE name = 'Poor support — peer'`)
 db.exec(`
   UPDATE hazard_library
   SET legislation = REPLACE(
     REPLACE(legislation,
-      'Managing psychosocial hazards at work â Code of Practice 2021 (NSW)',
+      'Managing psychosocial hazards at work — Code of Practice 2021 (NSW)',
       'Managing psychosocial hazards at work, Code of Practice 2021 (NSW)'),
-    'Managing the risk of psychosocial hazards at work â Code of Practice 2022 (Qld)',
+    'Managing the risk of psychosocial hazards at work — Code of Practice 2022 (Qld)',
     'Managing the risk of psychosocial hazards at work, Code of Practice 2022 (Qld)')
 `)
 
