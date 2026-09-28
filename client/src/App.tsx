@@ -18,6 +18,7 @@ import { CaseDetail } from './pages/CaseDetail'
 import { Billing } from './pages/Billing'
 import { Team } from './pages/Team'
 import { Security } from './pages/Security'
+import { GapCheck } from './pages/GapCheck'
 
 // Pre-launch switch. Set VITE_MAINTENANCE_MODE=true as a build-time env var
 // on the connexus-app Render service (then redeploy) to take the whole site
@@ -26,8 +27,17 @@ import { Security } from './pages/Security'
 // bring the real app back. No route changes needed either way.
 const MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
+// The gap-check tool is the public lead-gen funnel, so it stays reachable
+// even while the rest of the site is behind the coming-soon gate (mirrors
+// the /api/gap-check exemption on the server's maintenance-mode gate).
+// Checked against the raw URL rather than a route match, since this decision
+// happens before the router (and its Routes) is even rendered.
+function isGapCheckPath() {
+  return typeof window !== 'undefined' && window.location.pathname.startsWith('/gap-check')
+}
+
 export default function App() {
-  if (MAINTENANCE_MODE && !hasPreviewAccess()) {
+  if (MAINTENANCE_MODE && !hasPreviewAccess() && !isGapCheckPath()) {
     return (
       <BrowserRouter>
         <Routes>
@@ -43,6 +53,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/sectors/:slug" element={<SectorGuide />} />
+          <Route path="/gap-check" element={<GapCheck />} />
           <Route path="/legal" element={<Legal />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
