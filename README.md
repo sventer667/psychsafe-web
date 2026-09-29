@@ -24,14 +24,14 @@ signs up is the organisation being assessed.
 - **Organisation profile** — industry, state/territory, and business unit, set once on the
   Billing page. The state/territory drives which legislation citations show up everywhere else.
 - **Case Files** — every assessment lives in a five-tab workflow:
-  - **Details** — case metadata, open/closed status, and the cryptographic seal once closed
-  - **Hazard Register** — pull hazards from a built-in reference library aligned to WHS codes of
+  - **Overview** — case metadata, open/closed status, and the cryptographic seal once closed
+  - **Risk Register** — pull hazards from a built-in reference library aligned to WHS codes of
     practice nationwide, each carrying a staged pathway of controls and the specific legislation
     for your organisation's state or territory (NSW, VIC, QLD, WA, SA, TAS, ACT, NT)
-  - **Action Plan** — assign owners and due dates; status moves through Pending → In Progress →
+  - **Action Items** — assign owners and due dates; status moves through Pending → In Progress →
     Verification Pending → Complete → Closed, with overdue items flagged automatically
-  - **Consultations** — log worker consultation records (date, method, attendees, summary)
-  - **Export** — one-click PDF: risk-level chart, action items ordered by urgency, the
+  - **Consultation Log** — log worker consultation records (date, method, attendees, summary)
+  - **Report** — one-click PDF: risk-level chart, action items ordered by urgency, the
     consultation log, and a state-specific compliance section, with the report preparer's name
     and credential (set on the Billing page)
 - **Cryptographic sealing** — closing a case computes a SHA-256 hash of every hazard, action
@@ -71,7 +71,7 @@ automatically at `server/connexus.db` on first run, seeded with the 22+ entry ha
 
 The `/api/checkout/*` endpoints work out of the box but return a "Stripe not configured" message
 until you add real keys. Connexus has three pricing tiers — Starter ($89/mo, 1 seat), Growth
-($179/mo, up to 3 seats), and Enterprise ($399/mo, up to 10 seats) — each backed by its own Stripe
+($179/mo, up to 5 seats), and Enterprise ($399/mo, up to 20 seats) — each backed by its own Stripe
 Price:
 
 1. In `server/.env`, set `STRIPE_SECRET_KEY` to your own Stripe secret key (never commit it, and
