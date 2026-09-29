@@ -21,15 +21,15 @@ const TIERS: { id: PlanTier; label: string; price: string; seats: string; blurb:
     id: 'growth',
     label: 'Growth',
     price: '$179/mo',
-    seats: 'Up to 3 seats',
+    seats: 'Up to 5 seats',
     blurb: 'A WHS/HR team collaborating across assessments.',
     features: ['Everything in Starter', 'Unlimited assessments', 'Priority email support'],
   },
   {
     id: 'enterprise',
     label: 'Enterprise',
-    price: '$599/mo',
-    seats: 'Up to 10 seats',
+    price: '$399/mo',
+    seats: 'Up to 20 seats',
     blurb: 'A larger organisation with a dedicated WHS function.',
     features: ['Everything in Growth', 'Dedicated onboarding', 'Priority support SLA'],
   },
@@ -53,20 +53,12 @@ const INDUSTRIES = [
 
 const STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT']
 
-const REVIEW_FREQUENCIES = [
-  { value: 3, label: 'Every 3 months' },
-  { value: 6, label: 'Every 6 months' },
-  { value: 12, label: 'Every 12 months' },
-  { value: 24, label: 'Every 24 months' },
-]
-
 export function Billing() {
   const { org, refresh } = useAuth()
   const [busy, setBusy] = useState(false)
   const [industry, setIndustry] = useState('')
   const [state, setState] = useState('')
   const [businessUnit, setBusinessUnit] = useState('')
-  const [reviewFrequencyMonths, setReviewFrequencyMonths] = useState(12)
   const [savingOrg, setSavingOrg] = useState(false)
   const [savedOrg, setSavedOrg] = useState(false)
   const [consultantName, setConsultantName] = useState('')
@@ -80,7 +72,6 @@ export function Billing() {
     setIndustry(org?.industry || '')
     setState(org?.state || '')
     setBusinessUnit(org?.businessUnit || '')
-    setReviewFrequencyMonths(org?.reviewFrequencyMonths || 12)
     setConsultantName(org?.consultantName || '')
     setConsultantCredential(org?.consultantCredential || '')
   }, [org])
@@ -90,7 +81,7 @@ export function Billing() {
     setSavingOrg(true)
     setSavedOrg(false)
     try {
-      await api('/auth/org', { method: 'PATCH', body: { industry, state, businessUnit, reviewFrequencyMonths } })
+      await api('/auth/org', { method: 'PATCH', body: { industry, state, businessUnit } })
       await refresh()
       setSavedOrg(true)
     } finally {
@@ -187,7 +178,7 @@ export function Billing() {
         <h2 className="mb-1 font-serif text-lg text-ink">Organisation profile</h2>
         <p className="mb-4 text-sm text-muted">
           This state/territory is the default used to pre-fill new assessments. If your organisation has sites in
-          more than one state, you can set each assessment's own state/territory individually on its Details tab,
+          more than one state, you can set each assessment's own state/territory individually on its Overview tab,
           which is what actually drives that assessment's legislation citations and compliance sections.
         </p>
         <form onSubmit={saveOrgProfile} className="space-y-4">
@@ -217,22 +208,6 @@ export function Billing() {
               value={businessUnit}
               onChange={(e) => setBusinessUnit(e.target.value)}
             />
-          </div>
-          <div>
-            <Label htmlFor="reviewFrequency">Reassessment cadence</Label>
-            <Select
-              id="reviewFrequency"
-              value={reviewFrequencyMonths}
-              onChange={(e) => setReviewFrequencyMonths(Number(e.target.value))}
-            >
-              {REVIEW_FREQUENCIES.map((f) => (
-                <option key={f.value} value={f.value}>{f.label}</option>
-              ))}
-            </Select>
-            <p className="mt-1 text-xs text-muted">
-              How often you plan to re-run a psychosocial risk assessment. Drives the reassessment reminder on your
-              dashboard, counted from when your most recent assessment was opened.
-            </p>
           </div>
           <div className="flex items-center gap-3">
             <Button type="submit" disabled={savingOrg}>
