@@ -75,7 +75,7 @@ export function ActionPlanTab({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="font-serif text-lg text-ink">Action Plan</h2>
+          <h2 className="font-serif text-lg text-ink">Action Items</h2>
           <p className="text-sm text-muted">{actionItems.length} action{actionItems.length === 1 ? '' : 's'} tracked</p>
         </div>
         {!readOnly && (
@@ -131,7 +131,7 @@ export function ActionPlanTab({
               </Select>
               <p className="mt-1 text-xs text-muted">
                 One hazard per action. If this action addresses more than one hazard, add it again for each
-                hazard, or use the "Recommended actions" button on the hazard itself in the Hazard Register.
+                hazard, or use the "Recommended actions" button on the hazard itself in the Risk Register.
               </p>
             </div>
             <div className="col-span-2 flex justify-end gap-2">
