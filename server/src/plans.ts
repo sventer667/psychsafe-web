@@ -8,8 +8,8 @@ export type PlanTier = (typeof PLAN_TIERS)[number]
 
 export const SEAT_LIMITS: Record<PlanTier, number> = {
   starter: 1,
-  growth: 3,
-  enterprise: 10,
+  growth: 5,
+  enterprise: 20,
 }
 
 export function seatLimitFor(tier: string): number {
