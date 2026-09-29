@@ -1,4 +1,4 @@
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import {
   ClipboardList,
   ShieldCheck,
@@ -12,9 +12,7 @@ import {
 import { useAuth } from '../context/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
-import { SECTORS } from '../lib/sectors'
 import logo from '../assets/connexus-logo.png'
-import heroImage from '../assets/hero-meeting.jpg'
 
 // Public marketing page, the front door for visitors who aren't signed in
 // yet. Deliberately its own layout (not the in-app Topbar/Layout), since it
@@ -26,7 +24,7 @@ const FEATURES = [
     icon: ClipboardList,
     title: 'Hazard register with a built-in library',
     description:
-      'Pull from a reference library of psychosocial hazards aligned to state regulators\' codes of practice, rate them with plain-English descriptions instead of a raw 1-5 scale, and get a staged pathway of controls for each one.',
+      'Pull from a reference library of psychosocial hazards aligned to Safe Work Australia\'s model, rate them with plain-English descriptions instead of a raw 1-5 scale, and get a staged pathway of controls for each one.',
   },
   {
     icon: MapPin,
@@ -36,27 +34,27 @@ const FEATURES = [
   },
   {
     icon: ShieldCheck,
-    title: 'Action plans with automatic overdue flags',
+    title: 'Action plans that track themselves',
     description:
-      'Turn a recommended control into an action item in one click, assign an owner and due date, and see overdue items flagged automatically instead of getting lost in a spreadsheet.',
+      'Turn a recommended control into an action item in one click, assign an owner and due date, and let overdue items surface automatically instead of getting lost in a spreadsheet.',
   },
   {
     icon: Users,
     title: 'Worker consultation, logged properly',
     description:
-      'Record consultation dates, methods, attendees, and outcomes against the assessment they relate to, giving you a clear record that the legislated consultation requirement was met.',
+      'Record consultation dates, methods, attendees, and outcomes against the assessment they relate to, so you can show the legislated consultation requirement was actually met.',
   },
   {
     icon: FileLock2,
-    title: 'Tamper-evident sealing',
+    title: 'Cryptographic sealing',
     description:
-      'Closing an assessment locks the hazard register, action plan, and consultation log together, generates a SHA-256 fingerprint of the record, and certifies the time with an independent RFC 3161 authority.',
+      'Closing an assessment fingerprints every hazard, action, and consultation record with a SHA-256 hash and attempts to certify it against an independent RFC 3161 timestamp authority, so its integrity and timing can be checked without having to trust us.',
   },
   {
     icon: FileOutput,
-    title: 'One-click compliance report',
+    title: 'Boardroom-ready PDF export',
     description:
-      'One click produces a report with a risk-level chart, an action plan ordered by urgency, the consultation log, and a compliance reference section, formatted for a board pack or regulator request.',
+      'One click produces a report with a risk-level chart, an action plan ordered by urgency, the consultation log, and a compliance reference section, ready to hand to a board or regulator.',
   },
 ]
 
@@ -64,7 +62,7 @@ const STEPS = [
   { title: 'Create your organisation', description: 'Sign up, and you\'re in, no sales call required to start your 7-day free trial.' },
   { title: 'Set your state and industry', description: 'A short profile drives which legislation citations show up everywhere else.' },
   { title: 'Run the assessment', description: 'Add hazards from the library, rate them, assign actions, and log consultations as you go.' },
-  { title: 'Export and seal', description: 'Download a formatted PDF report, then close and seal the record with a verifiable timestamp.' },
+  { title: 'Export and seal', description: 'Download a boardroom-ready PDF, then close and cryptographically seal the record.' },
 ]
 
 const TIERS = [
@@ -73,20 +71,20 @@ const TIERS = [
     price: '$89',
     seats: '1 seat',
     blurb: 'A single person running one assessment at a time.',
-    features: ['Full hazard register & action plans', 'One-click compliance report', 'Cryptographic assessment sealing'],
+    features: ['Full hazard register & action plans', 'Boardroom-ready PDF export', 'Cryptographic assessment sealing'],
   },
   {
     label: 'Growth',
     price: '$179',
-    seats: 'Up to 3 seats',
+    seats: 'Up to 5 seats',
     blurb: 'A WHS/HR team collaborating across assessments.',
     features: ['Everything in Starter', 'Unlimited assessments', 'Priority email support'],
     highlighted: true,
   },
   {
     label: 'Enterprise',
-    price: '$599',
-    seats: 'Up to 10 seats',
+    price: '$399',
+    seats: 'Up to 20 seats',
     blurb: 'A larger organisation with a dedicated WHS function.',
     features: ['Everything in Growth', 'Dedicated onboarding', 'Priority support SLA'],
   },
@@ -96,11 +94,11 @@ export function Home() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
 
-  // A signed-in visitor can still browse the public site (e.g. via the "Home"
-  // link in the app's top bar), so this page no longer force-redirects them.
-  // It just swaps the login/signup prompts for a straight link back into the
-  // app, so there's always a way back either direction.
+  // A signed-in visitor landing on "/" belongs in the app, not the pitch. Wait
+  // for the auth check to resolve before deciding, so an already-logged-in
+  // visitor doesn't see a flash of marketing copy before being redirected.
   if (loading) return <div className="min-h-screen bg-canvas" />
+  if (user) return <Navigate to="/dashboard" replace />
 
   return (
     <div className="bg-canvas">
@@ -112,64 +110,32 @@ export function Home() {
             <div className="font-serif text-lg font-semibold text-navy-contrast">Connexus</div>
           </div>
           <div className="flex items-center gap-3">
-            {user ? (
-              <Button onClick={() => navigate('/dashboard')}>Go to dashboard</Button>
-            ) : (
-              <>
-                <button onClick={() => navigate('/login')} className="text-sm font-medium text-navy-contrast/80 hover:text-navy-contrast">
-                  Log in
-                </button>
-                <Button onClick={() => navigate('/signup')}>Start free trial</Button>
-              </>
-            )}
+            <button onClick={() => navigate('/login')} className="text-sm font-medium text-navy-contrast/80 hover:text-navy-contrast">
+              Log in
+            </button>
+            <Button onClick={() => navigate('/signup')}>Start free trial</Button>
           </div>
         </div>
       </header>
 
-      {/* Hero: dark navy band, continuous with the header above it, for
-          more visual weight than a plain white hero. */}
-      <section className="bg-navy py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-accent">
-                Built for Australian workplaces managing psychosocial risk
-              </p>
-              <h1 className="mt-3 font-serif text-4xl font-bold leading-tight text-navy-contrast sm:text-5xl">
-                Reduce psychosocial risk before it escalates.
-              </h1>
-              <p className="mt-5 text-lg font-normal text-navy-contrast/70">
-                Log hazards, assign controls, and record consultation in one place, with the right WHS citation applied
-                automatically for wherever in Australia you operate.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                {user ? (
-                  <Button onClick={() => navigate('/dashboard')} className="px-6 py-3 text-base">
-                    Go to dashboard <ArrowRight size={18} />
-                  </Button>
-                ) : (
-                  <>
-                    <Button onClick={() => navigate('/signup')} className="px-6 py-3 text-base">
-                      Start your free 7-day trial <ArrowRight size={18} />
-                    </Button>
-                    <Button variant="secondary" onClick={() => navigate('/login')} className="px-6 py-3 text-base">
-                      Log in
-                    </Button>
-                  </>
-                )}
-              </div>
-              {!user && <p className="mt-4 text-sm text-navy-contrast/60">No credit card required to start.</p>}
-            </div>
-
-            <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/10 shadow-lg shadow-black/40">
-              <img
-                src={heroImage}
-                alt="A WHS and HR team reviewing a psychosocial risk assessment together"
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
+      {/* Hero */}
+      <section className="mx-auto max-w-5xl px-6 py-20 text-center">
+        <h1 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
+          Psychosocial risk management, without the spreadsheet sprawl
+        </h1>
+        <p className="mx-auto mt-5 max-w-2xl text-lg text-muted">
+          Connexus turns a psychosocial risk assessment into one structured, auditable record: hazards, action
+          plans, consultations, and a sealed report, instead of a folder of scattered documents.
+        </p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Button onClick={() => navigate('/signup')} className="px-6 py-3 text-base">
+            Start your free 7-day trial <ArrowRight size={18} />
+          </Button>
+          <Button variant="secondary" onClick={() => navigate('/login')} className="px-6 py-3 text-base">
+            Log in
+          </Button>
         </div>
+        <p className="mt-4 text-sm text-muted">No credit card required to start.</p>
       </section>
 
       {/* Features */}
@@ -188,35 +154,6 @@ export function Home() {
                 <h3 className="mt-3 font-serif text-base text-ink">{f.title}</h3>
                 <p className="mt-1.5 text-sm text-muted">{f.description}</p>
               </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Sector-specific guidance */}
-      <section className="py-16">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-serif text-2xl text-ink sm:text-3xl">How this looks in your industry</h2>
-            <p className="mt-3 text-muted">
-              Psychosocial hazards show up differently depending on what your business does. Pick your sector to see
-              the hazards that turn up most often there, and the WHS rules that apply.
-            </p>
-          </div>
-          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {SECTORS.map((s) => (
-              <Link key={s.slug} to={`/sectors/${s.slug}`} className="block">
-                <Card className="h-full transition hover:border-accent/50">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15 text-accent">
-                    <s.icon size={20} />
-                  </div>
-                  <h3 className="mt-3 font-serif text-base text-ink">{s.name}</h3>
-                  <p className="mt-1.5 text-sm text-muted">{s.cardSummary}</p>
-                  <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent">
-                    View sector guide <ArrowRight size={14} />
-                  </span>
-                </Card>
-              </Link>
             ))}
           </div>
         </div>
@@ -272,9 +209,9 @@ export function Home() {
                 <Button
                   variant={t.highlighted ? 'primary' : 'secondary'}
                   className="mt-5 w-full"
-                  onClick={() => navigate(user ? '/dashboard' : '/signup')}
+                  onClick={() => navigate('/signup')}
                 >
-                  {user ? 'Go to dashboard' : 'Start free trial'}
+                  Start free trial
                 </Button>
               </div>
             ))}
@@ -285,14 +222,10 @@ export function Home() {
       {/* Final CTA */}
       <section className="bg-navy py-16">
         <div className="mx-auto max-w-2xl px-6 text-center">
-          <h2 className="font-serif text-2xl text-navy-contrast sm:text-3xl">
-            {user ? 'Pick up where you left off' : 'Ready to run your first assessment?'}
-          </h2>
-          <p className="mt-3 text-navy-contrast/70">
-            {user ? 'Head back to your dashboard to continue.' : 'Start your free 7-day trial, no credit card required.'}
-          </p>
-          <Button onClick={() => navigate(user ? '/dashboard' : '/signup')} className="mt-6 px-6 py-3 text-base">
-            {user ? 'Go to dashboard' : 'Start free trial'} <ArrowRight size={18} />
+          <h2 className="font-serif text-2xl text-navy-contrast sm:text-3xl">Ready to run your first assessment?</h2>
+          <p className="mt-3 text-navy-contrast/70">Start your free 7-day trial, no credit card required.</p>
+          <Button onClick={() => navigate('/signup')} className="mt-6 px-6 py-3 text-base">
+            Start free trial <ArrowRight size={18} />
           </Button>
         </div>
       </section>
@@ -304,17 +237,8 @@ export function Home() {
             <span>© {new Date().getFullYear()} Connexus</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link to="/legal" className="hover:text-ink">Legal</Link>
-            <Link to="/privacy" className="hover:text-ink">Privacy</Link>
-            <Link to="/terms" className="hover:text-ink">Terms</Link>
-            {user ? (
-              <button onClick={() => navigate('/dashboard')} className="hover:text-ink">Go to dashboard</button>
-            ) : (
-              <>
-                <button onClick={() => navigate('/login')} className="hover:text-ink">Log in</button>
-                <button onClick={() => navigate('/signup')} className="hover:text-ink">Sign up</button>
-              </>
-            )}
+            <button onClick={() => navigate('/login')} className="hover:text-ink">Log in</button>
+            <button onClick={() => navigate('/signup')} className="hover:text-ink">Sign up</button>
           </div>
         </div>
       </footer>
