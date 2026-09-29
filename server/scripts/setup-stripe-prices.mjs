@@ -37,13 +37,13 @@ const TIERS = [
     tier: 'growth',
     name: 'Connexus Growth',
     amount: 17900,
-    description: 'Up to 3 seats · unlimited case files · priority email support',
+    description: 'Up to 5 seats · unlimited case files · priority email support',
   },
   {
     tier: 'enterprise',
     name: 'Connexus Enterprise',
     amount: 39900,
-    description: 'Up to 10 seats · dedicated onboarding · priority support SLA',
+    description: 'Up to 20 seats · dedicated onboarding · priority support SLA',
   },
 ]
 
