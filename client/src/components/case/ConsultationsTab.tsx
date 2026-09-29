@@ -42,7 +42,7 @@ export function ConsultationsTab({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="font-serif text-lg text-ink">Consultations</h2>
+          <h2 className="font-serif text-lg text-ink">Consultation Log</h2>
           <p className="text-sm text-muted">
             {consultations.length} record{consultations.length === 1 ? '' : 's'}. Worker consultation is a legislated
             requirement of every psychosocial risk assessment.
