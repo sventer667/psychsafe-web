@@ -12,11 +12,11 @@ import { HazardRegisterTab } from '../components/case/HazardRegisterTab'
 import { ActionPlanTab } from '../components/case/ActionPlanTab'
 import { ConsultationsTab } from '../components/case/ConsultationsTab'
 
-// Hazard Register comes first since it's where an assessment actually
-// starts, and Details (which holds the close & seal action) comes last so
-// sealing reads as the final step of the workflow rather than competing
-// with it for the first tab.
-const TABS = ['Hazard Register', 'Action Plan', 'Consultations', 'Export', 'Details'] as const
+// Risk Register comes first since it's where an assessment actually starts,
+// and Overview (which holds the close & seal action) comes last so sealing
+// reads as the final step of the workflow rather than competing with it for
+// the first tab.
+const TABS = ['Risk Register', 'Action Items', 'Consultation Log', 'Report', 'Overview'] as const
 type Tab = (typeof TABS)[number]
 
 const STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT']
@@ -280,7 +280,7 @@ export function CaseDetail() {
         ))}
       </div>
 
-      {tab === 'Hazard Register' && (
+      {tab === 'Risk Register' && (
         <div className="space-y-4">
           <HazardRegisterTab
             hazards={hazards}
@@ -299,11 +299,11 @@ export function CaseDetail() {
             onDeleteEvidence={deleteHazardEvidence}
             highlightCategory={highlightCategory}
           />
-          <NextStepButton onClick={() => setTab('Action Plan')} label="Action Plan" />
+          <NextStepButton onClick={() => setTab('Action Items')} label="Action Items" />
         </div>
       )}
 
-      {tab === 'Action Plan' && (
+      {tab === 'Action Items' && (
         <div className="space-y-4">
           <ActionPlanTab
             actionItems={actionItems}
@@ -314,21 +314,21 @@ export function CaseDetail() {
             onStatusChange={updateActionStatus}
             onOwnerChange={updateActionOwner}
           />
-          <NextStepButton onClick={() => setTab('Consultations')} label="Consultations" />
+          <NextStepButton onClick={() => setTab('Consultation Log')} label="Consultation Log" />
         </div>
       )}
 
-      {tab === 'Consultations' && (
+      {tab === 'Consultation Log' && (
         <div className="space-y-4">
           <ConsultationsTab consultations={consultations} readOnly={caseFile.status === 'closed'} onAdd={addConsultation} />
-          <NextStepButton onClick={() => setTab('Export')} label="Export" />
+          <NextStepButton onClick={() => setTab('Report')} label="Report" />
         </div>
       )}
 
-      {tab === 'Export' && (
+      {tab === 'Report' && (
         <div className="space-y-4">
           <Card>
-            <h2 className="mb-2 font-serif text-lg text-ink">Export report</h2>
+            <h2 className="mb-2 font-serif text-lg text-ink">Compliance report</h2>
             <p className="mb-4 text-sm text-muted">
               Generates a single PDF pulling together the hazard register, a risk-level breakdown, your action items
               ordered by how overdue they are, the consultation log, and the compliance obligations for your state,
@@ -343,14 +343,14 @@ export function CaseDetail() {
               <Download size={16} /> {downloading ? 'Generating…' : 'Download PDF report'}
             </Button>
           </Card>
-          <NextStepButton onClick={() => setTab('Details')} label="Details, to close & seal" />
+          <NextStepButton onClick={() => setTab('Overview')} label="Overview, to close & seal" />
         </div>
       )}
 
-      {tab === 'Details' && (
+      {tab === 'Overview' && (
         <div className="space-y-4">
           <Card>
-            <h2 className="mb-3 font-serif text-lg text-ink">Assessment details</h2>
+            <h2 className="mb-3 font-serif text-lg text-ink">Assessment overview</h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <div className="text-muted">Organisation</div>
@@ -379,7 +379,7 @@ export function CaseDetail() {
                 ))}
               </Select>
               <p className="mt-1 text-xs text-muted">
-                Drives the legislation citations in the Hazard Register and PDF export for this assessment. If your
+                Drives the legislation citations in the Risk Register and PDF export for this assessment. If your
                 organisation has sites in more than one state, set each assessment to the state that site is in
                 (your organisation's own default state is set on the Billing page).
               </p>
@@ -414,7 +414,7 @@ export function CaseDetail() {
                 <h2 className="font-serif text-lg text-ink">Close &amp; seal this assessment</h2>
               </div>
               <p className="mb-3 text-sm font-medium text-ink">
-                This is the final step. Make sure the Hazard Register, Action Plan, and Consultations tabs are
+                This is the final step. Make sure the Risk Register, Action Items, and Consultation Log tabs are
                 complete first, closing locks the assessment from further edits.
               </p>
               <p className="mb-4 text-sm text-muted">
