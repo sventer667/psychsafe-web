@@ -280,7 +280,7 @@ export function HazardRegisterTab({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="font-serif text-lg text-ink">Hazard Register</h2>
+          <h2 className="font-serif text-lg text-ink">Risk Register</h2>
           <p className="text-sm text-muted">{hazards.length} hazard{hazards.length === 1 ? '' : 's'} in this assessment</p>
         </div>
         {!readOnly && (
@@ -699,7 +699,7 @@ export function HazardRegisterTab({
                                     disabled={addingAction === c}
                                     className="shrink-0 whitespace-nowrap text-xs font-medium text-accent hover:underline disabled:opacity-50"
                                   >
-                                    {addingAction === c ? 'Adding…' : '+ Add to action plan'}
+                                    {addingAction === c ? 'Adding…' : '+ Add to action items'}
                                   </button>
                                 ))}
                             </li>
@@ -711,7 +711,7 @@ export function HazardRegisterTab({
 
                   <div>
                     <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
-                      Linked action plan items
+                      Linked action items
                     </div>
                     {linkedActions.length > 0 ? (
                       <div className="space-y-1.5">
@@ -725,7 +725,7 @@ export function HazardRegisterTab({
                     ) : (
                       <p className="text-sm text-muted">
                         No action items linked to this hazard yet. Add one of the recommended actions above, or create a
-                        custom one from the Action Plan tab.
+                        custom one from the Action Items tab.
                       </p>
                     )}
                   </div>
@@ -812,7 +812,7 @@ export function HazardRegisterTab({
                       <p className="text-sm text-ink">
                         {assessmentState
                           ? libEntry.legislation[assessmentState]
-                          : 'Set this assessment\'s state/territory on the Details tab to see the relevant citation.'}
+                          : 'Set this assessment\'s state/territory on the Overview tab to see the relevant citation.'}
                       </p>
                     </div>
                   )}
