@@ -8,11 +8,11 @@ import type { ActionItem, ActionStatus, Hazard, TeamMember } from '../../lib/typ
 const STATUSES: ActionStatus[] = ['pending', 'in_progress', 'verification_pending', 'complete', 'closed']
 
 const STATUS_LABEL: Record<ActionStatus, string> = {
-  pending: 'Pending',
-  in_progress: 'In Progress',
-  verification_pending: 'Verification Pending',
-  complete: 'Complete',
-  closed: 'Closed',
+  pending: 'Not started',
+  in_progress: 'Underway',
+  verification_pending: 'Awaiting sign-off',
+  complete: 'Done',
+  closed: 'Closed out',
 }
 
 const STATUS_TONE: Record<ActionStatus, 'default' | 'accent' | 'destructive' | 'success' | 'alert'> = {
