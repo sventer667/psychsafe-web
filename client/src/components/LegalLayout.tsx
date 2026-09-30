@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { AlertTriangle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { Button } from './ui/Button'
 import logo from '../assets/connexus-logo.png'
@@ -54,15 +53,6 @@ export function LegalLayout({
 
         <h1 className="font-serif text-3xl text-ink sm:text-4xl">{title}</h1>
         <p className="mt-2 text-sm text-muted">Version {version} · Effective {effectiveDate}</p>
-
-        <div className="mt-6 flex gap-3 rounded-xl border border-alert/30 bg-alert/10 p-4 text-sm text-ink">
-          <AlertTriangle size={18} className="mt-0.5 shrink-0 text-alert" />
-          <p>
-            This is a working draft prepared to match what Connexus actually does today. It is not legal advice, and
-            it should be reviewed by a qualified Australian lawyer, with the bracketed placeholders below filled in,
-            before it's relied on as your published legal terms.
-          </p>
-        </div>
 
         <div className="prose-legal mt-10 space-y-8 text-sm leading-relaxed text-ink [&_h2]:font-serif [&_h2]:text-xl [&_h2]:text-ink [&_h3]:font-serif [&_h3]:text-base [&_h3]:text-ink [&_p]:text-muted [&_li]:text-muted [&_strong]:text-ink [&_a]:text-accent [&_a:hover]:underline">
           {children}
