@@ -48,7 +48,7 @@ const FEATURES = [
     icon: FileLock2,
     title: 'Cryptographic sealing',
     description:
-      'Closing an assessment fingerprints every hazard, action, and consultation record with a SHA-256 hash and attempts to certify it against an independent RFC 3161 timestamp authority, so its integrity and timing can be checked without having to trust us.',
+      'When an assessment is closed, every hazard, action, and consultation entry is locked in with a SHA-256 checksum and stamped through an independent RFC 3161 time authority, giving anyone reviewing it later a way to confirm both its contents and its closing time without taking our word for it.',
   },
   {
     icon: FileOutput,
@@ -62,7 +62,7 @@ const STEPS = [
   { title: 'Create your organisation', description: 'Sign up, and you\'re in, no sales call required to start your 7-day free trial.' },
   { title: 'Set your state and industry', description: 'A short profile drives which legislation citations show up everywhere else.' },
   { title: 'Run the assessment', description: 'Add hazards from the library, rate them, assign actions, and log consultations as you go.' },
-  { title: 'Export and seal', description: 'Download a boardroom-ready PDF, then close and cryptographically seal the record.' },
+  { title: 'Export and seal', description: 'Download a boardroom-ready PDF, then close the assessment to lock in a verifiable, tamper-evident seal.' },
 ]
 
 const TIERS = [
@@ -71,12 +71,12 @@ const TIERS = [
     price: '$89',
     seats: '1 seat',
     blurb: 'A single person running one assessment at a time.',
-    features: ['Full hazard register & action plans', 'Boardroom-ready PDF export', 'Cryptographic assessment sealing'],
+    features: ['Full hazard register & action plans', 'Boardroom-ready PDF export', 'Tamper-evident assessment sealing'],
   },
   {
     label: 'Growth',
     price: '$179',
-    seats: 'Up to 5 seats',
+    seats: 'Up to 3 seats',
     blurb: 'A WHS/HR team collaborating across assessments.',
     features: ['Everything in Starter', 'Unlimited assessments', 'Priority email support'],
     highlighted: true,
@@ -84,7 +84,7 @@ const TIERS = [
   {
     label: 'Enterprise',
     price: '$399',
-    seats: 'Up to 20 seats',
+    seats: 'Up to 10 seats',
     blurb: 'A larger organisation with a dedicated WHS function.',
     features: ['Everything in Growth', 'Dedicated onboarding', 'Priority support SLA'],
   },
