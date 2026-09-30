@@ -26,6 +26,17 @@ function riskColor(rating: number) {
   return SUCCESS
 }
 
+// Mirrors client/src/components/case/ActionPlanTab.tsx's STATUS_LABEL so the
+// PDF shows the same human-facing wording as the app rather than the raw
+// internal status code with its underscore swapped for a space.
+const STATUS_LABEL: Record<string, string> = {
+  pending: 'Not started',
+  in_progress: 'Underway',
+  verification_pending: 'Awaiting sign-off',
+  complete: 'Done',
+  closed: 'Closed out',
+}
+
 reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
   const startedAt = Date.now()
   try {
@@ -67,7 +78,7 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
 
   doc.fontSize(10).fillColor(MUTED)
   doc.text(`Assessment: ${caseRow.name}`)
-  doc.text(`Status: ${caseRow.status}${caseRow.status === 'closed' ? ` (sealed ${caseRow.sealTimestampTime ?? ''})` : ''}`)
+  doc.text(`Status: ${caseRow.status}${caseRow.status === 'closed' ? ` (sealed ${caseRow.sealTimestampTime ?? ''}`) : ''}`)
   doc.text(`Industry: ${org.industry || 'â'}    State/Territory: ${caseRow.state || org.state || 'â'}`)
   if (org.consultantName) doc.text(`Prepared by: ${org.consultantName}${org.consultantCredential ? ` (${org.consultantCredential})` : ''}`)
   doc.text(`Report generated: ${new Date().toLocaleString()}`)
@@ -107,7 +118,7 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
 
   // --- Hazard register + risk chart ---
   doc.addPage()
-  doc.fontSize(18).fillColor(INK).text('Hazard Register')
+  doc.fontSize(18).fillColor(INK).text('Risk Register')
   doc.moveDown(0.5)
   doc.fontSize(10).fillColor(MUTED).text(`${hazards.length} hazard${hazards.length === 1 ? '' : 's'} assessed`)
   doc.moveDown(1)
@@ -198,7 +209,7 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
 
   // --- Action plan ---
   doc.addPage()
-  doc.fontSize(18).fillColor(INK).text('Action Plan')
+  doc.fontSize(18).fillColor(INK).text('Action Items')
   doc.moveDown(0.3)
   doc.fontSize(10).fillColor(MUTED).text('Sorted by urgency: overdue items first, then by due date.')
   doc.moveDown(1)
@@ -208,7 +219,7 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
     const overdue = a.dueDate && !['complete', 'closed'].includes(a.status) && new Date(a.dueDate) < today
     doc.fontSize(11).fillColor(overdue ? DESTRUCTIVE : INK).text(`${overdue ? '[OVERDUE] ' : ''}${a.title}`)
     doc.fontSize(9).fillColor(MUTED).text(
-      `Owner: ${a.ownerName || 'â'}    Due: ${a.dueDate || 'â'}    Status: ${a.status.replace('_', ' ')}`
+      `Owner: ${a.ownerName || 'â'}    Due: ${a.dueDate || 'â'}    Status: ${STATUS_LABEL[a.status] || a.status}`
     )
     if (a.description) doc.fontSize(9).fillColor(INK).text(a.description, { width: 495 })
     doc.moveDown(0.6)
