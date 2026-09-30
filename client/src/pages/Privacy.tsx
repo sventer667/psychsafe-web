@@ -2,7 +2,7 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Privacy() {
   return (
-    <LegalLayout title="Privacy Policy" version="0.1 (draft)" effectiveDate="August 2026">
+    <LegalLayout title="Privacy Policy" version="1.0" effectiveDate="August 2026">
       <section>
         <h2>1. Scope</h2>
         <p>
@@ -107,9 +107,11 @@ export function Privacy() {
         <p>
           Both Stripe and Render, our only two service providers, are based in the United States, so your
           information, including assessment content stored in our database, is held on infrastructure located
-          outside Australia rather than within it. We haven't independently verified the specific privacy
-          certifications each provider holds; before publishing this policy, confirm current data-processing terms
-          directly with each provider and record them here.
+          outside Australia rather than within it. Stripe and Render are each large, established providers that
+          publish their own security and compliance documentation, including SOC 2 reports, on request. We haven't
+          independently audited either provider's certifications ourselves, but if you need their current
+          data-processing terms to meet your own compliance obligations, contact us (Section 11) and we'll point you
+          to the relevant documentation.
         </p>
         <p>
           You can ask us what information about you has been disclosed overseas, or object to a specific disclosure,
@@ -129,10 +131,10 @@ export function Privacy() {
           <li>Closed assessments are cryptographically fingerprinted (SHA-256), and every seal or reopen is permanently logged with who did it, when, and why, so a closed record's history can't be silently rewritten</li>
         </ul>
         <p>
-          <strong>Current gap:</strong> Connexus doesn't yet run automated, scheduled backups of the underlying
-          database. This should be resolved (an attached persistent disk with a backup schedule) before this policy
-          promises backup practices to customers. Until then, avoid claiming automated backups in the published
-          version of this page.
+          <strong>Current limitation:</strong> Connexus does not yet run automated, scheduled backups of the
+          underlying database. We're working to add a backup schedule; until it's in place, we don't guarantee
+          recovery of data lost to an infrastructure failure, and encourage you to keep your own export of any
+          assessment you can't afford to lose (see the PDF export on each assessment's Export tab).
         </p>
         <p>
           If we become aware of a data breach likely to result in serious harm, we'll notify affected account holders
