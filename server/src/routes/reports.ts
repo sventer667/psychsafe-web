@@ -78,7 +78,7 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
 
   doc.fontSize(10).fillColor(MUTED)
   doc.text(`Assessment: ${caseRow.name}`)
-  doc.text(`Status: ${caseRow.status}${caseRow.status === 'closed' ? ` (sealed ${caseRow.sealTimestampTime ?? ''}`) : ''}`)
+  doc.text(`Status: ${caseRow.status}${caseRow.status === 'closed' ? ` (sealed ${caseRow.sealTimestampTime ?? ''})` : ''}`)
   doc.text(`Industry: ${org.industry || 'â'}    State/Territory: ${caseRow.state || org.state || 'â'}`)
   if (org.consultantName) doc.text(`Prepared by: ${org.consultantName}${org.consultantCredential ? ` (${org.consultantCredential})` : ''}`)
   doc.text(`Report generated: ${new Date().toLocaleString()}`)
