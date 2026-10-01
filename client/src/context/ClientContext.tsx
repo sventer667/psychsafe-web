@@ -1,4 +1,4 @@
-// Retired: Connexus moved from a consultant/multi-client model to a direct
+// Retired: Humanora moved from a consultant/multi-client model to a direct
 // self-service model. Each signed-up Organization manages its own psychosocial
 // risks, so there's no separate "Client" selection concept anymore. Use
 // `useAuth()` for the current organisation. Not imported anywhere; kept as a
