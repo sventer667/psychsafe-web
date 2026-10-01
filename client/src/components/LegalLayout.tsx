@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Button } from './ui/Button'
-import logo from '../assets/connexus-logo.png'
+import logo from '../assets/humanora-logo.svg'
 
 // Shared header/footer for the three standalone legal pages (Legal, Privacy,
 // Terms), same public-page treatment as Home and SectorGuide. Original
