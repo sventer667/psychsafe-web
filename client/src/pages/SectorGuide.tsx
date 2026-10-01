@@ -28,8 +28,8 @@ export function SectorGuide() {
         <div className="h-[3px] bg-gradient-to-r from-accent via-accent to-navy" />
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
           <button onClick={() => navigate('/')} className="flex items-center gap-2">
-            <img src={logo} alt="Connexus" className="h-8 w-8 object-contain" />
-            <div className="font-serif text-lg font-semibold text-navy-contrast">Connexus</div>
+            <img src={logo} alt="Humanora" className="h-8 w-8 object-contain" />
+            <div className="font-serif text-lg font-semibold text-navy-contrast">Humanora</div>
           </button>
           <div className="flex items-center gap-3">
             {user ? (
@@ -76,7 +76,7 @@ export function SectorGuide() {
         <p className="mt-3 text-muted">{sector.legislationNote}</p>
         <p className="mt-3 text-sm text-muted">
           The specific regulation and code of practice reference depends on the state or territory an assessment is
-          run in. Connexus cites the right one automatically once you set a state on the assessment.
+          run in. Humanora cites the right one automatically once you set a state on the assessment.
         </p>
 
         <Card className="mt-10 flex flex-col items-start gap-3 border-accent/30 bg-accent/5 sm:flex-row sm:items-center sm:justify-between">
@@ -111,8 +111,8 @@ export function SectorGuide() {
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 text-sm text-muted">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Connexus" className="h-6 w-6 object-contain" />
-            <span>© {new Date().getFullYear()} Connexus</span>
+            <img src={logo} alt="Humanora" className="h-6 w-6 object-contain" />
+            <span>© {new Date().getFullYear()} Humanora</span>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/legal" className="hover:text-ink">Legal</Link>
