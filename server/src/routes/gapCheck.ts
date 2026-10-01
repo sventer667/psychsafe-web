@@ -399,5 +399,4 @@ gapCheckRouter.get('/:id/pdf', async (req, res) => {
     )
 
   doc.end()
-}
-
+})
