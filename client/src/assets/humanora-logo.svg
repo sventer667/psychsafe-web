@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 200" width="900" height="200">
+  <!-- Interlocking rounded-square icon -->
+  <g>
+    <rect x="24" y="24" width="118" height="118" rx="30" fill="none" stroke="#0A3238" stroke-width="34"/>
+    <rect x="74" y="74" width="118" height="118" rx="30" fill="none" stroke="#6F9566" stroke-width="34"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="225" y="152" font-family='Segoe UI, Poppins, Helvetica Neue, Arial, sans-serif' font-weight="800" font-size="118" fill="#0A3238" letter-spacing="-2">Humanora</text>
+</svg>
