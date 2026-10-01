@@ -6,7 +6,7 @@ export function Privacy() {
       <section>
         <h2>1. Scope</h2>
         <p>
-          This policy explains how Connexus (<strong>Connexus OHS, ABN 80 423 515 887</strong>)
+          This policy explains how Humanora (<strong>Humanora OHS, ABN 80 423 515 887</strong>)
           collects, holds, uses, and discloses personal information through our website and platform. It's written
           to comply with the Australian Privacy Principles (APPs) under the Privacy Act 1988 (Cth). Nothing here
           limits any right you have under the Privacy Act or the Australian Consumer Law that can't lawfully be
@@ -17,8 +17,8 @@ export function Privacy() {
       <section>
         <h2>2. Who this policy is for</h2>
         <p>
-          Connexus is self-service: the organisation that signs up is the organisation being assessed, there's no
-          separate consultant-and-client layer. That means, in most cases, the organisation using Connexus is
+          Humanora is self-service: the organisation that signs up is the organisation being assessed, there's no
+          separate consultant-and-client layer. That means, in most cases, the organisation using Humanora is
           already the employer of the workers described in its own hazard, action, and consultation records, and
           this policy is written primarily for that organisation and the people it invites as users. Section 8 below
           covers the position of a worker whose information appears in a record entered by someone else at their
@@ -50,7 +50,7 @@ export function Privacy() {
         <h3>Technical information</h3>
         <p>
           Our hosting provider, Render, automatically logs standard web request data (IP address, requested URL,
-          timestamp) for security and operational purposes, the same way any web host does. Connexus doesn't run
+          timestamp) for security and operational purposes, the same way any web host does. Humanora doesn't run
           Google Analytics, advertising pixels, or any other third-party tracking or analytics tool, and doesn't set
           any cookies, your signed-in session is kept in your browser's session storage rather than a cookie, and is
           cleared when you close the tab or log out.
@@ -126,12 +126,12 @@ export function Privacy() {
         <ul>
           <li>Passwords are hashed with bcrypt and never stored or logged in plaintext</li>
           <li>Optional two-factor authentication (TOTP) is available on every account, with one-time backup codes stored as bcrypt hashes</li>
-          <li>All traffic between your browser and Connexus is encrypted in transit (HTTPS/TLS)</li>
+          <li>All traffic between your browser and Humanora is encrypted in transit (HTTPS/TLS)</li>
           <li>Every API request is authenticated and scoped to your organisation, one organisation's data is never returned in response to another organisation's request</li>
           <li>Closed assessments are cryptographically fingerprinted (SHA-256), and every seal or reopen is permanently logged with who did it, when, and why, so a closed record's history can't be silently rewritten</li>
         </ul>
         <p>
-          <strong>Current limitation:</strong> Connexus does not yet run automated, scheduled backups of the
+          <strong>Current limitation:</strong> Humanora does not yet run automated, scheduled backups of the
           underlying database. We're working to add a backup schedule; until it's in place, we don't guarantee
           recovery of data lost to an infrastructure failure, and encourage you to keep your own export of any
           assessment you can't afford to lose (see the PDF export on each assessment's Export tab).
@@ -146,8 +146,8 @@ export function Privacy() {
         <h2>8. Rights of a worker described in someone else's record</h2>
         <p>
           If you're a worker whose name or circumstances appear in a hazard, action, or consultation record entered
-          by your employer, your employer (the Connexus account holder) is the data controller for that record, they
-          decide what's collected and why, in the course of meeting their WHS obligations. Connexus stores and
+          by your employer, your employer (the Humanora account holder) is the data controller for that record, they
+          decide what's collected and why, in the course of meeting their WHS obligations. Humanora stores and
           processes it on their behalf.
         </p>
         <p>
@@ -189,7 +189,7 @@ export function Privacy() {
       <section>
         <h2>11. Complaints</h2>
         <p>
-          If you think we've mishandled your personal information, email <strong>contact@connexusohs.com.au</strong> with
+          If you think we've mishandled your personal information, email <strong>contact@humanoraohs.com.au</strong> with
           details. We'll acknowledge your complaint within 5 business days and aim to resolve it within 30 days. If
           you're not satisfied with our response, you can complain to the OAIC at oaic.gov.au, free of charge.
         </p>
@@ -206,9 +206,9 @@ export function Privacy() {
       <section>
         <h2>13. Contact</h2>
         <p>
-          <strong>Connexus</strong><br />
-          Connexus OHS, ABN 80 423 515 887<br />
-          Email: contact@connexusohs.com.au
+          <strong>Humanora</strong><br />
+          Humanora OHS, ABN 80 423 515 887<br />
+          Email: contact@humanoraohs.com.au
         </p>
       </section>
     </LegalLayout>
