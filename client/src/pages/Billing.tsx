@@ -142,7 +142,7 @@ export function Billing() {
     <div>
       <div className="mb-6">
         <h1 className="font-serif text-2xl text-ink">Billing &amp; Organisation</h1>
-        <p className="text-sm text-muted">Manage your Connexus subscription and organisation profile</p>
+        <p className="text-sm text-muted">Manage your Humanora subscription and organisation profile</p>
       </div>
 
       {isTrialExpired(org) ? (
