@@ -69,7 +69,7 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
   doc.pipe(res)
 
   // --- Title page ---
-  doc.fontSize(10).fillColor(MUTED).text((org.name || 'Connexus').toUpperCase(), { characterSpacing: 1 })
+  doc.fontSize(10).fillColor(MUTED).text((org.name || 'Humanora').toUpperCase(), { characterSpacing: 1 })
   doc.moveDown(2)
   doc.fontSize(26).fillColor(INK).text('Psychosocial Risk Assessment Report', { width: 480 })
   doc.moveDown(0.5)
