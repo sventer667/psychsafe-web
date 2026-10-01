@@ -6,8 +6,8 @@ export function Terms() {
       <section>
         <h2>1. Agreement</h2>
         <p>
-          These terms govern access to and use of Connexus, provided by{' '}
-          <strong>Connexus OHS, ABN 80 423 515 887</strong> ("Connexus", "we", "us"). By creating
+          These terms govern access to and use of Humanora, provided by{' '}
+          <strong>Humanora OHS, ABN 80 423 515 887</strong> ("Humanora", "we", "us"). By creating
           an account, you agree to these terms on behalf of yourself and, if you're signing up for an organisation,
           on behalf of that organisation. If you don't agree, don't create an account or use the platform.
         </p>
@@ -16,7 +16,7 @@ export function Terms() {
       <section>
         <h2>2. The service</h2>
         <p>
-          Connexus is a web application for recording, tracking, and reporting on workplace psychosocial hazards,
+          Humanora is a web application for recording, tracking, and reporting on workplace psychosocial hazards,
           associated actions, and worker consultation, against a built-in reference library aligned to Australian
           WHS psychosocial hazard regulations. See our <a href="/legal">Legal Disclaimer</a> for what the platform
           does and doesn't do, it is a documentation tool, not a compliance guarantee or a source of legal advice.
@@ -37,7 +37,7 @@ export function Terms() {
       <section>
         <h2>4. Plans, pricing, and billing</h2>
         <p>
-          Connexus is offered on Starter, Growth, and Enterprise plans, billed per seat. Current pricing is shown on
+          Humanora is offered on Starter, Growth, and Enterprise plans, billed per seat. Current pricing is shown on
           our pricing page and may change; we'll give existing subscribers at least 30 days notice before a price
           change takes effect on their account. Payment is processed by Stripe; we don't store your card details.
           Subscriptions renew automatically for the same billing period unless cancelled before the renewal date.
@@ -49,7 +49,7 @@ export function Terms() {
         <h2>5. License and usage restrictions</h2>
         <p>
           Subject to these terms, we grant your organisation a non-exclusive, non-transferable licence to access and
-          use Connexus for your own internal WHS and HR purposes for as long as your subscription is active. You must
+          use Humanora for your own internal WHS and HR purposes for as long as your subscription is active. You must
           not: resell, sublicense, or provide platform access to anyone outside your organisation; reverse-engineer,
           decompile, or attempt to extract the source code; use the platform to build a competing product; or use it
           in a way that breaches any law, including by entering information you're not authorised to enter about
@@ -60,7 +60,7 @@ export function Terms() {
       <section>
         <h2>6. Your assessment data</h2>
         <p>
-          You own the hazard, action, and consultation data you enter into Connexus. We don't claim ownership of it,
+          You own the hazard, action, and consultation data you enter into Humanora. We don't claim ownership of it,
           and we don't use it to train any model or share it with any other customer. You're responsible for having
           a lawful basis to enter personal information about your workers, see our <a href="/privacy">Privacy
           Policy</a> for how we handle that data on your behalf. Once an assessment is closed and sealed, its content
@@ -72,7 +72,7 @@ export function Terms() {
       <section>
         <h2>7. Availability and support</h2>
         <p>
-          We aim to keep Connexus available at all times but don't guarantee uninterrupted access. Scheduled
+          We aim to keep Humanora available at all times but don't guarantee uninterrupted access. Scheduled
           maintenance and issues with third-party infrastructure (see our <a href="/privacy">Privacy Policy</a> for
           the providers we rely on) can cause downtime. We don't currently offer a service-level agreement with
           uptime credits; if you need one, contact us to discuss an Enterprise arrangement.
@@ -84,12 +84,12 @@ export function Terms() {
         <p>
           Nothing in these terms excludes, restricts, or modifies any consumer guarantee, right, or remedy you have
           under the Australian Consumer Law that cannot lawfully be excluded. Subject to that, to the maximum extent
-          permitted by law: Connexus is provided "as is"; we exclude all warranties not expressly stated in these
+          permitted by law: Humanora is provided "as is"; we exclude all warranties not expressly stated in these
           terms; and our total liability arising out of or in connection with these terms, however caused, is limited
           to the fees you paid us in the 12 months before the claim arose. We're not liable for indirect or
           consequential loss, including loss connected to a WHS regulatory inquiry, prosecution, or dispute relating
           to an assessment you conducted using the platform, that responsibility sits with you as the person
-          conducting a business or undertaking, not with Connexus as a software provider.
+          conducting a business or undertaking, not with Humanora as a software provider.
         </p>
       </section>
 
@@ -143,9 +143,9 @@ export function Terms() {
       <section>
         <h2>14. Contact</h2>
         <p>
-          <strong>Connexus</strong><br />
-          Connexus OHS, ABN 80 423 515 887<br />
-          Email: contact@connexusohs.com.au
+          <strong>Humanora</strong><br />
+          Humanora OHS, ABN 80 423 515 887<br />
+          Email: contact@humanoraohs.com.au
         </p>
       </section>
     </LegalLayout>
