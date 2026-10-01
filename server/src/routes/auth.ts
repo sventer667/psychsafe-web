@@ -142,7 +142,7 @@ authRouter.post('/2fa/setup', requireAuth, async (req: AuthedRequest, res) => {
   const secret = authenticator.generateSecret()
   db.prepare('UPDATE users SET totpSecret = ? WHERE id = ?').run(secret, user.id)
 
-  const otpauthUri = authenticator.keyuri(user.email, 'Connexus', secret)
+  const otpauthUri = authenticator.keyuri(user.email, 'Humanora', secret)
   try {
     const qrCodeDataUrl = await QRCode.toDataURL(otpauthUri)
     res.json({ secret, qrCodeDataUrl })
