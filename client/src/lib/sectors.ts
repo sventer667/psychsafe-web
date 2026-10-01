@@ -1,7 +1,7 @@
 import { Pickaxe, Stethoscope, HardHat, GraduationCap, Truck, Siren, type LucideIcon } from 'lucide-react'
 
 // Sector-specific marketing content for the public site (Home + the per-sector
-// guide pages). This is original copy written for Connexus, describing which
+// guide pages). This is original copy written for Humanora, describing which
 // of the 22 hazards in the actual in-app hazard library tend to be most
 // prominent in each sector, it isn't pulled live from app data (the app's
 // hazard library itself isn't filtered by industry today), so hazard names
