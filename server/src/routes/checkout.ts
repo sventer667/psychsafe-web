@@ -41,7 +41,7 @@ function priceIdFor(tier: PlanTier): string | undefined {
 
 // Creates a Stripe Checkout session for the org's subscription to a specific
 // pricing tier. Mirrors the /api/checkout/create-session pattern used by
-// psychosocialguard.com.au, extended to support the three Connexus tiers.
+// psychosocialguard.com.au, extended to support the three Humanora tiers.
 //
 // Every Stripe call below is try/caught deliberately: an async route handler
 // that throws (e.g. because Stripe is unreachable, or a misconfigured price ID
