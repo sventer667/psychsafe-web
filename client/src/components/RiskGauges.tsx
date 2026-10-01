@@ -75,7 +75,7 @@ function Gauge({ title, pct, score, hazardCount }: { title: string; pct: number;
       <p className="mt-1 text-center text-xs text-muted">
         {pct}% of maximum possible risk score
         <br />
-        Connexus risk score: {score} / 25 · <span className={tone.className}>{tone.label}</span>
+        Humanora risk score: {score} / 25 · <span className={tone.className}>{tone.label}</span>
       </p>
       <p className="mt-0.5 text-center text-xs text-muted">
         Averaged across {hazardCount} open hazard{hazardCount === 1 ? '' : 's'}
