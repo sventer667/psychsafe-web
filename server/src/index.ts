@@ -72,5 +72,5 @@ app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
 const port = Number(process.env.PORT) || 4000
 app.listen(port, () => {
-  console.log(`Connexus API listening on http://localhost:${port}`)
+  console.log(`Humanora API listening on http://localhost:${port}`)
 })
