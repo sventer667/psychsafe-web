@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Input, Label } from '../components/ui/Input'
 import { api } from '../lib/api'
-import logo from '../assets/connexus-logo.png'
+import logo from '../assets/humanora-logo.svg'
 
 export function ForgotPassword() {
   const [email, setEmail] = useState('')
