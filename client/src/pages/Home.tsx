@@ -12,7 +12,7 @@ import {
 import { useAuth } from '../context/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
-import logo from '../assets/connexus-logo.png'
+import logo from '../assets/humanora-logo.svg'
 
 // Public marketing page, the front door for visitors who aren't signed in
 // yet. Deliberately its own layout (not the in-app Topbar/Layout), since it
