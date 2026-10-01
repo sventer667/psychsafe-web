@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 // real access control, actual account data is still protected by normal
 // login. Full reload (not client-side navigate) so App.tsx re-evaluates the
 // flag from a clean start.
-export const PREVIEW_ACCESS_KEY = 'connexus_preview_access'
+export const PREVIEW_ACCESS_KEY = 'humanora_preview_access'
 
 export function PreviewUnlock() {
   useEffect(() => {
