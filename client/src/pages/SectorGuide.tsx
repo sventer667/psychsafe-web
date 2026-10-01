@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { getSector, SECTORS } from '../lib/sectors'
-import logo from '../assets/connexus-logo.png'
+import logo from '../assets/humanora-logo.svg'
 
 // Public per-sector guide page, linked from the sector cards on Home. Same
 // standalone header/footer treatment as Home (not the in-app Topbar/Layout),
