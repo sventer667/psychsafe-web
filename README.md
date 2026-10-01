@@ -1,4 +1,4 @@
-# Connexus
+# Humanora
 
 A psychosocial risk management and assessment tool for organisations — self-service, not a
 consultant tool. Each organisation that signs up manages its own psychosocial hazards, action
@@ -17,7 +17,7 @@ of practice in its own state or territory. Built as two separate projects:
 
 ## What it does
 
-Connexus turns a psychosocial risk assessment into a structured, auditable **Case File** instead
+Humanora turns a psychosocial risk assessment into a structured, auditable **Case File** instead
 of a folder of scattered documents. There's no separate "client" layer — the organisation that
 signs up is the organisation being assessed.
 
@@ -65,12 +65,12 @@ npm run dev                 # http://localhost:5173, proxies /api to :4000
 ```
 
 Open http://localhost:5173, sign up, and you're in. The SQLite database file is created
-automatically at `server/connexus.db` on first run, seeded with the 22+ entry hazard library.
+automatically at `server/humanora.db` on first run, seeded with the 22+ entry hazard library.
 
 ## Enabling Stripe billing
 
 The `/api/checkout/*` endpoints work out of the box but return a "Stripe not configured" message
-until you add real keys. Connexus has three pricing tiers — Starter ($89/mo, 1 seat), Growth
+until you add real keys. Humanora has three pricing tiers — Starter ($89/mo, 1 seat), Growth
 ($179/mo, up to 5 seats), and Enterprise ($399/mo, up to 20 seats) — each backed by its own Stripe
 Price:
 
@@ -96,13 +96,13 @@ subscription update.
 immediately), but the results email won't actually send until Resend is configured — until then
 `server/src/email.ts` logs a warning and no-ops rather than failing the request:
 
-1. Create a Resend account and add `connexusohs.com.au` as a sending domain. Resend gives you
+1. Create a Resend account and add `humanoraohs.com.au` as a sending domain. Resend gives you
    SPF, DKIM, and DMARC DNS records to add at your domain registrar — this is a manual step only
    someone with access to the domain's DNS can do, and can take a few hours to verify.
 2. Once the domain is verified, create an API key in Resend and set `RESEND_API_KEY` in
    `server/.env` (or the Render dashboard for `connexus-api`).
 3. Set `EMAIL_FROM` to a verified address on that domain, e.g.
-   `EMAIL_FROM="Connexus <hello@connexusohs.com.au>"`. If unset, it falls back to Resend's own
+   `EMAIL_FROM="Humanora <hello@humanoraohs.com.au>"`. If unset, it falls back to Resend's own
    `onboarding@resend.dev` sender, which works for testing but shouldn't be used for real leads.
 4. Redeploy the backend. No code change is needed either way — `sendEmail()` picks up the new env
    vars automatically.
@@ -132,7 +132,7 @@ repo:
 
 Known gap: the backend service doesn't currently have a persistent disk attached, so the SQLite
 database resets on every redeploy. Fix in the Render dashboard → the backend service → **Disks**
-→ add a disk mounted at `/var/data`, then set `DATABASE_PATH=/var/data/connexus.db`.
+→ add a disk mounted at `/var/data`, then set `DATABASE_PATH=/var/data/humanora.db`.
 
 To deploy elsewhere (Vercel/Netlify for the frontend, Railway/Fly.io for the backend), the same
 build/start commands apply — just set `VITE_API_URL` on the frontend and the vars from
@@ -150,7 +150,7 @@ two-step:
 
 ## Project layout notes
 
-Connexus started as a consultant tool where one login managed multiple "Client" businesses, each
+Humanora started as a consultant tool where one login managed multiple "Client" businesses, each
 with their own case files. It's since moved to a direct self-service model — each signed-up
 Organization manages its own psychosocial risks, with industry/state/business unit living on
 `organizations` instead of a separate `clients` table. A number of files from that earlier model
