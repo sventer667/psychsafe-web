@@ -9,7 +9,7 @@
 // the pre-launch site at all"), not per-layer security, anyone who extracts
 // this value from the shipped JS bundle gets both. That's an accepted
 // tradeoff for a pre-launch demo link, not something to reuse post-launch.
-export const PREVIEW_ACCESS_KEY = 'connexus_preview_access'
+export const PREVIEW_ACCESS_KEY = 'humanora_preview_access'
 export const PREVIEW_SECRET = '9zls-p0fe-ykf8'
 
 export function hasPreviewAccess(): boolean {
