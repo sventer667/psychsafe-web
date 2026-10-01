@@ -17,11 +17,11 @@ export function Topbar() {
     <header className="sticky top-0 z-10 bg-navy">
       <div className="h-[3px] bg-gradient-to-r from-accent via-accent to-navy" />
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-6 py-3">
-        <Link to="/" title="Back to the Connexus website" className="flex items-center gap-2">
+        <Link to="/" title="Back to the Humanora website" className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-bold text-accent-contrast">
-            C
+            H
           </div>
-          <div className="font-serif text-lg font-semibold text-navy-contrast">Connexus</div>
+          <div className="font-serif text-lg font-semibold text-navy-contrast">Humanora</div>
         </Link>
 
         <nav className="flex flex-1 items-center gap-1 overflow-x-auto">
@@ -49,7 +49,7 @@ export function Topbar() {
           </div>
           <Link
             to="/"
-            title="Back to the Connexus website"
+            title="Back to the Humanora website"
             className="flex h-8 w-8 items-center justify-center rounded-lg text-navy-contrast/70 transition hover:bg-white/10 hover:text-white"
           >
             <Globe size={16} />
