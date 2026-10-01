@@ -4,7 +4,7 @@ import { hasPreviewAccess, PREVIEW_SECRET } from './previewAccess'
 // In production, set VITE_API_URL to your deployed backend, e.g. https://api.example.com/api
 export const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
-const TOKEN_KEY = 'connexus_token'
+const TOKEN_KEY = 'humanora_token'
 
 export function getToken(): string | null {
   return sessionStorage.getItem(TOKEN_KEY)
