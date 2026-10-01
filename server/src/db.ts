@@ -5,14 +5,14 @@ import { seedHazardLibrary, HAZARD_CONTROLS } from './seedHazardLibrary.js'
 // Uses Node's built-in node:sqlite (stable-ish since Node 22.5, no native
 // build step required) rather than better-sqlite3, which needs a compiled
 // binary that isn't available in every deploy environment.
-const DB_PATH = process.env.DATABASE_PATH || './connexus.db'
+const DB_PATH = process.env.DATABASE_PATH || './humanora.db'
 const isNew = !existsSync(DB_PATH)
 
 export const db = new DatabaseSync(DB_PATH)
 db.exec('PRAGMA foreign_keys = ON')
 
 db.exec(`
--- An Organization is the employer using Connexus to manage its own psychosocial
+-- An Organization is the employer using Humanora to manage its own psychosocial
 -- risks directly (self-service model), not a third-party consultant's client list.
 CREATE TABLE IF NOT EXISTS organizations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -453,7 +453,7 @@ try {
 // the "Eliminate" line's noun phrase varied by hazard). Rewrites every
 // already-seeded row's `controls` column in place with the tailored text
 // from HAZARD_CONTROLS, keyed by name, since hazard_library is only ever
-// seeded once per database and a re-seed would duplicate rows.
+// seeded once per database.
 {
   const updateControls = db.prepare('UPDATE hazard_library SET controls = ? WHERE name = ?')
   for (const [name, controls] of Object.entries(HAZARD_CONTROLS)) {
