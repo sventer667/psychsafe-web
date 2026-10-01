@@ -5,7 +5,7 @@ import { PLAN_TIERS, type PlanTier } from '../plans.js'
 
 export const stripeWebhookRouter = Router()
 
-// Maps a Stripe price ID back to a Connexus plan tier by checking which of the
+// Maps a Stripe price ID back to a Humanora plan tier by checking which of the
 // three STRIPE_PRICE_* env vars it matches. Used when a subscription event
 // doesn't carry our own metadata (e.g. a tier change made from the Stripe
 // customer portal rather than through /checkout/create-session).
