@@ -27,7 +27,7 @@ export function requireTrialActive(req: AuthedRequest, res: Response, next: Next
 
   if (isTrialExpired(org)) {
     return res.status(402).json({
-      error: 'Your 7-day free trial has ended. Subscribe on the Billing page to keep using Connexus.',
+      error: 'Your 7-day free trial has ended. Subscribe on the Billing page to keep using Humanora.',
       code: 'trial_expired',
     })
   }
