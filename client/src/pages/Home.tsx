@@ -36,7 +36,7 @@ const FEATURES = [
     icon: ShieldCheck,
     title: 'Action plans that track themselves',
     description:
-      'Turn a recommended control into an action item in one click, assign an owner and due date, and let overdue items surface automatically instead of getting lost in a spreadsheet.',
+      'Turn a recommended control into an action item in one click, assign an owner and due date and let overdue items surface automatically instead of getting lost in a spreadsheet.',
   },
   {
     icon: Users,
