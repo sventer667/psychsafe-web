@@ -34,7 +34,7 @@ export function Signup() {
     <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto flex h-24 w-24 items-center justify-center p-3">
+          <div className="mx-auto flex h-44 w-44 items-center justify-center p-1">
             <img src={logo} alt="Humanora OHS" className="h-full w-full object-contain" />
           </div>
           <p className="mt-2 text-sm text-muted">Create your account</p>
