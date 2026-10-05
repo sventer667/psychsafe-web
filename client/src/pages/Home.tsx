@@ -52,7 +52,7 @@ const FEATURES = [
   },
   {
     icon: FileOutput,
-    title: 'Boardroom-ready PDF export',
+    title: 'Management ready PDF export',
     description:
       'One click produces a report with a risk-level chart, an action plan ordered by urgency, the consultation log, and a compliance reference section, ready to hand to a board or regulator.',
   },
@@ -71,7 +71,7 @@ const TIERS = [
     price: '$89',
     seats: '1 seat',
     blurb: 'A single person running one assessment at a time.',
-    features: ['Full hazard register & action plans', 'Boardroom-ready PDF export', 'Tamper-evident assessment sealing'],
+    features: ['Full hazard register & action plans', 'Management ready PDF export', 'Tamper-evident assessment sealing'],
   },
   {
     label: 'Growth',
