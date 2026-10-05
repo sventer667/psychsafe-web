@@ -70,7 +70,7 @@ export function Dashboard() {
           <div className="flex items-start gap-3">
             <AlertTriangle size={18} className="mt-0.5 shrink-0 text-alert" />
             <div className="flex-1">
-              <div className="text-sm font-medium text-ink">Set your organisation's state or territory first</div>
+              <div className="text-base font-bold" style={{ color: "#C0392B" }}>Set your organisation's state or territory first</div>
               <p className="mt-1 text-sm text-muted">
                 Hazard legislation citations and compliance reports are matched to your state/territory, so this
                 should be the first thing you set up. Add it on the{' '}
