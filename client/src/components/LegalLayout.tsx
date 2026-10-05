@@ -63,7 +63,7 @@ export function LegalLayout({
           <div className="flex flex-wrap gap-4">
             <Link to="/legal" className="hover:text-ink">Legal disclaimer</Link>
             <Link to="/privacy" className="hover:text-ink">Privacy policy</Link>
-            <Link to="/terms" className="hover:text-ink">Terms &amp; conditions</Link>
+            <Link to="/terms" className="hover:text-ink">Terms &amp; conditions</Link><Link to="/support" className="hover:text-ink">Support policy</Link>
           </div>
         </div>
       </section>
@@ -74,7 +74,7 @@ export function LegalLayout({
             <img src={logo} alt="Humanora" className="h-6 w-6 object-contain" />
             <span>© {new Date().getFullYear()} Humanora</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4"><Link to="/support" className="hover:text-ink">Support</Link>
             {user ? (
               <button onClick={() => navigate('/dashboard')} className="hover:text-ink">Go to dashboard</button>
             ) : (
