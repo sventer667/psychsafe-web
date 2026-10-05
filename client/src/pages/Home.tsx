@@ -48,7 +48,7 @@ const FEATURES = [
     icon: FileLock2,
     title: 'Cryptographic sealing',
     description:
-      'When an assessment is closed, every hazard, action, and consultation entry is locked in with a SHA-256 checksum and stamped through an independent RFC 3161 time authority, giving anyone reviewing it later a way to confirm both its contents and its closing time without taking our word for it.',
+      'When an assessment is closed, every hazard, action, and consultation entry is locked in with Secure Hash Algorithms and stamped through an independent RFC 3161 time stamp authority, giving anyone reviewing it later a way to confirm both its contents and its closing time.',
   },
   {
     icon: FileOutput,
