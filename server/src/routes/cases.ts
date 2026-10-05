@@ -215,7 +215,25 @@ function closeReadinessErrors(caseId: number | string): string[] {
   return errors
 }
 
-casesRouter.post('/:id/close', async (req: AuthedRequest, res) => {
+casesRouter.delete('/:id', (req: AuthedRequest, res) => {
+  if (!ownsCase(req.auth!.orgId, req.params.id)) return res.status(404).json({ error: 'Assessment not found' })
+  const c = db.prepare('SELECT status FROM cases WHERE id = ?').get(req.params.id) as { status: string } | undefined
+  if (!c) return res.status(404).json({ error: 'Assessment not found' })
+  if (c.status === 'closed') return res.status(400).json({ error: 'A sealed assessment cannot be deleted. Reopen it first.' })
+  const id = Number(req.params.id)
+  try {
+    const tables = (db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as { name: string }[]).map((t) => t.name)
+    const hasCol = (t: string, col: string) => db.prepare(`SELECT 1 FROM pragma_table_info('${t}') WHERE name = ?`).get(col) !== undefined
+    for (const t of tables) { if (t !== 'cases' && t !== 'hazards' && hasCol(t, 'hazardId')) db.prepare(`DELETE FROM ${t} WHERE hazardId IN (SELECT id FROM hazards WHERE caseId = ?)`).run(id) }
+    for (const t of tables) { if (t !== 'cases' && hasCol(t, 'caseId')) db.prepare(`DELETE FROM ${t} WHERE caseId = ?`).run(id) }
+    db.prepare('DELETE FROM cases WHERE id = ?').run(id)
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('Assessment delete failed', err)
+    res.status(500).json({ error: 'Failed to delete assessment' })
+  }
+})
+  casesRouter.post('/:id/close', async (req: AuthedRequest, res) => {
   if (!ownsCase(req.auth!.orgId, req.params.id)) return res.status(404).json({ error: 'Assessment not found' })
   const c = db.prepare('SELECT * FROM cases WHERE id = ?').get(req.params.id) as { status: string } | undefined
   if (!c) return res.status(404).json({ error: 'Assessment not found' })
