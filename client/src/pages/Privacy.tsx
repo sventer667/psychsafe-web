@@ -49,7 +49,7 @@ export function Privacy() {
         </p>
         <h3>Technical information</h3>
         <p>
-          Our hosting provider, Render, automatically logs standard web request data (IP address, requested URL,
+          Our cloud hosting provider, located in Australia, automatically logs standard web request data (IP address, requested URL,
           timestamp) for security and operational purposes, the same way any web host does. Humanora doesn't run
           Google Analytics, advertising pixels, or any other third-party tracking or analytics tool, and doesn't set
           any cookies, your signed-in session is kept in your browser's session storage rather than a cookie, and is
@@ -88,10 +88,10 @@ export function Privacy() {
               <td className="py-2">United States</td>
             </tr>
             <tr>
-              <td className="py-2 pr-3 text-ink">Render</td>
+              <td className="py-2 pr-3 text-ink">Cloud hosting provider</td>
               <td className="py-2 pr-3">The full application database, including assessment content</td>
               <td className="py-2 pr-3">Application hosting</td>
-              <td className="py-2">United States (Oregon)</td>
+              <td className="py-2">Australia (Sydney)</td>
             </tr>
           </tbody>
         </table>
@@ -105,9 +105,9 @@ export function Privacy() {
       <section>
         <h2>6. Overseas disclosure (Australian Privacy Principle 8)</h2>
         <p>
-          Both Stripe and Render, our only two service providers, are based in the United States, so your
-          information, including assessment content stored in our database, is held on infrastructure located
-          outside Australia rather than within it. Stripe and Render are each large, established providers that
+          Our application database, including all assessment content, is hosted on cloud infrastructure located in
+          Australia (Sydney), so that information is not sent overseas as part of hosting. Our payment processor,
+          Stripe, is based in the United States, so the payment information you provide is processed outside Australia. Our hosting provider and Stripe are each large, established providers that
           publish their own security and compliance documentation, including SOC 2 reports, on request. We haven't
           independently audited either provider's certifications ourselves, but if you need their current
           data-processing terms to meet your own compliance obligations, contact us (Section 11) and we'll point you
