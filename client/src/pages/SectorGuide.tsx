@@ -117,7 +117,7 @@ export function SectorGuide() {
           <div className="flex items-center gap-4">
             <Link to="/legal" className="hover:text-ink">Legal</Link>
             <Link to="/privacy" className="hover:text-ink">Privacy</Link>
-            <Link to="/terms" className="hover:text-ink">Terms</Link>
+            <Link to="/terms" className="hover:text-ink">Terms</Link><Link to="/support" className="hover:text-ink">Support</Link>
             {user ? (
               <button onClick={() => navigate('/dashboard')} className="hover:text-ink">Go to dashboard</button>
             ) : (
