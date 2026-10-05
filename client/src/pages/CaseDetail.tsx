@@ -209,7 +209,18 @@ export function CaseDetail() {
       setBusy(false)
     }
   }
-
+async function deleteCase() {
+  if (!id) return
+  if (!window.confirm('Permanently delete this assessment and all its data? This cannot be undone.')) return
+  setBusy(true)
+  try {
+    await api(`/cases/${id}`, { method: 'DELETE' })
+    navigate('/cases')
+  } catch (err) {
+    setCloseError(err instanceof ApiError ? err.message : 'Something went wrong')
+    setBusy(false)
+  }
+}
   async function reopenCase() {
     if (!id) return
     setReopenError('')
@@ -483,7 +494,13 @@ export function CaseDetail() {
             </Card>
           )}
 
-          {(caseFile.sealHistory?.length ?? 0) > 0 && (
+        {caseFile.status === 'open' && (
+  <Card>
+    <h2 className="mb-2 font-serif text-lg text-ink">Delete this assessment</h2>
+    <p className="mb-3 text-sm text-muted">Permanently removes this assessment and all its hazards, actions, consultations and evidence. This cannot be undone.</p>
+    <Button variant="secondary" onClick={deleteCase} disabled={busy}>Delete assessment</Button>
+  </Card>
+)}  {(caseFile.sealHistory?.length ?? 0) > 0 && (
             <Card>
               <div className="mb-3 flex items-center gap-2">
                 <History size={16} className="text-muted" />
