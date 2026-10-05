@@ -85,7 +85,7 @@ export function Legal() {
         <h2>7. Third-party services</h2>
         <p>
           Humanora relies on third-party infrastructure to operate: <strong>Stripe</strong> for payment processing
-          and <strong>Render</strong> for application hosting. We're not responsible for the availability, content,
+          and <strong>DigitalOcean</strong> for application hosting. We're not responsible for the availability, content,
           or practices of these or any other third-party service, including any external site you reach via a link
           from Humanora. Their own terms and privacy policies apply to your use of them. See our{' '}
           <a href="/privacy">Privacy Policy</a> for where these providers are located and what they can access.
