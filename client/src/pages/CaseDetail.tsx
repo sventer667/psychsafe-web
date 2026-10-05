@@ -418,8 +418,8 @@ export function CaseDetail() {
                 complete first, closing locks the assessment from further edits.
               </p>
               <p className="mb-4 text-sm text-muted">
-                Closing locks the hazard register, action plan, and consultation log together, generates a SHA-256
-                fingerprint of the record, and certifies the time with an independent RFC 3161 authority. The
+                When an assessment is closed, every hazard, action, and consultation entry is locked in with Secure Hash Algorithms and stamped through an independent RFC 3161 time stamp authority, giving anyone reviewing it later a way to confirm both its contents and its closing time.
+                The
                 assessment can't be edited once sealed.
               </p>
               {(hazards.length === 0 || consultations.length === 0) && (
