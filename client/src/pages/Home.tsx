@@ -24,7 +24,7 @@ const FEATURES = [
     icon: ClipboardList,
     title: 'Hazard register with a built-in library',
     description:
-      'Pull from a reference library of psychosocial hazards aligned to Safe Work Australia\'s model, rate them with plain-English descriptions instead of a raw 1-5 scale, and get a staged pathway of controls for each one.',
+      'Pull from a reference library of psychosocial hazards aligned to Safe Work Australia\'s model, rate them with plain English descriptions and get a staged pathway of controls for each one.',
   },
   {
     icon: MapPin,
