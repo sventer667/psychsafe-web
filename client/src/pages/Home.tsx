@@ -120,7 +120,8 @@ export function Home() {
 
       {/* Hero */}
       <section className="mx-auto max-w-5xl px-6 py-20 text-center">
-        <h1 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
+        <img src={logo} alt="Humanora" className="mx-auto mb-8 h-16 w-auto sm:h-20" />
+<h1 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
           Psychosocial risk management
         </h1><h2 className="mx-auto mt-4 max-w-3xl font-serif text-xl text-ink sm:text-2xl">Identify and manage the Psychosocial risks in your organisation.</h2>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-muted">
