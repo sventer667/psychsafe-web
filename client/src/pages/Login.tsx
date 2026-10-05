@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Input, Label } from '../components/ui/Input'
 import { ApiError } from '../lib/api'
-import logo from '../assets/humanora-logo.svg'
+import logo from '../assets/humanora-logo.png'
 
 export function Login() {
   const { login, loginWithTotp } = useAuth()
