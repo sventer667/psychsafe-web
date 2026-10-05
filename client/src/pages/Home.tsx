@@ -62,7 +62,7 @@ const STEPS = [
   { title: 'Create your organisation', description: 'Sign up, and you\'re in, no sales call required to start your 7-day free trial.' },
   { title: 'Set your state and industry', description: 'A short profile drives which legislation citations show up everywhere else.' },
   { title: 'Run the assessment', description: 'Add hazards from the library, rate them, assign actions, and log consultations as you go.' },
-  { title: 'Export and seal', description: 'Download a boardroom-ready PDF, then close the assessment to lock in a verifiable, tamper-evident seal.' },
+  { title: 'Export and seal', description: 'Download a management-ready PDF, then close the assessment to lock in a verifiable, tamper-evident seal.' },
 ]
 
 const TIERS = [
