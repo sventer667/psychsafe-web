@@ -238,7 +238,7 @@ export function Home() {
             <span>© {new Date().getFullYear()} Humanora</span>
           </div>
           <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/support')} className="hover:text-ink">Support</button><button onClick={() => navigate('/login')} className="hover:text-ink">Log in</button>
+            <button onClick={() => navigate('/legal')} className="hover:text-ink">Legal</button><button onClick={() => navigate('/privacy')} className="hover:text-ink">Privacy</button><button onClick={() => navigate('/terms')} className="hover:text-ink">Terms</button><button onClick={() => navigate('/support')} className="hover:text-ink">Support</button><button onClick={() => navigate('/login')} className="hover:text-ink">Log in</button>
             <button onClick={() => navigate('/signup')} className="hover:text-ink">Sign up</button>
           </div>
         </div>
