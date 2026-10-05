@@ -1,6 +1,7 @@
 import { NavLink, Link } from 'react-router-dom'
 import { LayoutDashboard, FolderLock, Users, ShieldCheck, CreditCard, LogOut, Globe } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import emblem from '../assets/humanora-emblem.png'
 
 const nav = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -18,8 +19,8 @@ export function Topbar() {
       <div className="h-[3px] bg-gradient-to-r from-accent via-accent to-navy" />
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-6 py-3">
         <Link to="/" title="Back to the Humanora website" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-bold text-accent-contrast">
-            H
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white">
+            <img src={emblem} alt="" className="h-6 w-6" />
           </div>
           <div className="font-serif text-lg font-semibold text-navy-contrast">Humanora</div>
         </Link>
