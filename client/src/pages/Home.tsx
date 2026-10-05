@@ -121,7 +121,7 @@ export function Home() {
       {/* Hero */}
       <section className="mx-auto max-w-5xl px-6 py-20 text-center">
         <h1 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
-          Psychosocial risk management, without the spreadsheet sprawl
+          Psychosocial risk management: identify and manage what could harm mental health at work
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-muted">
           Humanora is a self-serve system of record for psychosocial workplace risk. It's built for any
