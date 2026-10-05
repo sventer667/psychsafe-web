@@ -106,7 +106,7 @@ export function Home() {
         <div className="h-[3px] bg-gradient-to-r from-accent via-accent to-navy" />
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Humanora" className="h-8 w-8 object-contain" />
+            
             <div className="font-serif text-lg font-semibold text-navy-contrast">Humanora</div>
           </div>
           <div className="flex items-center gap-3">
@@ -234,7 +234,7 @@ export function Home() {
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 text-sm text-muted">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Humanora" className="h-6 w-6 object-contain" />
+            
             <span>© {new Date().getFullYear()} Humanora</span>
           </div>
           <div className="flex items-center gap-4">
