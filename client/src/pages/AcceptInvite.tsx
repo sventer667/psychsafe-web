@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button'
 import { Input, Label } from '../components/ui/Input'
 import { api, ApiError } from '../lib/api'
 import type { Organization, User } from '../lib/types'
-import logo from '../assets/humanora-logo.svg'
+import logo from '../assets/humanora-logo.png'
 
 interface InvitePreview {
   name: string
