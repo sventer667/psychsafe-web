@@ -124,8 +124,8 @@ export function Home() {
           Psychosocial risk management, without the spreadsheet sprawl
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-muted">
-          Humanora turns a psychosocial risk assessment into one structured, auditable record: hazards, action
-          plans, consultations, and a sealed report, instead of a folder of scattered documents.
+          Humanora is a self-serve system of record for psychosocial workplace risk. It's built for any
+          organisation that needs to assess hazards, manage controls and keep a defensible record.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Button onClick={() => navigate('/signup')} className="px-6 py-3 text-base">
