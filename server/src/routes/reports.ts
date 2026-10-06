@@ -4,6 +4,7 @@ import { db } from '../db.js'
 import { requireAuth, type AuthedRequest } from '../auth.js'
 import { ownsCase } from '../ownership.js'
 import { requireTrialActive } from '../trialGate.js'
+import { drawLogo } from '../pdfLogo.js'
 
 export const reportsRouter = Router()
 reportsRouter.use(requireAuth)
@@ -67,6 +68,7 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
 
   const doc = new PDFDocument({ size: 'A4', margin: 50 })
   doc.pipe(res)
+  drawLogo(doc)
 
   // --- Title page ---
   doc.fontSize(10).fillColor(MUTED).text((org.name || 'Humanora').toUpperCase(), { characterSpacing: 1 })
