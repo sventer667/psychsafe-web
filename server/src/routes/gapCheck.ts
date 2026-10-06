@@ -2,6 +2,7 @@ import { Router } from 'express'
 import PDFDocument from 'pdfkit'
 import { db } from '../db.js'
 import { sendEmail } from '../email.js'
+import { drawLogo } from '../pdfLogo.js'
 
 // Public, unauthenticated router. Unlike reports.ts (which requires a logged
 // in user who owns the case), the gap-check quiz is answered by anonymous
@@ -308,6 +309,7 @@ gapCheckRouter.get('/:id/pdf', async (req, res) => {
 
   const doc = new PDFDocument({ size: 'A4', margin: 50 })
   doc.pipe(res)
+  drawLogo(doc)
 
   // Cover
   doc.fontSize(22).fillColor(INK).text('Your psychosocial risk gap check', { align: 'left' })
