@@ -87,6 +87,12 @@ export function Privacy() {
               <td className="py-2 pr-3">Payment processing</td>
               <td className="py-2">United States</td>
             </tr>
+            <tr className="border-b border-border">
+              <td className="py-2 pr-3 text-ink">Resend (email delivery)</td>
+              <td className="py-2 pr-3">Name, email address and the content of emails we send you (for example Gap Check results, invitations and password resets)</td>
+              <td className="py-2 pr-3">Sending transactional emails</td>
+              <td className="py-2">United States, delivered from Japan (Tokyo)</td>
+            </tr>
             <tr>
               <td className="py-2 pr-3 text-ink">Cloud hosting provider</td>
               <td className="py-2 pr-3">The full application database, including assessment content</td>
@@ -107,11 +113,11 @@ export function Privacy() {
         <p>
           Our application database, including all assessment content, is hosted on cloud infrastructure located in
           Australia (Sydney), so that information is not sent overseas as part of hosting. Our payment processor,
-          Stripe, is based in the United States, so the payment information you provide is processed outside Australia. Our hosting provider and Stripe are each large, established providers that
+          Stripe, is based in the United States, so the payment information you provide is processed outside Australia. Our email delivery provider, Resend, is also based in the United States and sends our emails from Japan (Tokyo), so your name, email address and the content of emails we send you (such as Gap Check results, invitations and password resets) are processed outside Australia. Our hosting provider and Stripe are each large, established providers that
           publish their own security and compliance documentation, including SOC 2 reports, on request. We haven't
           independently audited either provider's certifications ourselves, but if you need their current
           data-processing terms to meet your own compliance obligations, contact us (Section 11) and we'll point you
-          to the relevant documentation.
+          to the relevant documentation, including Resend's own security and data-processing terms.
         </p>
         <p>
           You can ask us what information about you has been disclosed overseas, or object to a specific disclosure,
