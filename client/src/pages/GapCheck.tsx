@@ -309,7 +309,7 @@ export function GapCheck() {
               We'll pre-load your hazard register with the gaps we just found for {industry} in {state}.
             </p>
             <p className="mt-4 text-sm">
-              <a href={`https://connexus-api-f5h7.onrender.com${result.pdfUrl}`} className="text-accent hover:underline">
+              <a href={`https://api.humanora.com.au${result.pdfUrl}`} className="text-accent hover:underline">
                 Not ready? No worries, your breakdown is already on its way.
               </a>
             </p>
