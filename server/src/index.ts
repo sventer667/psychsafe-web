@@ -46,6 +46,7 @@ if (MAINTENANCE_MODE) {
   app.use((req, res, next) => {
     if (req.path === '/api/health') return next()
     if (req.path.startsWith('/api/gap-check')) return next()
+    if (req.path === '/api/stripe/webhook') return next()
     if (PREVIEW_ACCESS_SECRET && req.get('X-Preview-Access') === PREVIEW_ACCESS_SECRET) return next()
     res.status(503).json({ error: 'Service temporarily unavailable' })
   })
