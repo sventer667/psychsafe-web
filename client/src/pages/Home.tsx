@@ -76,15 +76,15 @@ const TIERS = [
   {
     label: 'Growth',
     price: '$179',
-    seats: 'Up to 3 seats',
+    seats: 'Up to 5 seats',
     blurb: 'A WHS/HR team collaborating across assessments.',
     features: ['Everything in Starter', 'Unlimited assessments', 'Priority email support'],
     highlighted: true,
   },
   {
     label: 'Enterprise',
-    price: '$399',
-    seats: 'Up to 10 seats',
+    price: '$599',
+    seats: 'Up to 20 seats',
     blurb: 'A larger organisation with a dedicated WHS function.',
     features: ['Everything in Growth', 'Dedicated onboarding', 'Priority support SLA'],
   },
