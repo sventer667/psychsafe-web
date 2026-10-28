@@ -35,12 +35,12 @@ export function Terms() {
       </section>
 
       <section>
-        <h2>4. Plans, pricing, and billing</h2>
+        <h2>4. Plans, pricing, and payment</h2>
         <p>
           Humanora is offered on Starter, Growth, and Enterprise plans, billed per seat. Current pricing is shown on
           our pricing page and may change; we'll give existing subscribers at least 30 days notice before a price
           change takes effect on their account. Payment is processed by Stripe; we don't store your card details.
-          Subscriptions renew automatically for the same billing period unless cancelled before the renewal date.
+          Subscriptions renew automatically for the same subscription period unless cancelled before the renewal date.
           Fees are non-refundable except where required by law.
         </p>
       </section>
@@ -105,7 +105,7 @@ export function Terms() {
       <section>
         <h2>10. Termination and cancellation</h2>
         <p>
-          You can cancel your subscription at any time; access continues until the end of the current billing
+          You can cancel your subscription at any time; access continues until the end of the current subscription
           period, with no partial refund for the unused portion. We can suspend or terminate an account for material
           breach of these terms, non-payment, or unlawful use, with notice where practicable. We don't currently run
           an automated data-deletion process after cancellation, your data remains stored, though write access is
