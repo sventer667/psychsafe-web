@@ -103,7 +103,7 @@ export function Legal() {
       <section>
         <h2>9. Contact</h2>
         <p>
-          Questions about this page: <strong>contact@humanoraohs.com.au</strong>.
+          Questions about this page: <strong>contact@humanora.com.au</strong>.
         </p>
       </section>
     </LegalLayout>
