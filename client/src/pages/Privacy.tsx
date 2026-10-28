@@ -42,7 +42,7 @@ export function Privacy() {
           and a description of a psychosocial hazard, incident, or their wellbeing. We treat this category as
           sensitive and apply the same access controls as account data; see Section 6.
         </p>
-        <h3>Billing information</h3>
+        <h3>Payment information</h3>
         <p>
           Payment is handled by Stripe. We receive your subscription plan and payment status from Stripe, we don't
           receive or store your card number.
@@ -61,7 +61,7 @@ export function Privacy() {
         <h2>4. Why we collect and use it</h2>
         <ul>
           <li><strong>Service delivery</strong>: to create and run your account, store your assessments, and generate PDF reports</li>
-          <li><strong>Billing</strong>: to manage your subscription and trial period via Stripe</li>
+          <li><strong>Payments</strong>: to manage your subscription and trial period via Stripe</li>
           <li><strong>Security</strong>: to authenticate sign-ins, support two-factor authentication, and investigate suspicious activity</li>
           <li><strong>Support</strong>: to respond if you contact us with a question or issue</li>
           <li><strong>Legal and accounting obligations</strong>: to keep records the law requires us to keep, such as financial records</li>
