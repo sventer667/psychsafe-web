@@ -195,7 +195,7 @@ export function Privacy() {
       <section>
         <h2>11. Complaints</h2>
         <p>
-          If you think we've mishandled your personal information, email <strong>contact@humanoraohs.com.au</strong> with
+          If you think we've mishandled your personal information, email <strong>contact@humanora.com.au</strong> with
           details. We'll acknowledge your complaint within 5 business days and aim to resolve it within 30 days. If
           you're not satisfied with our response, you can complain to the OAIC at oaic.gov.au, free of charge.
         </p>
@@ -214,7 +214,7 @@ export function Privacy() {
         <p>
           <strong>Humanora</strong><br />
           Humanora OHS, ABN 80 423 515 887<br />
-          Email: contact@humanoraohs.com.au
+          Email: contact@humanora.com.au
         </p>
       </section>
     </LegalLayout>
