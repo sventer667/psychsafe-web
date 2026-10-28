@@ -17,8 +17,8 @@ export function ComingSoon() {
       </p>
       <p className="mt-8 text-sm text-navy-contrast/60">
         In the meantime, reach us at{' '}
-        <a href="mailto:contact@humanoraohs.com.au" className="text-accent underline underline-offset-2">
-          contact@humanoraohs.com.au
+        <a href="mailto:contact@humanora.com.au" className="text-accent underline underline-offset-2">
+          contact@humanora.com.au
         </a>
       </p>
     </div>
