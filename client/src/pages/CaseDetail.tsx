@@ -392,7 +392,7 @@ async function deleteCase() {
               <p className="mt-1 text-xs text-muted">
                 Drives the legislation citations in the Risk Register and PDF export for this assessment. If your
                 organisation has sites in more than one state, set each assessment to the state that site is in
-                (your organisation's own default state is set on the Billing page).
+                (your organisation's own default state is set on the Subscription page).
               </p>
               {savingState && <p className="mt-1 text-xs text-muted">Saving…</p>}
               {stateSaved && !savingState && <p className="mt-1 text-xs text-success">Saved</p>}
