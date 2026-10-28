@@ -8,7 +8,7 @@ const nav = [
   { to: '/cases', label: 'Assessments', icon: FolderLock },
   { to: '/team', label: 'Team', icon: Users },
   { to: '/security', label: 'Security', icon: ShieldCheck },
-  { to: '/billing', label: 'Billing', icon: CreditCard },
+  { to: '/billing', label: 'Subscription', icon: CreditCard },
 ]
 
 export function Topbar() {
