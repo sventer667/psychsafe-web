@@ -97,7 +97,7 @@ export function Team() {
         <Card className="mb-6">
           <p className="text-sm text-muted">
             You're at your plan's seat limit. Upgrade on the{' '}
-            <Link to="/billing" className="text-accent hover:underline">Billing &amp; Organisation</Link> page to invite
+            <Link to="/billing" className="text-accent hover:underline">Subscription &amp; Organisation</Link> page to invite
             more people.
           </p>
         </Card>
