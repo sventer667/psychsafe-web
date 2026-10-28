@@ -141,7 +141,7 @@ export function Billing() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl text-ink">Billing &amp; Organisation</h1>
+        <h1 className="font-serif text-2xl text-ink">Subscription &amp; Organisation</h1>
         <p className="text-sm text-muted">Manage your Humanora subscription and organisation profile</p>
       </div>
 
@@ -288,7 +288,7 @@ export function Billing() {
 
         <p className="mt-4 text-xs text-muted">
           {isSubscribed
-            ? 'Manage payment method, invoices, or cancel via the Stripe billing portal above.'
+            ? 'Manage payment method, invoices, or cancel via the Stripe customer portal above.'
             : 'Pick a tier above to start a subscription via Stripe Checkout.'}{' '}
           Requires STRIPE_SECRET_KEY and the STRIPE_PRICE_* vars in server/.env. See server/scripts/setup-stripe-prices.mjs.
         </p>
