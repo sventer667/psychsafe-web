@@ -74,7 +74,7 @@ export function Dashboard() {
               <p className="mt-1 text-sm text-muted">
                 Hazard legislation citations and compliance reports are matched to your state/territory, so this
                 should be the first thing you set up. Add it on the{' '}
-                <Link to="/billing" className="text-accent hover:underline">Billing &amp; Organisation</Link> page.
+                <Link to="/billing" className="text-accent hover:underline">Subscription &amp; Organisation</Link> page.
               </p>
             </div>
             <Button variant="secondary" onClick={() => navigate('/billing')}>
@@ -148,7 +148,7 @@ export function Dashboard() {
                   ? `Based on your ${org?.reviewFrequencyMonths}-month reassessment cadence, a new assessment was due on ${reviewDueDate.toLocaleDateString()}. Psychosocial risk changes over time, an assessment that's gone stale can't be relied on to reflect current conditions.`
                   : `Based on your ${org?.reviewFrequencyMonths}-month reassessment cadence, a new assessment is due by ${reviewDueDate.toLocaleDateString()}.`}{' '}
                 Change the cadence on the{' '}
-                <Link to="/billing" className="text-accent hover:underline">Billing &amp; Organisation</Link> page.
+                <Link to="/billing" className="text-accent hover:underline">Subscription &amp; Organisation</Link> page.
             </p>
           </div>
           <Button variant="secondary" onClick={() => navigate('/cases')}>
