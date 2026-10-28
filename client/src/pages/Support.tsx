@@ -74,7 +74,7 @@ export function Support() {
               <tr className="border-b border-border">
                 <td className="py-3 pr-4 font-medium text-ink">Normal</td>
                 <td className="py-3 pr-4">
-                  A feature is not working as expected but you can still do your work, or you have a billing or
+                  A feature is not working as expected but you can still do your work, or you have a payment or
                   account question.
                 </td>
                 <td className="py-3 pr-4">Within 2 business days</td>
@@ -101,7 +101,7 @@ export function Support() {
           <li>Help signing in, resetting passwords and recovering two-factor authentication after identity verification.</li>
           <li>Help using features such as hazard libraries, action plans, consultation records, exports and sealing.</li>
           <li>Investigating and fixing faults in Humanora.</li>
-          <li>Billing and plan questions, including invoices, plan changes and cancellations.</li>
+          <li>Payment and plan questions, including invoices, plan changes and cancellations.</li>
           <li>Adding, removing and changing user seats within your plan.</li>
         </ul>
       </section>
