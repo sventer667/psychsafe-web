@@ -145,7 +145,7 @@ export function Terms() {
         <p>
           <strong>Humanora</strong><br />
           Humanora OHS, ABN 80 423 515 887<br />
-          Email: contact@humanoraohs.com.au
+          Email: contact@humanora.com.au
         </p>
       </section>
     </LegalLayout>
