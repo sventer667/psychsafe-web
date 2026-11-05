@@ -11,7 +11,11 @@ enterpriseRouter.use(requireAuth)
 const ROLES = ['admin', 'member', 'viewer'] as const
 
 function orgTier(orgId: number): string {
-  return (db.prepare('SELECT planTier FROM organizations WHERE id = ?').get(orgId) as { planTier: string } | undefined)?.planTier ?? 'starter'
+  const org = db.prepare('SELECT planTier, planStatus FROM organizations WHERE id = ?').get(orgId) as
+    | { planTier: string; planStatus: string }
+    | undefined
+  // Enterprise features need a paid, current subscription.
+  return org?.planStatus === 'active' ? org.planTier : 'starter'
 }
 
 function actor(req: AuthedRequest) {
