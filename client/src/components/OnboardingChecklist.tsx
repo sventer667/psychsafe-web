@@ -128,6 +128,14 @@ export function OnboardingChecklist() {
         ))}
       </ul>
 
+      <p className="mt-3 text-sm text-muted">
+        Not sure where to start?{' '}
+        <a href="/gap-check" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+          Take the 2-minute gap check
+        </a>
+        .
+      </p>
+
       <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-canvas p-3">
         <Sparkles size={18} className="shrink-0 text-accent" />
         <div className="min-w-0 flex-1 text-sm text-ink">
