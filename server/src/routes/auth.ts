@@ -6,13 +6,12 @@ import QRCode from 'qrcode'
 import { db } from '../db.js'
 import { requireAuth, signPendingTwoFactorToken, verifyPendingTwoFactorToken, type AuthedRequest } from '../auth.js'
 import { startSession } from '../sessions.js'
-import { PLAN_TIERS } from '../plans.js'
 import { passwordResetRouter } from '../passwordReset.js'
 
 export const authRouter = Router()
 
 const ORG_COLUMNS =
-  'id, name, industry, state, businessUnit, planStatus, planTier, trialEndsAt, stripeCustomerId, consultantName, consultantCredential, reviewFrequencyMonths'
+  'id, name, industry, state, businessUnit, planStatus, planTier, require2fa, trialEndsAt, stripeCustomerId, consultantName, consultantCredential, reviewFrequencyMonths'
 
 const TRIAL_DAYS = 7
 
@@ -221,8 +220,10 @@ const REVIEW_FREQUENCY_OPTIONS = [3, 6, 12, 24]
 authRouter.patch('/org', requireAuth, (req: AuthedRequest, res) => {
   const { name, industry, state, businessUnit, consultantName, consultantCredential, planTier, reviewFrequencyMonths } =
     req.body as Record<string, string | number>
-  if (planTier !== undefined && !PLAN_TIERS.includes(planTier as (typeof PLAN_TIERS)[number])) {
-    return res.status(400).json({ error: 'Invalid plan tier' })
+  // The plan tier is never set from here: it only changes through Stripe
+  // (checkout / the billing webhook). Accepting it would let anyone self-upgrade.
+  if (planTier !== undefined) {
+    return res.status(400).json({ error: 'Change your plan from the Subscription page' })
   }
   if (reviewFrequencyMonths !== undefined && !REVIEW_FREQUENCY_OPTIONS.includes(Number(reviewFrequencyMonths))) {
     return res.status(400).json({ error: 'Invalid reassessment cadence' })
@@ -234,7 +235,6 @@ authRouter.patch('/org', requireAuth, (req: AuthedRequest, res) => {
     ['businessUnit', businessUnit],
     ['consultantName', consultantName],
     ['consultantCredential', consultantCredential],
-    ['planTier', planTier],
     ['reviewFrequencyMonths', reviewFrequencyMonths !== undefined ? Number(reviewFrequencyMonths) : undefined],
   ]
   for (const [column, value] of fields) {
