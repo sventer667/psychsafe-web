@@ -6,7 +6,7 @@ export function Privacy() {
       <section>
         <h2>1. Scope</h2>
         <p>
-          This policy explains how Humanora (<strong>Humanora OHS, ABN 80 423 515 887</strong>)
+          This policy explains how Humanora (<strong>ABN 80 423 515 887</strong>)
           collects, holds, uses, and discloses personal information through our website and platform. It's written
           to comply with the Australian Privacy Principles (APPs) under the Privacy Act 1988 (Cth). Nothing here
           limits any right you have under the Privacy Act or the Australian Consumer Law that can't lawfully be
@@ -213,7 +213,7 @@ export function Privacy() {
         <h2>13. Contact</h2>
         <p>
           <strong>Humanora</strong><br />
-          Humanora OHS, ABN 80 423 515 887<br />
+          ABN 80 423 515 887<br />
           Email: contact@humanora.com.au
         </p>
       </section>
