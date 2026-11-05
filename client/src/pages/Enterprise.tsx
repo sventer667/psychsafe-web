@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Download, Lock } from 'lucide-react'
+import { Download, Lock, Upload } from 'lucide-react'
 import { Card, Badge } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { api, ApiError, API_BASE, getToken } from '../lib/api'
@@ -14,6 +14,8 @@ const LABELS: Record<string, string> = {
   assessment_sealed: 'Sealed an assessment',
   assessment_reopened: 'Reopened an assessment',
   assessment_deleted: 'Deleted an assessment',
+  import_assessments: 'Imported assessments',
+  import_team: 'Imported team invites',
   report_exported: 'Exported a PDF report',
   invite_sent: 'Invited a teammate',
   role_changed: 'Changed a role',
@@ -119,6 +121,9 @@ export function Enterprise() {
         </div>
       </Card>
 
+      <ImportCard kind="assessments" enterprise={enterprise} />
+      <ImportCard kind="team" enterprise={enterprise} />
+
       <Card>
         <div className="mb-3 flex items-center justify-between gap-4">
           <div>
@@ -157,5 +162,166 @@ export function Enterprise() {
         )}
       </Card>
     </div>
+  )
+}
+
+// Minimal CSV parser: handles quoted fields, escaped quotes and CRLF.
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = []
+  let row: string[] = []
+  let cell = ''
+  let quoted = false
+  const t = text.replace(/^\uFEFF/, '')
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i]
+    if (quoted) {
+      if (c === '"' && t[i + 1] === '"') {
+        cell += '"'
+        i++
+      } else if (c === '"') quoted = false
+      else cell += c
+    } else if (c === '"') quoted = true
+    else if (c === ',') {
+      row.push(cell)
+      cell = ''
+    } else if (c === '\n' || c === '\r') {
+      if (c === '\r' && t[i + 1] === '\n') i++
+      row.push(cell)
+      cell = ''
+      if (row.some((x) => x.trim() !== '')) rows.push(row)
+      row = []
+    } else cell += c
+  }
+  row.push(cell)
+  if (row.some((x) => x.trim() !== '')) rows.push(row)
+  return rows
+}
+
+function download(name: string, content: string) {
+  const url = URL.createObjectURL(new Blob([content], { type: 'text/csv;charset=utf-8' }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+const IMPORTS = {
+  assessments: {
+    title: 'Import assessments',
+    blurb: 'Create one assessment per site or team from a spreadsheet. Columns: name, state, scope. State is optional (NSW, VIC, QLD, WA, SA, TAS, ACT, NT).',
+    template: 'name,state,scope\nSydney head office,NSW,All office staff\nMelbourne warehouse,VIC,Warehouse and dispatch teams\n',
+    path: '/enterprise/import/assessments',
+    file: 'humanora-assessments-template.csv',
+  },
+  team: {
+    title: 'Import team members',
+    blurb: 'Create invites for many people at once. Columns: name, email. Each person gets an invite link to set their password; you can download all the links afterwards.',
+    template: 'name,email\nJane Citizen,jane@example.com\nAlex Smith,alex@example.com\n',
+    path: '/enterprise/import/team',
+    file: 'humanora-team-template.csv',
+  },
+} as const
+
+type ImportResult = {
+  valid: number
+  errors: { row: number; message: string }[]
+  created: number
+  invites?: { name: string; email: string; token: string }[]
+}
+
+function ImportCard({ kind, enterprise }: { kind: 'assessments' | 'team'; enterprise: boolean }) {
+  const cfg = IMPORTS[kind]
+  const [rows, setRows] = useState<Record<string, string>[] | null>(null)
+  const [fileName, setFileName] = useState('')
+  const [result, setResult] = useState<ImportResult | null>(null)
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  async function onFile(f: File | undefined) {
+    setResult(null)
+    setError('')
+    setRows(null)
+    if (!f) return
+    setFileName(f.name)
+    const grid = parseCsv(await f.text())
+    if (grid.length < 2) {
+      setError('The file needs a header row and at least one data row.')
+      return
+    }
+    const header = grid[0].map((h) => h.trim().toLowerCase())
+    const parsed = grid.slice(1).map((cells) => Object.fromEntries(header.map((h, i) => [h, (cells[i] ?? '').trim()])))
+    setRows(parsed)
+    await run(parsed, false)
+  }
+
+  async function run(data: Record<string, string>[], commit: boolean) {
+    setBusy(true)
+    setError('')
+    try {
+      const r = await api<ImportResult>(cfg.path, { method: 'POST', body: { rows: data, commit } })
+      setResult(r)
+      if (commit && r.created > 0) setRows(null)
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Import failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const ready = rows && result && result.errors.length === 0 && result.created === 0
+  return (
+    <Card className="mb-6">
+      <h2 className="font-serif text-lg text-ink">{cfg.title}</h2>
+      <p className="mb-3 text-sm text-muted">{cfg.blurb}</p>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button variant="secondary" onClick={() => download(cfg.file, cfg.template)}>
+          <Download size={16} /> Download template
+        </Button>
+        <label className={`inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm ${enterprise ? 'cursor-pointer text-ink hover:border-accent/50' : 'cursor-not-allowed text-muted'}`}>
+          <Upload size={16} /> Choose CSV file
+          <input type="file" accept=".csv,text/csv" className="hidden" disabled={!enterprise || busy} onChange={(e) => onFile(e.target.files?.[0])} />
+        </label>
+        {fileName && rows && <span className="text-sm text-muted">{fileName}</span>}
+      </div>
+      {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
+      {result && result.errors.length > 0 && (
+        <div className="mt-3 rounded-lg border border-border bg-canvas p-3 text-sm">
+          <p className="mb-1 text-ink">Nothing was imported. Fix these and choose the file again:</p>
+          <ul className="list-disc pl-5 text-destructive">
+            {result.errors.slice(0, 25).map((e, i) => (
+              <li key={i}>{e.row ? `Row ${e.row}: ` : ''}{e.message}</li>
+            ))}
+          </ul>
+          {result.errors.length > 25 && <p className="mt-1 text-muted">and {result.errors.length - 25} more</p>}
+        </div>
+      )}
+      {ready && (
+        <div className="mt-3 flex items-center gap-3">
+          <span className="text-sm text-ink">{result.valid} rows look good.</span>
+          <Button onClick={() => run(rows!, true)} disabled={busy}>{busy ? 'Importing…' : `Import ${result.valid}`}</Button>
+        </div>
+      )}
+      {result && result.created > 0 && (
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <span className="text-sm text-success">Imported {result.created}.</span>
+          {result.invites && (
+            <Button
+              variant="secondary"
+              onClick={() =>
+                download(
+                  'humanora-invite-links.csv',
+                  'name,email,invite link\n' +
+                    result.invites!.map((i) => `"${i.name.replace(/"/g, '""')}",${i.email},${window.location.origin}/invite/${i.token}`).join('\n') +
+                    '\n'
+                )
+              }
+            >
+              <Download size={16} /> Download invite links
+            </Button>
+          )}
+        </div>
+      )}
+    </Card>
   )
 }
