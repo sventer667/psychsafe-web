@@ -18,7 +18,7 @@ export function Layout() {
 
   // Admin accounts must have two-factor authentication on. Until they do, the
   // only page they can use is Security (the API enforces the same rule).
-  if (user.role === 'admin' && !user.totpEnabled && location.pathname !== '/security') {
+  if ((user.role === 'admin' || org?.require2fa) && !user.totpEnabled && location.pathname !== '/security') {
     return <Navigate to="/security" replace />
   }
 

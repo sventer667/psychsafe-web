@@ -1,5 +1,5 @@
 import { NavLink, Link } from 'react-router-dom'
-import { LayoutDashboard, FolderLock, Users, ShieldCheck, CreditCard, LogOut, Globe } from 'lucide-react'
+import { LayoutDashboard, FolderLock, Users, ShieldCheck, CreditCard, LogOut, Globe, Building2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import emblem from '../assets/humanora-emblem.png'
 
@@ -10,6 +10,8 @@ const nav = [
   { to: '/security', label: 'Security', icon: ShieldCheck },
   { to: '/billing', label: 'Subscription', icon: CreditCard },
 ]
+
+const enterpriseNav = { to: '/enterprise', label: 'Enterprise', icon: Building2 }
 
 export function Topbar() {
   const { user, org, logout } = useAuth()
@@ -26,7 +28,7 @@ export function Topbar() {
         </Link>
 
         <nav className="flex flex-1 items-center gap-1 overflow-x-auto">
-          {nav.map(({ to, label, icon: Icon }) => (
+          {(user?.role === 'admin' ? [...nav.slice(0, 4), enterpriseNav, nav[4]] : nav).map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
