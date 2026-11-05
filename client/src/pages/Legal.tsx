@@ -2,7 +2,7 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Legal() {
   return (
-    <LegalLayout title="Legal Disclaimer" version="1.0" effectiveDate="August 2026">
+    <LegalLayout title="Legal Disclaimer" version="1.0" effectiveDate="November 2026">
       <section>
         <h2>1. What this page is</h2>
         <p>
@@ -84,8 +84,7 @@ export function Legal() {
       <section>
         <h2>7. Third-party services</h2>
         <p>
-          Humanora relies on third-party infrastructure to operate: <strong>Stripe</strong> for payment processing
-          and a cloud hosting provider located in <strong>Australia</strong> for application hosting. We're not responsible for the availability, content,
+          Humanora relies on third-party infrastructure to operate: <strong>Stripe</strong> for payment processing, <strong>Resend</strong> for sending emails, <strong>Render</strong> for serving the website, and a cloud hosting provider located in <strong>Australia</strong> for application and database hosting. We're not responsible for the availability, content,
           or practices of these or any other third-party service, including any external site you reach via a link
           from Humanora. Their own terms and privacy policies apply to your use of them. See our{' '}
           <a href="/privacy">Privacy Policy</a> for where these providers are located and what they can access.
