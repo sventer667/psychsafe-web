@@ -486,3 +486,24 @@ CREATE TABLE IF NOT EXISTS known_devices (
   UNIQUE(userId, deviceHash)
 );
 `)
+
+// Enterprise: organisation-wide audit log, and an org-level switch that makes
+// two-factor authentication mandatory for every user (not just admins).
+db.exec(`
+CREATE TABLE IF NOT EXISTS audit_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  orgId INTEGER NOT NULL,
+  userId INTEGER,
+  userName TEXT NOT NULL DEFAULT '',
+  action TEXT NOT NULL,
+  detail TEXT NOT NULL DEFAULT '',
+  ip TEXT NOT NULL DEFAULT '',
+  createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_audit_log_org ON audit_log(orgId, id DESC);
+`)
+try {
+  db.exec('ALTER TABLE organizations ADD COLUMN require2fa INTEGER NOT NULL DEFAULT 0')
+} catch {
+  // Column already exists.
+}
