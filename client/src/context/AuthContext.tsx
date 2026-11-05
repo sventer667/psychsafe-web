@@ -90,6 +90,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function logout() {
+    // Ends the server-side session too (the token is read synchronously
+    // inside api() before it is cleared below).
+    if (getToken()) api('/auth/logout', { method: 'POST' }).catch(() => {})
     clearToken()
     setUser(null)
     setOrg(null)
