@@ -4,6 +4,7 @@ import { requireAuth, type AuthedRequest } from '../auth.js'
 import { ownsCase } from '../ownership.js'
 import { sealCase } from '../seal.js'
 import { requireTrialActive } from '../trialGate.js'
+import { logAudit } from '../audit.js'
 
 export const casesRouter = Router()
 casesRouter.use(requireAuth)
@@ -227,6 +228,7 @@ casesRouter.delete('/:id', (req: AuthedRequest, res) => {
     for (const t of tables) { if (t !== 'cases' && t !== 'hazards' && hasCol(t, 'hazardId')) db.prepare(`DELETE FROM ${t} WHERE hazardId IN (SELECT id FROM hazards WHERE caseId = ?)`).run(id) }
     for (const t of tables) { if (t !== 'cases' && hasCol(t, 'caseId')) db.prepare(`DELETE FROM ${t} WHERE caseId = ?`).run(id) }
     db.prepare('DELETE FROM cases WHERE id = ?').run(id)
+    logAudit(req.auth!.orgId, req.auth!.userId, 'assessment_deleted', `Assessment #${id}`, req)
     res.json({ ok: true })
   } catch (err) {
     console.error('Assessment delete failed', err)
@@ -251,6 +253,7 @@ casesRouter.delete('/:id', (req: AuthedRequest, res) => {
        sealTimestampToken = ?, sealTimestampAuthority = ?, sealTimestampTime = ? WHERE id = ?`
     ).run(seal.hash, seal.algorithm, seal.timestampToken, seal.timestampAuthority, seal.timestampTime, req.params.id)
     recordSealEvent(req.params.id, 'sealed', req.auth!.userId, '', seal)
+    logAudit(req.auth!.orgId, req.auth!.userId, 'assessment_sealed', `Assessment #${req.params.id}`, req)
     res.json(db.prepare('SELECT * FROM cases WHERE id = ?').get(req.params.id))
   } catch (err) {
     console.error('Assessment sealing failed', err)
@@ -291,6 +294,7 @@ casesRouter.post('/:id/reopen', (req: AuthedRequest, res) => {
     timestampTime: c.sealTimestampTime,
   })
 
+  logAudit(req.auth!.orgId, req.auth!.userId, 'assessment_reopened', `Assessment #${req.params.id}: ${reason.trim()}`, req)
   db.prepare(
     "UPDATE cases SET status = 'open', closedAt = NULL, sealHash = NULL, sealAlgorithm = NULL, sealTimestampToken = NULL, sealTimestampAuthority = NULL, sealTimestampTime = NULL WHERE id = ?"
   ).run(req.params.id)
