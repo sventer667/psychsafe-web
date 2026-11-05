@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Input, Label, Select } from '../components/ui/Input'
 import { api, ApiError } from '../lib/api'
+import logo from '../assets/humanora-logo.png'
 
 const STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT']
 const INDUSTRIES = [
@@ -130,6 +131,10 @@ export function GapCheck() {
   return (
     <div className="min-h-screen bg-canvas px-4 py-16">
       <div className="mx-auto w-full max-w-xl">
+        <a href="/" className="mx-auto mb-8 block h-24 w-48">
+          <img src={logo} alt="Humanora" className="h-full w-full object-contain" />
+        </a>
+
         {screen === 'landing' && (
           <div className="rounded-xl border border-border bg-surface p-8 text-center">
             <h1 className="text-2xl font-semibold text-ink">
