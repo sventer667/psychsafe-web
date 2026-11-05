@@ -59,13 +59,21 @@ stripeWebhookRouter.post('/', async (req, res) => {
       const sub = event.data.object as Stripe.Subscription
       const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer?.id
       const priceId = sub.items.data[0]?.price?.id
-      const tier = tierFromMetadata(sub.metadata) || tierForPriceId(priceId)
+      // The price is the source of truth. Metadata is only what the subscription
+      // was created with, so after a plan change in the Stripe portal it is stale.
+      const tier = tierForPriceId(priceId) || tierFromMetadata(sub.metadata)
+      // Mirror Stripe's own subscription status rather than assuming 'active'.
+      const status =
+        sub.status === 'active' || sub.status === 'trialing'
+          ? 'active'
+          : sub.status === 'past_due'
+            ? 'past_due'
+            : sub.status === 'canceled' || sub.status === 'unpaid' || sub.status === 'incomplete_expired'
+              ? 'canceled'
+              : null
       if (customerId) {
-        if (tier) {
-          db.prepare("UPDATE organizations SET planStatus = 'active', planTier = ? WHERE stripeCustomerId = ?").run(tier, customerId)
-        } else {
-          db.prepare("UPDATE organizations SET planStatus = 'active' WHERE stripeCustomerId = ?").run(customerId)
-        }
+        if (status) db.prepare('UPDATE organizations SET planStatus = ? WHERE stripeCustomerId = ?').run(status, customerId)
+        if (tier && status !== 'canceled') db.prepare('UPDATE organizations SET planTier = ? WHERE stripeCustomerId = ?').run(tier, customerId)
       }
       break
     }
