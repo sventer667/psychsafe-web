@@ -17,6 +17,7 @@ import { AcceptInvite } from './pages/AcceptInvite'
 import { Dashboard } from './pages/Dashboard'
 import { Cases } from './pages/Cases'
 import { CaseDetail } from './pages/CaseDetail'
+import { Enterprise } from './pages/Enterprise'
 import { Billing } from './pages/Billing'
 import { Team } from './pages/Team'
 import { Security } from './pages/Security'
@@ -71,6 +72,7 @@ export default function App() {
             <Route path="/cases/:id" element={<CaseDetail />} />
             <Route path="/team" element={<Team />} />
             <Route path="/security" element={<Security />} />
+            <Route path="/enterprise" element={<Enterprise />} />
             <Route path="/billing" element={<Billing />} />
           </Route>
         </Routes>
