@@ -1,11 +1,15 @@
 import jwt from 'jsonwebtoken'
 import type { Request, Response, NextFunction } from 'express'
+import { db } from './db.js'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me'
 
 export interface AuthPayload {
   userId: number
   orgId: number
+  // Id of the row in `sessions` this token belongs to. requireAuth rejects a
+  // token whose session has been ended (see sessions.ts).
+  sid?: string
 }
 
 export function signToken(payload: AuthPayload): string {
@@ -47,16 +51,53 @@ export function requireAuth(req: AuthedRequest, res: Response, next: NextFunctio
   if (!header?.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Missing authorization token' })
   }
+
+  let payload: AuthPayload & { pending2fa?: boolean }
   try {
-    const payload = jwt.verify(header.slice(7), JWT_SECRET) as AuthPayload & { pending2fa?: boolean }
-    // A pending-2FA token is deliberately rejected here: it's only valid
-    // against POST /auth/login/2fa, never against a real protected route.
-    if (payload.pending2fa) {
-      return res.status(401).json({ error: 'Two-factor verification required' })
-    }
-    req.auth = payload
-    next()
+    payload = jwt.verify(header.slice(7), JWT_SECRET) as AuthPayload & { pending2fa?: boolean }
   } catch {
-    return res.status(401).json({ error: 'Invalid or expired token' })
+    return res.status(401).json({ error: 'Invalid or expired token', code: 'SESSION_ENDED' })
   }
+
+  // A pending-2FA token is deliberately rejected here: it's only valid
+  // against POST /auth/login/2fa, never against a real protected route.
+  if (payload.pending2fa) {
+    return res.status(401).json({ error: 'Two-factor verification required' })
+  }
+
+  // The token must belong to a live server-side session. Tokens issued before
+  // sessions existed carry no sid and are treated as ended (one re-login).
+  const session = payload.sid
+    ? (db.prepare('SELECT id, lastSeenAt FROM sessions WHERE id = ? AND userId = ?').get(payload.sid, payload.userId) as
+        | { id: string; lastSeenAt: string }
+        | undefined)
+    : undefined
+  if (!session) {
+    return res
+      .status(401)
+      .json({ error: 'You were signed out because this account signed in somewhere else.', code: 'SESSION_ENDED' })
+  }
+
+  // Record activity (at most once a minute) so "least recently used" is meaningful.
+  if (Date.now() - Date.parse(session.lastSeenAt) > 60_000) {
+    db.prepare('UPDATE sessions SET lastSeenAt = ? WHERE id = ?').run(new Date().toISOString(), session.id)
+  }
+
+  // Admin accounts must have two-factor authentication on. Until they do, the
+  // only routes they can use are the /api/auth ones (so they can enrol).
+  const user = db.prepare('SELECT role, totpEnabled FROM users WHERE id = ?').get(payload.userId) as
+    | { role: string; totpEnabled: number }
+    | undefined
+  if (!user) {
+    return res.status(401).json({ error: 'Account not found', code: 'SESSION_ENDED' })
+  }
+  if (user.role === 'admin' && !user.totpEnabled && !req.originalUrl.startsWith('/api/auth/')) {
+    return res.status(403).json({
+      error: 'Two-factor authentication is required for admin accounts. Set it up under Security.',
+      code: '2FA_REQUIRED',
+    })
+  }
+
+  req.auth = payload
+  next()
 }
