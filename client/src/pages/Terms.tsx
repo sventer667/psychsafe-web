@@ -7,7 +7,7 @@ export function Terms() {
         <h2>1. Agreement</h2>
         <p>
           These terms govern access to and use of Humanora, provided by{' '}
-          <strong>Humanora OHS, ABN 80 423 515 887</strong> ("Humanora", "we", "us"). By creating
+          <strong>Humanora, ABN 80 423 515 887</strong> ("Humanora", "we", "us"). By creating
           an account, you agree to these terms on behalf of yourself and, if you're signing up for an organisation,
           on behalf of that organisation. If you don't agree, don't create an account or use the platform.
         </p>
@@ -37,7 +37,7 @@ export function Terms() {
       <section>
         <h2>4. Plans, pricing, and payment</h2>
         <p>
-          Humanora is offered on Starter, Growth, and Enterprise plans, billed per seat. Current pricing is shown on
+          Humanora is offered on Starter, Growth, and Enterprise plans, each billed at a flat monthly price that includes a set number of seats. All prices are in Australian dollars (AUD) and no GST is charged. Current pricing is shown on
           our pricing page and may change; we'll give existing subscribers at least 30 days notice before a price
           change takes effect on their account. Payment is processed by Stripe; we don't store your card details.
           Subscriptions renew automatically for the same subscription period unless cancelled before the renewal date.
@@ -144,7 +144,7 @@ export function Terms() {
         <h2>14. Contact</h2>
         <p>
           <strong>Humanora</strong><br />
-          Humanora OHS, ABN 80 423 515 887<br />
+          ABN 80 423 515 887<br />
           Email: contact@humanora.com.au
         </p>
       </section>
