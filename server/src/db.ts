@@ -460,3 +460,29 @@ try {
     updateControls.run(JSON.stringify(controls), name)
   }
 }
+
+// Server-side login sessions (see sessions.ts). Each login inserts a row and the
+// signed token carries its id, so a session can be ended from the server.
+// known_devices remembers which browser + OS combinations each user has signed
+// in from, so a sign-in from an unfamiliar one can trigger a notification email.
+db.exec(`
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  userId INTEGER NOT NULL REFERENCES users(id),
+  createdAt TEXT NOT NULL,
+  lastSeenAt TEXT NOT NULL,
+  ip TEXT DEFAULT '',
+  userAgent TEXT DEFAULT '',
+  deviceLabel TEXT DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(userId);
+
+CREATE TABLE IF NOT EXISTS known_devices (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  userId INTEGER NOT NULL REFERENCES users(id),
+  deviceHash TEXT NOT NULL,
+  deviceLabel TEXT DEFAULT '',
+  firstSeenAt TEXT NOT NULL,
+  UNIQUE(userId, deviceHash)
+);
+`)
