@@ -3,7 +3,7 @@ export interface User {
   email: string
   name: string
   orgId: number
-  role: 'admin' | 'member'
+  role: 'admin' | 'member' | 'viewer'
   totpEnabled: boolean
 }
 
@@ -17,6 +17,7 @@ export interface Organization {
   businessUnit: string
   planStatus: 'trialing' | 'active' | 'past_due' | 'canceled'
   planTier: PlanTier
+  require2fa?: boolean
   trialEndsAt: string | null
   stripeCustomerId: string | null
   consultantName: string
