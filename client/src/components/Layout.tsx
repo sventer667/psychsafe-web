@@ -16,11 +16,17 @@ export function Layout() {
     return <Navigate to="/login" replace />
   }
 
+  // Admin accounts must have two-factor authentication on. Until they do, the
+  // only page they can use is Security (the API enforces the same rule).
+  if (user.role === 'admin' && !user.totpEnabled && location.pathname !== '/security') {
+    return <Navigate to="/security" replace />
+  }
+
   // A locked org can still reach Billing to see the paywall and subscribe.
   // Every other page bounces there, matching what the backend's
   // requireTrialActive gate actually allows (Dashboard, Cases, and Team all
   // hit the API and would 402 anyway).
-  if (isTrialExpired(org) && location.pathname !== '/billing') {
+  if (isTrialExpired(org) && location.pathname !== '/billing' && location.pathname !== '/security') {
     return <Navigate to="/billing" replace />
   }
 
