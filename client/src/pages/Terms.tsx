@@ -2,7 +2,7 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Terms() {
   return (
-    <LegalLayout title="Terms & Conditions" version="0.1 (draft)" effectiveDate="August 2026">
+    <LegalLayout title="Terms & Conditions" version="1.0" effectiveDate="November 2026">
       <section>
         <h2>1. Agreement</h2>
         <p>
