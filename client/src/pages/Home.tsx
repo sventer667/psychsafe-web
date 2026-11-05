@@ -184,7 +184,7 @@ export function Home() {
       <section className="border-t border-border bg-surface py-16">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-serif text-2xl text-ink sm:text-3xl">Simple, per-seat pricing</h2>
+            <h2 className="font-serif text-2xl text-ink sm:text-3xl">Simple monthly pricing</h2>
             <p className="mt-3 text-muted">Every plan includes the full hazard register, action plans, and sealed PDF export.</p>
           </div>
           <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
@@ -217,6 +217,7 @@ export function Home() {
               </div>
             ))}
           </div>
+          <p className="mt-6 text-center text-xs text-muted">All prices are in Australian dollars (AUD). No GST is charged.</p>
         </div>
       </section>
 
