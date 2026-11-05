@@ -4,6 +4,7 @@ import { requireAuth, type AuthedRequest } from '../auth.js'
 import crypto from 'node:crypto'
 import { logAudit } from '../audit.js'
 import { seatLimitFor } from '../plans.js'
+import { sendInviteEmail } from '../inviteEmail.js'
 
 // Enterprise-only controls: audit log (view + CSV export), mandatory 2FA for
 // everyone, and role management including a read-only "viewer" role.
@@ -148,7 +149,7 @@ enterpriseRouter.post('/import/assessments', requireEnterprise, (req: AuthedRequ
   res.json({ valid: clean.length, errors: [], created: clean.length })
 })
 
-enterpriseRouter.post('/import/team', requireEnterprise, (req: AuthedRequest, res) => {
+enterpriseRouter.post('/import/team', requireEnterprise, async (req: AuthedRequest, res) => {
   const { rows, commit } = req.body as { rows?: Record<string, unknown>[]; commit?: boolean }
   if (!Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'The file has no rows' })
   if (rows.length > MAX_ROWS) return res.status(400).json({ error: `Import up to ${MAX_ROWS} rows at a time` })
@@ -202,5 +203,9 @@ enterpriseRouter.post('/import/team', requireEnterprise, (req: AuthedRequest, re
     return res.status(500).json({ error: 'Import failed and nothing was saved' })
   }
   logAudit(orgId, req.auth!.userId, 'import_team', `${invites.length} invites`, req)
-  res.json({ valid: clean.length, errors: [], created: invites.length, invites })
+  // Email each invitee. Failures don't undo the import; the link list can still be downloaded.
+  const results = await Promise.all(
+    invites.map((i) => sendInviteEmail({ orgId, inviterId: req.auth!.userId, name: i.name, email: i.email, token: i.token }))
+  )
+  res.json({ valid: clean.length, errors: [], created: invites.length, invites, emailed: results.filter(Boolean).length })
 })
