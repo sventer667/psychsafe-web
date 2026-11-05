@@ -2,7 +2,8 @@ import { Router } from 'express'
 import crypto from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import { db } from '../db.js'
-import { signToken, requireAuth, type AuthedRequest } from '../auth.js'
+import { requireAuth, type AuthedRequest } from '../auth.js'
+import { startSession } from '../sessions.js'
 import { seatLimitFor } from '../plans.js'
 import { requireTrialActive, isTrialExpired } from '../trialGate.js'
 
@@ -134,7 +135,7 @@ invitesRouter.post('/invites/accept', (req, res) => {
 
   db.prepare("UPDATE invites SET status = 'accepted', acceptedAt = datetime('now') WHERE id = ?").run(invite.id)
 
-  const jwtToken = signToken({ userId, orgId: invite.orgId })
+  const jwtToken = startSession({ id: userId, orgId: invite.orgId, name: invite.name, email: invite.email }, req, { notifyNewDevice: false })
   const org = db.prepare(`SELECT ${ORG_COLUMNS} FROM organizations WHERE id = ?`).get(invite.orgId)
   res.json({
     token: jwtToken,
