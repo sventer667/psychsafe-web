@@ -216,7 +216,7 @@ const IMPORTS = {
   },
   team: {
     title: 'Import team members',
-    blurb: 'Create invites for many people at once. Columns: name, email. Each person gets an invite link to set their password; you can download all the links afterwards.',
+    blurb: 'Create invites for many people at once. Columns: name, email. Each person is emailed an invite link to set their password. You can also download the links afterwards.',
     template: 'name,email\nJane Citizen,jane@example.com\nAlex Smith,alex@example.com\n',
     path: '/enterprise/import/team',
     file: 'humanora-team-template.csv',
