@@ -13,6 +13,7 @@ import { checkoutRouter } from './routes/checkout.js'
 import { stripeWebhookRouter } from './routes/stripeWebhook.js'
 import { invitesRouter } from './routes/invites.js'
 import { gapCheckRouter } from './routes/gapCheck.js'
+import { onboardingRouter } from './routes/onboarding.js'
 
 // Safety net: Node crashes the whole process on an unhandled promise
 // rejection by default. Every route that calls an external service (Stripe,
@@ -68,6 +69,7 @@ app.use('/api/reports', reportsRouter)
 app.use('/api/checkout', checkoutRouter)
 app.use('/api', invitesRouter)
 app.use('/api/gap-check', gapCheckRouter)
+app.use('/api/onboarding', onboardingRouter)
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
