@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import { db } from '../db.js'
 import { requireAuth, type AuthedRequest } from '../auth.js'
+import crypto from 'node:crypto'
 import { logAudit } from '../audit.js'
+import { seatLimitFor } from '../plans.js'
 
 // Enterprise-only controls: audit log (view + CSV export), mandatory 2FA for
 // everyone, and role management including a read-only "viewer" role.
@@ -90,4 +92,115 @@ enterpriseRouter.patch('/users/:id/role', (req: AuthedRequest, res) => {
   db.prepare('UPDATE users SET role = ? WHERE id = ?').run(role, target.id)
   logAudit(req.auth!.orgId, req.auth!.userId, 'role_changed', `${target.name}: ${target.role} to ${role}`, req)
   res.json({ ok: true })
+})
+
+// --- Bulk import (CSV rows parsed in the browser, validated and saved here) ---
+// Each endpoint takes { rows, commit }. With commit=false it only validates and
+// reports problems; with commit=true it saves, but refuses if any row is invalid
+// so a file is imported completely or not at all.
+
+const STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT']
+const MAX_ROWS = 500
+type RowError = { row: number; message: string }
+const str = (v: unknown, max: number) => String(v ?? '').trim().slice(0, max)
+
+enterpriseRouter.post('/import/assessments', requireEnterprise, (req: AuthedRequest, res) => {
+  const { rows, commit } = req.body as { rows?: Record<string, unknown>[]; commit?: boolean }
+  if (!Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'The file has no rows' })
+  if (rows.length > MAX_ROWS) return res.status(400).json({ error: `Import up to ${MAX_ROWS} rows at a time` })
+
+  const orgId = req.auth!.orgId
+  const org = db.prepare('SELECT state FROM organizations WHERE id = ?').get(orgId) as { state: string | null } | undefined
+  const existing = new Set(
+    (db.prepare('SELECT name FROM cases WHERE orgId = ?').all(orgId) as { name: string }[]).map((c) => c.name.toLowerCase())
+  )
+  const seen = new Set<string>()
+  const errors: RowError[] = []
+  const clean: { name: string; state: string; scope: string }[] = []
+
+  rows.forEach((r, i) => {
+    const row = i + 2 // spreadsheet row number, allowing for the header line
+    const name = str(r.name, 200)
+    const state = str(r.state, 3).toUpperCase() || org?.state || ''
+    const scope = str(r.scope, 1000)
+    if (!name) return errors.push({ row, message: 'Name is required' })
+    if (state && !STATES.includes(state)) return errors.push({ row, message: `State "${state}" is not one of ${STATES.join(', ')}` })
+    const key = name.toLowerCase()
+    if (existing.has(key)) return errors.push({ row, message: `An assessment called "${name}" already exists` })
+    if (seen.has(key)) return errors.push({ row, message: `"${name}" appears more than once in the file` })
+    seen.add(key)
+    clean.push({ name, state, scope })
+  })
+
+  if (!commit || errors.length > 0) return res.json({ valid: clean.length, errors, created: 0 })
+
+  try {
+    db.exec('BEGIN')
+    const ins = db.prepare("INSERT INTO cases (orgId, name, state, scope, status) VALUES (?, ?, ?, ?, 'open')")
+    for (const c of clean) ins.run(orgId, c.name, c.state, c.scope)
+    db.exec('COMMIT')
+  } catch (err) {
+    db.exec('ROLLBACK')
+    console.error('Assessment import failed', err)
+    return res.status(500).json({ error: 'Import failed and nothing was saved' })
+  }
+  logAudit(orgId, req.auth!.userId, 'import_assessments', `${clean.length} assessments`, req)
+  res.json({ valid: clean.length, errors: [], created: clean.length })
+})
+
+enterpriseRouter.post('/import/team', requireEnterprise, (req: AuthedRequest, res) => {
+  const { rows, commit } = req.body as { rows?: Record<string, unknown>[]; commit?: boolean }
+  if (!Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'The file has no rows' })
+  if (rows.length > MAX_ROWS) return res.status(400).json({ error: `Import up to ${MAX_ROWS} rows at a time` })
+
+  const orgId = req.auth!.orgId
+  const used = (db.prepare('SELECT COUNT(*) AS n FROM users WHERE orgId = ?').get(orgId) as { n: number }).n +
+    (db
+      .prepare("SELECT COUNT(*) AS n FROM invites WHERE orgId = ? AND status = 'pending' AND expiresAt > datetime('now')")
+      .get(orgId) as { n: number }).n
+  const limit = seatLimitFor(orgTier(orgId))
+
+  const seen = new Set<string>()
+  const errors: RowError[] = []
+  const clean: { name: string; email: string }[] = []
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+  rows.forEach((r, i) => {
+    const row = i + 2
+    const name = str(r.name, 120)
+    const email = str(r.email, 200).toLowerCase()
+    if (!name) return errors.push({ row, message: 'Name is required' })
+    if (!emailRe.test(email)) return errors.push({ row, message: `"${email}" is not a valid email address` })
+    if (seen.has(email)) return errors.push({ row, message: `${email} appears more than once in the file` })
+    seen.add(email)
+    if (db.prepare('SELECT 1 FROM users WHERE lower(email) = ?').get(email))
+      return errors.push({ row, message: `${email} already has an account` })
+    if (db.prepare("SELECT 1 FROM invites WHERE orgId = ? AND lower(email) = ? AND status = 'pending' AND expiresAt > datetime('now')").get(orgId, email))
+      return errors.push({ row, message: `${email} already has a pending invite` })
+    clean.push({ name, email })
+  })
+  if (used + clean.length > limit) {
+    errors.push({ row: 0, message: `This would use ${used + clean.length} seats but your plan allows ${limit} (${used} in use)` })
+  }
+
+  if (!commit || errors.length > 0) return res.json({ valid: clean.length, errors, created: 0, invites: [] })
+
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+  const invites: { name: string; email: string; token: string }[] = []
+  try {
+    db.exec('BEGIN')
+    const ins = db.prepare('INSERT INTO invites (orgId, name, email, token, expiresAt) VALUES (?, ?, ?, ?, ?)')
+    for (const c of clean) {
+      const token = crypto.randomBytes(24).toString('hex')
+      ins.run(orgId, c.name, c.email, token, expiresAt)
+      invites.push({ ...c, token })
+    }
+    db.exec('COMMIT')
+  } catch (err) {
+    db.exec('ROLLBACK')
+    console.error('Team import failed', err)
+    return res.status(500).json({ error: 'Import failed and nothing was saved' })
+  }
+  logAudit(orgId, req.auth!.userId, 'import_team', `${invites.length} invites`, req)
+  res.json({ valid: clean.length, errors: [], created: invites.length, invites })
 })
