@@ -7,7 +7,7 @@ export function Legal() {
         <h2>1. What this page is</h2>
         <p>
           This Legal Disclaimer, together with our <a href="/terms">Terms &amp; Conditions</a> and{' '}
-          <a href="/privacy">Privacy Policy</a>, sets out the basis on which Humanora (<strong>Humanora OHS, ABN 80
+          <a href="/privacy">Privacy Policy</a>, sets out the basis on which Humanora (<strong>ABN 80
           423 515 887</strong>) makes its platform available to you. If anything here conflicts with the Terms &amp;
           Conditions, the Terms &amp; Conditions govern.
         </p>
