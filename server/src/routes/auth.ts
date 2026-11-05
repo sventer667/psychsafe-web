@@ -7,6 +7,7 @@ import { db } from '../db.js'
 import { requireAuth, signPendingTwoFactorToken, verifyPendingTwoFactorToken, type AuthedRequest } from '../auth.js'
 import { startSession } from '../sessions.js'
 import { PLAN_TIERS } from '../plans.js'
+import { passwordResetRouter } from '../passwordReset.js'
 
 export const authRouter = Router()
 
@@ -245,8 +246,4 @@ authRouter.patch('/org', requireAuth, (req: AuthedRequest, res) => {
   res.json(org)
 })
 
-authRouter.post('/forgot-password', (req, res) => {
-  // Stub: in production this would email a reset link. We always respond 200
-  // to avoid leaking which emails have accounts.
-  res.json({ ok: true })
-})
+authRouter.use(passwordResetRouter)
