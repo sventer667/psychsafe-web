@@ -221,6 +221,21 @@ async function deleteCase() {
     setBusy(false)
   }
 }
+  const isSample = caseFile?.name?.startsWith('Sample:') ?? false
+
+  // One-click removal for the sample assessment (no confirmation: it is example data).
+  async function deleteSample() {
+    if (!id) return
+    setBusy(true)
+    try {
+      await api(`/cases/${id}`, { method: 'DELETE' })
+      navigate('/dashboard')
+    } catch (err) {
+      setCloseError(err instanceof ApiError ? err.message : 'Something went wrong')
+      setBusy(false)
+    }
+  }
+
   async function reopenCase() {
     if (!id) return
     setReopenError('')
@@ -276,6 +291,20 @@ async function deleteCase() {
           <Badge tone={caseFile.status === 'open' ? 'success' : 'default'}>{caseFile.status}</Badge>
         </div>
       </div>
+
+      {isSample && caseFile.status === 'open' && (
+        <Card className="mb-6 border-accent/40 bg-accent/5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="min-w-0 flex-1 text-sm text-ink">
+              This is a <strong>sample assessment</strong> with example data, so you can see how everything works. Delete it when you're ready to start your own.
+            </p>
+            <Button variant="secondary" onClick={deleteSample} disabled={busy}>
+              {busy ? 'Deleting…' : 'Delete sample'}
+            </Button>
+          </div>
+          {closeError && <p className="mt-2 text-sm text-destructive">{closeError}</p>}
+        </Card>
+      )}
 
       <div className="mb-6 flex gap-1 border-b border-border">
         {TABS.map((t) => (
