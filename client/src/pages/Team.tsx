@@ -52,6 +52,16 @@ export function Team() {
     }
   }
 
+  async function changeRole(id: number, role: string) {
+    setError('')
+    try {
+      await api(`/enterprise/users/${id}/role`, { method: 'PATCH', body: { role } })
+      await load()
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not change role')
+    }
+  }
+
   async function revoke(id: number) {
     await api(`/invites/${id}`, { method: 'DELETE' })
     await load()
@@ -121,6 +131,7 @@ export function Team() {
         </Card>
       )}
 
+      {error && !showForm && <p className="mb-3 text-sm text-destructive">{error}</p>}
       <Card className="mb-6">
         <h2 className="mb-3 font-serif text-lg text-ink">Members</h2>
         <div className="space-y-2">
@@ -132,7 +143,20 @@ export function Team() {
                 </div>
                 <div className="text-xs text-muted">{u.email}</div>
               </div>
-              <Badge tone="default">{u.role === 'admin' ? 'Admin' : 'Member'}</Badge>
+              {user?.role === 'admin' && u.id !== user.id ? (
+                <select
+                  value={u.role}
+                  onChange={(e) => changeRole(u.id, e.target.value)}
+                  className="rounded-lg border border-border bg-surface px-2 py-1 text-xs text-ink"
+                  aria-label={`Role for ${u.name}`}
+                >
+                  <option value="admin">Admin</option>
+                  <option value="member">Member</option>
+                  <option value="viewer">Viewer (read-only){data?.planTier === 'enterprise' ? '' : ' - Enterprise'}</option>
+                </select>
+              ) : (
+                <Badge tone="default">{u.role === 'admin' ? 'Admin' : u.role === 'viewer' ? 'Viewer' : 'Member'}</Badge>
+              )}
             </div>
           ))}
           {!loading && data?.users.length === 0 && <p className="text-sm text-muted">No team members yet.</p>}

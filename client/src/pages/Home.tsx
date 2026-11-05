@@ -86,7 +86,13 @@ const TIERS = [
     price: '$599',
     seats: 'Up to 20 seats',
     blurb: 'A larger organisation with a dedicated WHS function.',
-    features: ['Everything in Growth', 'Dedicated onboarding', 'Priority support SLA'],
+    features: [
+      'Everything in Growth',
+      'Audit log with CSV export',
+      'Mandatory 2FA for every user',
+      'Read-only viewer role',
+      'Dedicated onboarding & priority support SLA',
+    ],
   },
 ]
 

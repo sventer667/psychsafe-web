@@ -31,7 +31,13 @@ const TIERS: { id: PlanTier; label: string; price: string; seats: string; blurb:
     price: '$599/mo',
     seats: 'Up to 20 seats',
     blurb: 'A larger organisation with a dedicated WHS function.',
-    features: ['Everything in Growth', 'Dedicated onboarding', 'Priority support SLA'],
+    features: [
+      'Everything in Growth',
+      'Audit log with CSV export',
+      'Mandatory 2FA for every user',
+      'Read-only viewer role',
+      'Dedicated onboarding & priority support SLA',
+    ],
   },
 ]
 
@@ -65,7 +71,6 @@ export function Billing() {
   const [consultantCredential, setConsultantCredential] = useState('')
   const [savingProfile, setSavingProfile] = useState(false)
   const [savedProfile, setSavedProfile] = useState(false)
-  const [switchingTier, setSwitchingTier] = useState<PlanTier | null>(null)
   const [checkoutError, setCheckoutError] = useState('')
 
   useEffect(() => {
@@ -99,17 +104,6 @@ export function Billing() {
       setSavedProfile(true)
     } finally {
       setSavingProfile(false)
-    }
-  }
-
-  async function switchTier(tier: PlanTier) {
-    if (tier === org?.planTier) return
-    setSwitchingTier(tier)
-    try {
-      await api('/auth/org', { method: 'PATCH', body: { planTier: tier } })
-      await refresh()
-    } finally {
-      setSwitchingTier(null)
     }
   }
 
@@ -221,9 +215,8 @@ export function Billing() {
       <Card className="mb-6">
         <h2 className="mb-1 font-serif text-lg text-ink">Plan &amp; seats</h2>
         <p className="mb-4 text-sm text-muted">
-          Choose the tier that matches your team size. This sets your seat limit on the Team page today, and isn't
-          wired to a separate Stripe price per tier yet, so switching here doesn't change what's charged below until
-          that's connected.
+          Choose the tier that matches your team size. Your plan sets your seat limit on the Team page and changes when you
+          subscribe or change plan through Stripe.
         </p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {TIERS.map((t) => {
@@ -247,14 +240,6 @@ export function Billing() {
                     </li>
                   ))}
                 </ul>
-                <Button
-                  variant={current ? 'secondary' : 'primary'}
-                  disabled={current || switchingTier !== null}
-                  onClick={() => switchTier(t.id)}
-                >
-                  {switchingTier === t.id ? 'Switching…' : current ? 'Current plan' : `Switch to ${t.label}`}
-                </Button>
-
                 {isSubscribed && current ? (
                   <Button variant="secondary" className="mt-2" onClick={openPortal} disabled={busy}>
                     {busy ? 'Opening…' : 'Manage subscription'}
@@ -290,7 +275,6 @@ export function Billing() {
           {isSubscribed
             ? 'Manage payment method, invoices, or cancel via the Stripe customer portal above.'
             : 'Pick a tier above to start a subscription via Stripe Checkout.'}{' '}
-          Requires STRIPE_SECRET_KEY and the STRIPE_PRICE_* vars in server/.env. See server/scripts/setup-stripe-prices.mjs.
         </p>
       </Card>
 
