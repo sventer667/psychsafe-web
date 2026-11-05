@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Input, Label } from '../components/ui/Input'
-import { ApiError } from '../lib/api'
+import { ApiError, takeSessionEndedMessage } from '../lib/api'
 import logo from '../assets/humanora-logo.png'
 
 export function Login() {
@@ -13,6 +13,8 @@ export function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  // Shown once when the server ended this browser's session.
+  const [endedNotice] = useState(() => takeSessionEndedMessage())
 
   // When a login response comes back needing a second factor, we hold the
   // pending token here and swap the form for a code-entry step. Nothing is
@@ -60,12 +62,16 @@ export function Login() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-48 w-48 items-center justify-center p-6">
-            <img src={logo} alt="Humanora OHS" className="h-full w-full object-contain" />
+            <img src={logo} alt="Humanora" className="h-full w-full object-contain" />
           </div>
           <p className="mt-2 text-sm text-muted">
             {pendingToken ? `Welcome back, ${pendingName}` : 'Sign in to your account'}
           </p>
         </div>
+
+        {endedNotice && !pendingToken && (
+          <p className="mb-4 rounded-lg border border-alert/30 bg-alert/10 p-3 text-sm text-ink">{endedNotice}</p>
+        )}
 
         {!pendingToken ? (
           <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-border bg-surface p-6">

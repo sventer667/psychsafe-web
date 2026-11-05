@@ -1,5 +1,5 @@
-import { useState, type FormEvent } from 'react'
-import { ShieldCheck, ShieldOff, Copy, Check, AlertTriangle } from 'lucide-react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { ShieldCheck, ShieldOff, Copy, Check, AlertTriangle, Monitor } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Card, Badge } from '../components/ui/Card'
@@ -7,10 +7,16 @@ import { Input, Label } from '../components/ui/Input'
 import { api, ApiError } from '../lib/api'
 
 type SetupState = { secret: string; qrCodeDataUrl: string }
+type SessionRow = { id: string; deviceLabel: string; ip: string; createdAt: string; lastSeenAt: string; current: boolean }
+
+function fmt(iso: string) {
+  return new Date(iso).toLocaleString('en-AU', { dateStyle: 'medium', timeStyle: 'short' })
+}
 
 export function Security() {
   const { user, refresh } = useAuth()
   const enabled = !!user?.totpEnabled
+  const isAdmin = user?.role === 'admin'
 
   // Enrollment moves through: idle -> setup (QR shown, awaiting a code) ->
   // backupCodes (verified, codes shown exactly once) -> back to idle.
@@ -25,6 +31,32 @@ export function Security() {
 
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+
+  const [sessions, setSessions] = useState<SessionRow[]>([])
+  const [sessionsError, setSessionsError] = useState('')
+
+  async function loadSessions() {
+    try {
+      setSessions(await api<SessionRow[]>('/auth/sessions'))
+      setSessionsError('')
+    } catch (err) {
+      setSessionsError(err instanceof ApiError ? err.message : 'Could not load devices')
+    }
+  }
+
+  useEffect(() => {
+    loadSessions()
+  }, [])
+
+  async function endSession(id: string) {
+    await api(`/auth/sessions/${id}`, { method: 'DELETE' })
+    await loadSessions()
+  }
+
+  async function endOthers() {
+    await api('/auth/sessions/revoke-others', { method: 'POST' })
+    await loadSessions()
+  }
 
   async function startSetup() {
     setError('')
@@ -93,6 +125,13 @@ export function Security() {
         <h1 className="font-serif text-2xl text-ink">Security</h1>
         <p className="text-sm text-muted">Manage how you sign in to your account</p>
       </div>
+
+      {isAdmin && !enabled && !setup && !backupCodes && (
+        <div className="mb-6 flex items-start gap-2 rounded-lg border border-alert/30 bg-alert/10 p-3 text-sm text-ink">
+          <AlertTriangle size={16} className="mt-0.5 shrink-0 text-alert" />
+          <p>Two-factor authentication is required for admin accounts. Set it up below to continue using Humanora.</p>
+        </div>
+      )}
 
       {backupCodes ? (
         <Card className="mb-6">
@@ -181,13 +220,17 @@ export function Security() {
             </div>
           )}
 
-          {enabled && !showDisable && (
+          {enabled && isAdmin && (
+            <p className="mt-4 text-sm text-muted">Required for admin accounts, so it can't be turned off.</p>
+          )}
+
+          {enabled && !isAdmin && !showDisable && (
             <div className="mt-4">
               <Button variant="secondary" onClick={() => setShowDisable(true)}>Disable two-factor authentication</Button>
             </div>
           )}
 
-          {enabled && showDisable && (
+          {enabled && !isAdmin && showDisable && (
             <form onSubmit={onDisable} className="mt-4 space-y-3 border-t border-border pt-4">
               <div className="flex items-start gap-2 rounded-lg border border-alert/30 bg-alert/10 p-3 text-sm text-ink">
                 <AlertTriangle size={16} className="mt-0.5 shrink-0 text-alert" />
@@ -214,6 +257,41 @@ export function Security() {
           )}
         </Card>
       )}
+
+      {enabled || !isAdmin ? (
+        <Card className="mb-6">
+          <div className="mb-1 flex items-center gap-2">
+            <Monitor size={18} className="text-muted" />
+            <h2 className="font-serif text-lg text-ink">Signed-in devices</h2>
+          </div>
+          <p className="mb-4 text-sm text-muted">
+            An account can be signed in on up to 2 devices at once. Signing in on a third signs out the least recently used one.
+          </p>
+          {sessionsError && <p className="mb-3 text-sm text-destructive">{sessionsError}</p>}
+          <ul className="divide-y divide-border">
+            {sessions.map((s) => (
+              <li key={s.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                <div>
+                  <p className="text-ink">
+                    {s.deviceLabel} {s.current && <Badge tone="success">This device</Badge>}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {s.ip || 'Unknown IP'} · signed in {fmt(s.createdAt)} · last active {fmt(s.lastSeenAt)}
+                  </p>
+                </div>
+                {!s.current && (
+                  <Button variant="secondary" onClick={() => endSession(s.id)}>Sign out</Button>
+                )}
+              </li>
+            ))}
+          </ul>
+          {sessions.length > 1 && (
+            <div className="mt-4">
+              <Button variant="secondary" onClick={endOthers}>Sign out other devices</Button>
+            </div>
+          )}
+        </Card>
+      ) : null}
     </div>
   )
 }
