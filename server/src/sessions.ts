@@ -3,6 +3,7 @@ import type { Request } from 'express'
 import { db } from './db.js'
 import { signToken } from './auth.js'
 import { sendEmail } from './email.js'
+import { logAudit } from './audit.js'
 
 // Server-side sessions. Every login creates a row in `sessions` and the signed
 // token carries that row's id (`sid`). requireAuth rejects any token whose
@@ -120,5 +121,6 @@ export function startSession(user: SessionUser, req: Request, opts: { notifyNewD
     }
   }
 
+  logAudit(user.orgId, user.id, 'sign_in', label, req)
   return signToken({ userId: user.id, orgId: user.orgId, sid })
 }
