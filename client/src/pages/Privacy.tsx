@@ -32,7 +32,8 @@ export function Privacy() {
         <ul>
           <li>Your name, email address, and password (stored as a bcrypt hash, we never see or store your plaintext password)</li>
           <li>Your organisation's name, industry, state or territory, and business unit</li>
-          <li>If you enable two-factor authentication: an encrypted authenticator secret and bcrypt-hashed one-time backup codes</li>
+          <li>If you enable two-factor authentication (required for admin accounts): an authenticator secret and bcrypt-hashed one-time backup codes</li>
+          <li>Sign-in session details for each device signed in to your account: browser and operating system, IP address, and sign-in times. We also keep a record of the browser and operating system combinations you have signed in from, so we can email you when a new device signs in</li>
         </ul>
         <h3>Assessment content</h3>
         <p>
@@ -89,7 +90,7 @@ export function Privacy() {
             </tr>
             <tr className="border-b border-border">
               <td className="py-2 pr-3 text-ink">Resend (email delivery)</td>
-              <td className="py-2 pr-3">Name, email address and the content of emails we send you (for example Gap Check results, invitations and password resets)</td>
+              <td className="py-2 pr-3">Name, email address and the content of emails we send you (for example Gap Check results, invitations, password resets and new-device sign-in alerts)</td>
               <td className="py-2 pr-3">Sending transactional emails</td>
               <td className="py-2">United States, delivered from Japan (Tokyo)</td>
             </tr>
@@ -125,7 +126,7 @@ export function Privacy() {
         <p>
           Our application database, including all assessment content, is hosted on cloud infrastructure located in
           Australia (Sydney), so that information is not sent overseas as part of hosting. Our website's pages are served by Render in the United States, which logs the IP address and basic request details of visitors. Our payment processor,
-          Stripe, is based in the United States, so the payment information you provide is processed outside Australia. Our email delivery provider, Resend, is also based in the United States and sends our emails from Japan (Tokyo), so your name, email address and the content of emails we send you (such as Gap Check results, invitations and password resets) are processed outside Australia. Our hosting provider and Stripe are each large, established providers that
+          Stripe, is based in the United States, so the payment information you provide is processed outside Australia. Our email delivery provider, Resend, is also based in the United States and sends our emails from Japan (Tokyo), so your name, email address and the content of emails we send you (such as Gap Check results, invitations, password resets and new-device sign-in alerts) are processed outside Australia. Our hosting provider and Stripe are each large, established providers that
           publish their own security and compliance documentation, including SOC 2 reports, on request. We haven't
           independently audited either provider's certifications ourselves, but if you need their current
           data-processing terms to meet your own compliance obligations, contact us (Section 11) and we'll point you
@@ -143,7 +144,8 @@ export function Privacy() {
         <p>Measures currently in place:</p>
         <ul>
           <li>Passwords are hashed with bcrypt and never stored or logged in plaintext</li>
-          <li>Optional two-factor authentication (TOTP) is available on every account, with one-time backup codes stored as bcrypt hashes</li>
+          <li>Two-factor authentication (TOTP) is available on every account and required for admin accounts, with one-time backup codes stored as bcrypt hashes</li>
+          <li>Each account can be signed in on up to two devices at once, you can see and sign out your devices from the Security page, and we email you when your account is signed in from a new device</li>
           <li>All traffic between your browser and Humanora is encrypted in transit (HTTPS/TLS)</li>
           <li>Every API request is authenticated and scoped to your organisation, one organisation's data is never returned in response to another organisation's request</li>
           <li>Closed assessments are cryptographically fingerprinted (SHA-256), and every seal or reopen is permanently logged with who did it, when, and why, so a closed record's history can't be silently rewritten</li>
