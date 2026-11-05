@@ -4,7 +4,8 @@ import crypto from 'node:crypto'
 import { authenticator } from 'otplib'
 import QRCode from 'qrcode'
 import { db } from '../db.js'
-import { signToken, requireAuth, signPendingTwoFactorToken, verifyPendingTwoFactorToken, type AuthedRequest } from '../auth.js'
+import { requireAuth, signPendingTwoFactorToken, verifyPendingTwoFactorToken, type AuthedRequest } from '../auth.js'
+import { startSession } from '../sessions.js'
 import { PLAN_TIERS } from '../plans.js'
 
 export const authRouter = Router()
@@ -75,7 +76,7 @@ authRouter.post('/register', (req, res) => {
     .run(orgId, name, email, passwordHash, 'admin')
   const userId = Number(userResult.lastInsertRowid)
 
-  const token = signToken({ userId, orgId })
+  const token = startSession({ id: userId, orgId, name, email }, req, { notifyNewDevice: false })
   const org = db.prepare(`SELECT ${ORG_COLUMNS} FROM organizations WHERE id = ?`).get(orgId)
   res.json({ token, user: { id: userId, name, email, orgId, role: 'admin', totpEnabled: false }, org })
 })
@@ -95,7 +96,7 @@ authRouter.post('/login', (req, res) => {
     return res.json({ requiresTotp: true, pendingToken: signPendingTwoFactorToken(user.id), name: user.name })
   }
 
-  const token = signToken({ userId: user.id, orgId: user.orgId })
+  const token = startSession(user, req, { notifyNewDevice: true })
   const org = db.prepare(`SELECT ${ORG_COLUMNS} FROM organizations WHERE id = ?`).get(user.orgId)
   res.json({ token, user: userResponse(user), org })
 })
@@ -114,7 +115,7 @@ authRouter.post('/login/2fa', (req, res) => {
   const valid = authenticator.check(code.trim(), user.totpSecret) || verifyAndConsumeBackupCode(user, code)
   if (!valid) return res.status(401).json({ error: 'Incorrect or expired code' })
 
-  const token = signToken({ userId: user.id, orgId: user.orgId })
+  const token = startSession(user, req, { notifyNewDevice: true })
   const org = db.prepare(`SELECT ${ORG_COLUMNS} FROM organizations WHERE id = ?`).get(user.orgId)
   res.json({ token, user: userResponse(user), org })
 })
@@ -126,6 +127,32 @@ authRouter.get('/me', requireAuth, (req: AuthedRequest, res) => {
   const org = db.prepare(`SELECT ${ORG_COLUMNS} FROM organizations WHERE id = ?`).get(req.auth!.orgId)
   if (!user || !org) return res.status(404).json({ error: 'Account not found' })
   res.json({ user: userResponse(user), org })
+})
+
+// --- Signed-in devices (server-side sessions) ---
+// Each login creates a session row (see sessions.ts). An account can hold at
+// most MAX_SESSIONS_PER_USER at once; these routes let a user see and end them.
+
+authRouter.post('/logout', requireAuth, (req: AuthedRequest, res) => {
+  db.prepare('DELETE FROM sessions WHERE id = ? AND userId = ?').run(req.auth!.sid ?? '', req.auth!.userId)
+  res.json({ ok: true })
+})
+
+authRouter.get('/sessions', requireAuth, (req: AuthedRequest, res) => {
+  const rows = db
+    .prepare('SELECT id, deviceLabel, ip, createdAt, lastSeenAt FROM sessions WHERE userId = ? ORDER BY lastSeenAt DESC')
+    .all(req.auth!.userId) as { id: string; deviceLabel: string; ip: string; createdAt: string; lastSeenAt: string }[]
+  res.json(rows.map((s) => ({ ...s, current: s.id === req.auth!.sid })))
+})
+
+authRouter.post('/sessions/revoke-others', requireAuth, (req: AuthedRequest, res) => {
+  db.prepare('DELETE FROM sessions WHERE userId = ? AND id != ?').run(req.auth!.userId, req.auth!.sid ?? '')
+  res.json({ ok: true })
+})
+
+authRouter.delete('/sessions/:id', requireAuth, (req: AuthedRequest, res) => {
+  db.prepare('DELETE FROM sessions WHERE id = ? AND userId = ?').run(req.params.id, req.auth!.userId)
+  res.json({ ok: true })
 })
 
 // --- Two-factor authentication (TOTP) ---
@@ -171,6 +198,10 @@ authRouter.post('/2fa/verify', requireAuth, (req: AuthedRequest, res) => {
 authRouter.post('/2fa/disable', requireAuth, (req: AuthedRequest, res) => {
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.auth!.userId) as UserRow | undefined
   if (!user) return res.status(404).json({ error: 'Account not found' })
+
+  if (user.role === 'admin') {
+    return res.status(403).json({ error: 'Two-factor authentication is required for admin accounts and cannot be turned off.' })
+  }
 
   const { password } = req.body as Record<string, string>
   if (!password || !bcrypt.compareSync(password, user.passwordHash)) {
