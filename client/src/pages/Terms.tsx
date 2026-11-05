@@ -30,7 +30,7 @@ export function Terms() {
           paid subscription; if none is added, the account and its data are retained but write access is suspended
           until a plan is selected. You're responsible for the accuracy of the information you provide when signing
           up and for keeping your login credentials confidential. You're responsible for activity carried out under
-          your account, including by anyone you invite to your organisation.
+          your account, including by anyone you invite to your organisation. To protect accounts, each login may be signed in on up to two devices at once (signing in on a third signs out the least recently used device), and two-factor authentication is required for admin accounts. You must not share your login with anyone else; each person in your organisation needs their own seat.
         </p>
       </section>
 
