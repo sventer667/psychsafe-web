@@ -19,6 +19,7 @@ export function Team() {
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [notice, setNotice] = useState('')
   const [copiedToken, setCopiedToken] = useState<string | null>(null)
 
   async function load() {
@@ -59,6 +60,17 @@ export function Team() {
       await load()
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not change role')
+    }
+  }
+
+  async function resend(id: number) {
+    setError('')
+    setNotice('')
+    try {
+      await api(`/invites/${id}/resend`, { method: 'POST' })
+      setNotice('Invite email sent.')
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not send the email')
     }
   }
 
@@ -132,6 +144,7 @@ export function Team() {
       )}
 
       {error && !showForm && <p className="mb-3 text-sm text-destructive">{error}</p>}
+      {notice && <p className="mb-3 text-sm text-success">{notice}</p>}
       <Card className="mb-6">
         <h2 className="mb-3 font-serif text-lg text-ink">Members</h2>
         <div className="space-y-2">
@@ -167,7 +180,7 @@ export function Team() {
         <Card>
           <h2 className="mb-1 font-serif text-lg text-ink">Pending invites</h2>
           <p className="mb-3 text-sm text-muted">
-            There's no email sending configured yet, so copy each link and send it yourself.
+            Invitees are emailed their link automatically. If an email doesn't arrive, resend it or copy the link and send it yourself.
           </p>
           <div className="space-y-2">
             {data?.invites.map((inv) => (
@@ -177,6 +190,12 @@ export function Team() {
                   <div className="text-xs text-muted">{inv.email} · expires {new Date(inv.expiresAt).toLocaleDateString()}</div>
                 </div>
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => resend(inv.id)}
+                    className="rounded-lg border border-border px-2.5 py-1.5 text-xs text-muted hover:border-accent/50 hover:text-ink"
+                  >
+                    Resend email
+                  </button>
                   <button
                     onClick={() => copyLink(inv.token)}
                     className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs text-muted hover:border-accent/50 hover:text-ink"
