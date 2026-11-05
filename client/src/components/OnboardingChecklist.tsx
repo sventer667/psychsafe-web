@@ -131,7 +131,7 @@ export function OnboardingChecklist() {
       <p className="mt-3 text-sm text-muted">
         Not sure where to start?{' '}
         <a href="/gap-check" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-          Take the 2-minute gap check
+          Take the 3-minute gap check
         </a>
         .
       </p>
