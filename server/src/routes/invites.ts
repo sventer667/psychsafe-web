@@ -5,6 +5,7 @@ import { db } from '../db.js'
 import { requireAuth, type AuthedRequest } from '../auth.js'
 import { startSession } from '../sessions.js'
 import { logAudit } from '../audit.js'
+import { sendInviteEmail } from '../inviteEmail.js'
 import { seatLimitFor } from '../plans.js'
 import { requireTrialActive, isTrialExpired } from '../trialGate.js'
 
@@ -43,7 +44,7 @@ invitesRouter.get('/team', requireAuth, requireTrialActive, (req: AuthedRequest,
 })
 
 // POST /api/invites — create a pending invite, subject to the org's seat limit.
-invitesRouter.post('/invites', requireAuth, requireTrialActive, (req: AuthedRequest, res) => {
+invitesRouter.post('/invites', requireAuth, requireTrialActive, async (req: AuthedRequest, res) => {
   const { name, email } = req.body as Record<string, string>
   if (!name || !email) return res.status(400).json({ error: 'Name and email are required' })
 
@@ -72,7 +73,30 @@ invitesRouter.post('/invites', requireAuth, requireTrialActive, (req: AuthedRequ
 
   logAudit(req.auth!.orgId, req.auth!.userId, 'invite_sent', email, req)
   const invite = db.prepare('SELECT id, name, email, token, createdAt, expiresAt FROM invites WHERE id = ?').get(result.lastInsertRowid)
-  res.json(invite)
+  const emailed = await sendInviteEmail({ orgId: req.auth!.orgId, inviterId: req.auth!.userId, name, email, token })
+  res.json({ ...(invite as object), emailed })
+})
+
+// POST /api/invites/:id/resend — email the invite link again (max once a minute).
+const lastResend = new Map<number, number>()
+invitesRouter.post('/invites/:id/resend', requireAuth, requireTrialActive, async (req: AuthedRequest, res) => {
+  const invite = db
+    .prepare("SELECT id, name, email, token FROM invites WHERE id = ? AND orgId = ? AND status = 'pending' AND expiresAt > datetime('now')")
+    .get(req.params.id, req.auth!.orgId) as { id: number; name: string; email: string; token: string } | undefined
+  if (!invite) return res.status(404).json({ error: 'Invite not found or expired' })
+  if (Date.now() - (lastResend.get(invite.id) ?? 0) < 60_000) {
+    return res.status(429).json({ error: 'Wait a minute before sending this invite again' })
+  }
+  lastResend.set(invite.id, Date.now())
+  const emailed = await sendInviteEmail({
+    orgId: req.auth!.orgId,
+    inviterId: req.auth!.userId,
+    name: invite.name,
+    email: invite.email,
+    token: invite.token,
+  })
+  if (!emailed) return res.status(502).json({ error: 'The email could not be sent. Copy the link and send it yourself.' })
+  res.json({ ok: true })
 })
 
 // DELETE /api/invites/:id — revoke a pending invite.
