@@ -6,6 +6,7 @@ import { Card, Badge } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { HeatMap } from '../components/HeatMap'
 import { RiskGauges } from '../components/RiskGauges'
+import { OnboardingChecklist } from '../components/OnboardingChecklist'
 import { api } from '../lib/api'
 import { reviewStatus } from '../lib/reassessment'
 import type { Case, ActionItem, Heatmap, RiskGauges as RiskGaugesData } from '../lib/types'
@@ -65,6 +66,8 @@ export function Dashboard() {
 
   return (
     <div>
+      <OnboardingChecklist />
+
       {org && !org.state && (
         <Card className="mb-6 border-alert/40 bg-alert/5">
           <div className="flex items-start gap-3">
