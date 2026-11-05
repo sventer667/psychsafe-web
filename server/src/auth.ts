@@ -91,11 +91,21 @@ export function requireAuth(req: AuthedRequest, res: Response, next: NextFunctio
   if (!user) {
     return res.status(401).json({ error: 'Account not found', code: 'SESSION_ENDED' })
   }
-  if (user.role === 'admin' && !user.totpEnabled && !req.originalUrl.startsWith('/api/auth/')) {
+  const orgRow = db.prepare('SELECT require2fa FROM organizations WHERE id = ?').get(payload.orgId) as
+    | { require2fa: number }
+    | undefined
+  const needs2fa = user.role === 'admin' || !!orgRow?.require2fa
+  if (needs2fa && !user.totpEnabled && !req.originalUrl.startsWith('/api/auth/')) {
     return res.status(403).json({
-      error: 'Two-factor authentication is required for admin accounts. Set it up under Security.',
+      error: 'Two-factor authentication is required for your account. Set it up under Security.',
       code: '2FA_REQUIRED',
     })
+  }
+
+  // Viewers are read-only: anything that isn't a plain read is refused (the
+  // /api/auth routes stay open so they can sign out and manage their devices).
+  if (user.role === 'viewer' && !['GET', 'HEAD', 'OPTIONS'].includes(req.method) && !req.originalUrl.startsWith('/api/auth/')) {
+    return res.status(403).json({ error: 'Your account has read-only access.', code: 'READ_ONLY' })
   }
 
   req.auth = payload
