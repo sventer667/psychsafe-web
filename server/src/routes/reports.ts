@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import PDFDocument from 'pdfkit'
 import { db } from '../db.js'
+import { logAudit } from '../audit.js'
 import { requireAuth, type AuthedRequest } from '../auth.js'
 import { ownsCase } from '../ownership.js'
 import { requireTrialActive } from '../trialGate.js'
@@ -45,6 +46,7 @@ reportsRouter.get('/case/:id', async (req: AuthedRequest, res) => {
   if (!ownsCase(req.auth!.orgId, caseId)) return res.status(404).json({ error: 'Assessment not found' })
 
   const caseRow = db.prepare('SELECT * FROM cases WHERE id = ?').get(caseId) as any
+  logAudit(req.auth!.orgId, req.auth!.userId, 'report_exported', `Assessment #${caseId}`, req)
   const org = db.prepare('SELECT * FROM organizations WHERE id = ?').get(req.auth!.orgId) as any
   const sealHistory = db
     .prepare('SELECT * FROM case_seal_events WHERE caseId = ? ORDER BY createdAt ASC, id ASC')
