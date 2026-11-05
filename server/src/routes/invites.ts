@@ -4,13 +4,14 @@ import bcrypt from 'bcryptjs'
 import { db } from '../db.js'
 import { requireAuth, type AuthedRequest } from '../auth.js'
 import { startSession } from '../sessions.js'
+import { logAudit } from '../audit.js'
 import { seatLimitFor } from '../plans.js'
 import { requireTrialActive, isTrialExpired } from '../trialGate.js'
 
 export const invitesRouter = Router()
 
 const ORG_COLUMNS =
-  'id, name, industry, state, businessUnit, planStatus, planTier, stripeCustomerId, consultantName, consultantCredential'
+  'id, name, industry, state, businessUnit, planStatus, planTier, require2fa, stripeCustomerId, consultantName, consultantCredential'
 
 const INVITE_TTL_DAYS = 7
 
@@ -69,6 +70,7 @@ invitesRouter.post('/invites', requireAuth, requireTrialActive, (req: AuthedRequ
     .prepare('INSERT INTO invites (orgId, name, email, token, expiresAt) VALUES (?, ?, ?, ?, ?)')
     .run(req.auth!.orgId, name, email, token, expiresAt)
 
+  logAudit(req.auth!.orgId, req.auth!.userId, 'invite_sent', email, req)
   const invite = db.prepare('SELECT id, name, email, token, createdAt, expiresAt FROM invites WHERE id = ?').get(result.lastInsertRowid)
   res.json(invite)
 })
