@@ -103,7 +103,7 @@ export function Privacy() {
               <td className="py-2 pr-3 text-ink">Microsoft 365 (email)</td>
               <td className="py-2 pr-3">Name, email address and content of emails you send to contact@humanora.com.au</td>
               <td className="py-2 pr-3">Receiving and answering support and general enquiries</td>
-              <td className="py-2">Microsoft data centres</td>
+              <td className="py-2">Australia</td>
             </tr>
             <tr>
               <td className="py-2 pr-3 text-ink">Cloud hosting provider</td>
@@ -149,10 +149,10 @@ export function Privacy() {
           <li>Closed assessments are cryptographically fingerprinted (SHA-256), and every seal or reopen is permanently logged with who did it, when, and why, so a closed record's history can't be silently rewritten</li>
         </ul>
         <p>
-          <strong>Current limitation:</strong> Humanora does not yet run automated, scheduled backups of the
-          underlying database. We're working to add a backup schedule; until it's in place, we don't guarantee
-          recovery of data lost to an infrastructure failure, and encourage you to keep your own export of any
-          assessment you can't afford to lose (see the PDF export on each assessment's Export tab).
+          <strong>Backups:</strong> the server that holds our database is backed up weekly by our hosting provider.
+          Because backups are weekly, changes made since the most recent backup could be lost in an infrastructure
+          failure. We encourage you to keep your own export of any assessment you can't afford to lose (see the
+          PDF export on each assessment's Export tab).
         </p>
         <p>
           If we become aware of a data breach likely to result in serious harm, we'll notify affected account holders
