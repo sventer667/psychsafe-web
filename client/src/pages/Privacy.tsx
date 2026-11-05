@@ -2,7 +2,7 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Privacy() {
   return (
-    <LegalLayout title="Privacy Policy" version="1.0" effectiveDate="August 2026">
+    <LegalLayout title="Privacy Policy" version="1.0" effectiveDate="November 2026">
       <section>
         <h2>1. Scope</h2>
         <p>
@@ -49,8 +49,8 @@ export function Privacy() {
         </p>
         <h3>Technical information</h3>
         <p>
-          Our cloud hosting provider, located in Australia, automatically logs standard web request data (IP address, requested URL,
-          timestamp) for security and operational purposes, the same way any web host does. Humanora doesn't run
+          Our hosting providers automatically log standard web request data (IP address, requested URL,
+          timestamp) for security and operational purposes, the same way any web host does. Our website's pages are served by Render (United States), and our application and database run in Australia (Sydney). Humanora doesn't run
           Google Analytics, advertising pixels, or any other third-party tracking or analytics tool, and doesn't set
           any cookies, your signed-in session is kept in your browser's session storage rather than a cookie, and is
           cleared when you close the tab or log out.
@@ -93,6 +93,18 @@ export function Privacy() {
               <td className="py-2 pr-3">Sending transactional emails</td>
               <td className="py-2">United States, delivered from Japan (Tokyo)</td>
             </tr>
+            <tr className="border-b border-border">
+              <td className="py-2 pr-3 text-ink">Render (website hosting)</td>
+              <td className="py-2 pr-3">IP address and standard request details of visitors to our website</td>
+              <td className="py-2 pr-3">Serving the pages of our website</td>
+              <td className="py-2">United States</td>
+            </tr>
+            <tr className="border-b border-border">
+              <td className="py-2 pr-3 text-ink">Microsoft 365 (email)</td>
+              <td className="py-2 pr-3">Name, email address and content of emails you send to contact@humanora.com.au</td>
+              <td className="py-2 pr-3">Receiving and answering support and general enquiries</td>
+              <td className="py-2">Microsoft data centres</td>
+            </tr>
             <tr>
               <td className="py-2 pr-3 text-ink">Cloud hosting provider</td>
               <td className="py-2 pr-3">The full application database, including assessment content</td>
@@ -112,7 +124,7 @@ export function Privacy() {
         <h2>6. Overseas disclosure (Australian Privacy Principle 8)</h2>
         <p>
           Our application database, including all assessment content, is hosted on cloud infrastructure located in
-          Australia (Sydney), so that information is not sent overseas as part of hosting. Our payment processor,
+          Australia (Sydney), so that information is not sent overseas as part of hosting. Our website's pages are served by Render in the United States, which logs the IP address and basic request details of visitors. Our payment processor,
           Stripe, is based in the United States, so the payment information you provide is processed outside Australia. Our email delivery provider, Resend, is also based in the United States and sends our emails from Japan (Tokyo), so your name, email address and the content of emails we send you (such as Gap Check results, invitations and password resets) are processed outside Australia. Our hosting provider and Stripe are each large, established providers that
           publish their own security and compliance documentation, including SOC 2 reports, on request. We haven't
           independently audited either provider's certifications ourselves, but if you need their current
