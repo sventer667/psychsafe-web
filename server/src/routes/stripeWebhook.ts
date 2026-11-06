@@ -15,6 +15,9 @@ function tierForPriceId(priceId: string | undefined): PlanTier | null {
     [process.env.STRIPE_PRICE_STARTER, 'starter'],
     [process.env.STRIPE_PRICE_GROWTH, 'growth'],
     [process.env.STRIPE_PRICE_ENTERPRISE, 'enterprise'],
+    [process.env.STRIPE_PRICE_STARTER_ANNUAL, 'starter'],
+    [process.env.STRIPE_PRICE_GROWTH_ANNUAL, 'growth'],
+    [process.env.STRIPE_PRICE_ENTERPRISE_ANNUAL, 'enterprise'],
   ]
   return envToTier.find(([id]) => id === priceId)?.[1] ?? null
 }
