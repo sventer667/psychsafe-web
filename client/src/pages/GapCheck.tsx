@@ -85,6 +85,7 @@ export function GapCheck() {
   // Step 5
   const [email, setEmail] = useState('')
   const [firstName, setFirstName] = useState('')
+  const [marketingConsent, setMarketingConsent] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<SubmitResponse | null>(null)
@@ -115,6 +116,7 @@ export function GapCheck() {
           state,
           industry,
           orgSize,
+          marketingConsent,
           currentSetup,
           answers: answers.map((a) => Boolean(a)),
         },
@@ -274,8 +276,7 @@ export function GapCheck() {
           <div className="rounded-xl border border-border bg-surface p-8">
             <h2 className="text-xl font-semibold text-ink">Where should we send it?</h2>
             <p className="mt-2 text-sm text-muted">
-              Your personalised breakdown, plus the hazards and legislation specific to {state} and {industry}. We'll
-              only use your email to send it.
+              Your personalised breakdown, plus the hazards and legislation specific to {state} and {industry}.
             </p>
             <div className="mt-6 space-y-4">
               <div>
@@ -286,13 +287,24 @@ export function GapCheck() {
                 <Label htmlFor="firstName">First name (optional)</Label>
                 <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
               </div>
+              <label className="flex items-start gap-2 text-sm text-ink">
+                <input
+                  type="checkbox"
+                  checked={marketingConsent}
+                  onChange={(e) => setMarketingConsent(e.target.checked)}
+                  className="mt-1"
+                />
+                <span>
+                  Send me occasional tips and updates from Humanora (optional). You can unsubscribe at any time.
+                </span>
+              </label>
             </div>
             {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
             <Button className="mt-6 w-full" disabled={!email || busy} onClick={submitBreakdown}>
               {busy ? 'Sending…' : 'Send my breakdown'}
             </Button>
             <p className="mt-3 text-xs text-muted">
-              We'll only use this to send your result. See our{' '}
+              We'll use your email to send your result, and for tips and updates only if you tick the box above. See our{' '}
               <Link to="/privacy" className="text-accent hover:underline">
                 Privacy policy
               </Link>
