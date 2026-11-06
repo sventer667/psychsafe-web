@@ -2,7 +2,7 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Terms() {
   return (
-    <LegalLayout title="Terms & Conditions" version="1.0" effectiveDate="November 2026">
+    <LegalLayout title="Terms & Conditions" version="1.1" effectiveDate="November 2026">
       <section>
         <h2>1. Agreement</h2>
         <p>
@@ -31,6 +31,13 @@ export function Terms() {
           until a plan is selected. You're responsible for the accuracy of the information you provide when signing
           up and for keeping your login credentials confidential. You're responsible for activity carried out under
           your account, including by anyone you invite to your organisation. To protect accounts, each login may be signed in on up to two devices at once (signing in on a third signs out the least recently used device), and two-factor authentication is required for admin accounts. You must not share your login with anyone else; each person in your organisation needs their own seat.
+        </p>
+        <p>
+          Admins decide who in your organisation has access and at what level. On the Enterprise plan, an admin can give a
+          person a read-only viewer role, which allows them to view the organisation's assessments and reports but not
+          to change, create, or delete anything, and can require two-factor authentication for every user in the
+          organisation, not only admins. A viewer uses a seat like any other user. Your organisation's admins are
+          responsible for the access they grant and for removing access when someone no longer needs it.
         </p>
       </section>
 
