@@ -259,6 +259,8 @@ for (const col of [
   'consentAt TEXT',
   'unsubscribeToken TEXT',
   'unsubscribedAt TEXT',
+  'nurtureStep INTEGER NOT NULL DEFAULT 0',
+  'lastNurtureAt TEXT',
 ]) {
   try {
     db.exec(`ALTER TABLE gap_check_leads ADD COLUMN ${col}`)
