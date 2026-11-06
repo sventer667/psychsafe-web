@@ -2,7 +2,7 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Terms() {
   return (
-    <LegalLayout title="Terms & Conditions" version="1.1" effectiveDate="November 2026">
+    <LegalLayout title="Terms & Conditions" version="1.2" effectiveDate="November 2026">
       <section>
         <h2>1. Agreement</h2>
         <p>
@@ -44,11 +44,11 @@ export function Terms() {
       <section>
         <h2>4. Plans, pricing, and payment</h2>
         <p>
-          Humanora is offered on Starter, Growth, and Enterprise plans, each billed at a flat monthly price that includes a set number of seats. All prices are in Australian dollars (AUD) and no GST is charged. Current pricing is shown on
+          Humanora is offered on Starter, Growth, and Enterprise plans, each billed at a flat price that includes a set number of seats. You can pay monthly, or pay annually at a price equal to 11 months of the monthly price (12 months of service for the price of 11). All prices are in Australian dollars (AUD) and no GST is charged. Current pricing is shown on
           our pricing page and may change; we'll give existing subscribers at least 30 days notice before a price
           change takes effect on their account. Payment is processed by Stripe; we don't store your card details.
-          Subscriptions renew automatically for the same subscription period unless cancelled before the renewal date.
-          Fees are non-refundable except where required by law.
+          Subscriptions renew automatically for the same subscription period (monthly or annual) unless cancelled before the renewal date.
+          Fees are non-refundable except where required by law. If you cancel an annual subscription, it stays active until the end of the period you've paid for.
         </p>
       </section>
 
