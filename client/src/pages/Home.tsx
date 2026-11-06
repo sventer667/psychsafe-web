@@ -92,6 +92,7 @@ const TIERS = [
       'Mandatory 2FA for every user',
       'Read-only viewer role',
       'Onboarding setup: we load your sites, teams and starting hazards',
+      'Priority email support',
     ],
   },
 ]
