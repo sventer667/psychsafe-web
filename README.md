@@ -12,8 +12,11 @@ of practice in its own state or territory. Built as two separate projects:
 
 ## Live app
 
-- App: https://connexus-app.onrender.com
-- API: https://connexus-api-f5h7.onrender.com/api
+- App: https://humanora.com.au (Render static site `connexus-app`)
+- API: https://api.humanora.com.au/api (Node service on a DigitalOcean droplet, Sydney)
+
+The site is currently behind a coming-soon gate (`MAINTENANCE_MODE=true` on the API plus a frontend
+gate). Preview access uses a private `?unlock=` link.
 
 ## What it does
 
@@ -71,7 +74,7 @@ automatically at `server/humanora.db` on first run, seeded with the 22+ entry ha
 
 The `/api/checkout/*` endpoints work out of the box but return a "Stripe not configured" message
 until you add real keys. Humanora has three pricing tiers — Starter ($89/mo, 1 seat), Growth
-($179/mo, up to 5 seats), and Enterprise ($399/mo, up to 20 seats) — each backed by its own Stripe
+($179/mo, up to 5 seats), and Enterprise ($599/mo, up to 20 seats) — each backed by its own Stripe
 Price:
 
 1. In `server/.env`, set `STRIPE_SECRET_KEY` to your own Stripe secret key (never commit it, and
@@ -79,16 +82,15 @@ Price:
 2. Run `npm run setup:stripe` from `server/` (or `node scripts/setup-stripe-prices.mjs` directly).
    It creates the three Products/Prices in your Stripe account and prints the three price IDs.
 3. Copy those into `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_GROWTH`, and `STRIPE_PRICE_ENTERPRISE` in
-   `server/.env` (or the Render dashboard for `connexus-api`), then redeploy the backend.
+   `/etc/humanora/api.env` on the droplet (or `server/.env` locally), then restart the API.
 4. For subscription status and tier to update automatically, add a webhook endpoint pointing at
    `POST /api/stripe/webhook` and set `STRIPE_WEBHOOK_SECRET`. The webhook keeps an org's
    `planTier` in sync with whichever tier's price it's actually subscribed to.
 
-The Billing page's "Switch to X" buttons change an org's seat limit for free/instantly (used to
-test the Team page's invite flow) and are independent of the "Subscribe — $X/mo" buttons, which
-create a real Stripe Checkout session. There's no upgrade/downgrade-while-subscribed flow yet —
-switching tiers while already paying currently needs the Stripe customer portal or a manual
-subscription update.
+Plan tier is set only by Stripe: the webhook maps the subscribed price ID to a tier, and the
+server rejects tier changes from the app. Enterprise features (audit log, mandatory 2FA, read-only
+viewers, bulk import) only unlock while the subscription status is `active`. To change tier, use the
+Stripe customer portal.
 
 ## Enabling the gap-check tool's email
 
@@ -96,13 +98,13 @@ subscription update.
 immediately), but the results email won't actually send until Resend is configured — until then
 `server/src/email.ts` logs a warning and no-ops rather than failing the request:
 
-1. Create a Resend account and add `humanoraohs.com.au` as a sending domain. Resend gives you
+1. Create a Resend account and add `humanora.com.au` as a sending domain. Resend gives you
    SPF, DKIM, and DMARC DNS records to add at your domain registrar — this is a manual step only
    someone with access to the domain's DNS can do, and can take a few hours to verify.
 2. Once the domain is verified, create an API key in Resend and set `RESEND_API_KEY` in
-   `server/.env` (or the Render dashboard for `connexus-api`).
+   `/etc/humanora/api.env` on the droplet (or `server/.env` locally).
 3. Set `EMAIL_FROM` to a verified address on that domain, e.g.
-   `EMAIL_FROM="Humanora <hello@humanoraohs.com.au>"`. If unset, it falls back to Resend's own
+   `EMAIL_FROM="Humanora <contact@humanora.com.au>"`. If unset, it falls back to Resend's own
    `onboarding@resend.dev` sender, which works for testing but shouldn't be used for real leads.
 4. Redeploy the backend. No code change is needed either way — `sendEmail()` picks up the new env
    vars automatically.
@@ -120,33 +122,25 @@ outright; the SHA-256 hash itself is always computed and stored.
 
 ## Deploying
 
-This is currently deployed on Render as two services from the `sventer667/psychsafe-web` GitHub
-repo:
+- **Frontend** — Render static site `connexus-app` (domain humanora.com.au), built from the `main`
+  branch of `sventer667/psychsafe-web`: build `cd client && npm install && npm run build`, publish
+  `client/dist`, with `VITE_API_URL` pointing at the API's `/api` URL.
+- **Backend** — Node 22 service on a DigitalOcean droplet (Sydney), run by systemd as
+  `humanora-api`. Environment lives in `/etc/humanora/api.env`, the SQLite database at
+  `/var/lib/humanora/humanora.db`, and the repo at `/opt/humanora`. To deploy:
 
-- **Backend** (`connexus-api` service, live at `connexus-api-f5h7.onrender.com`) — Node web
-  service, build command `cd server && npm install && npm run build`, start command
-  `cd server && npm start`.
-- **Frontend** (`connexus-app` static site, live at `connexus-app.onrender.com`) — build command
-  `cd client && npm install && npm run build`, publish path `client/dist`, with `VITE_API_URL`
-  set to the backend's `/api` URL.
+  ```bash
+  cd /opt/humanora && git pull && cd server && npm run build && systemctl restart humanora-api
+  ```
 
-Known gap: the backend service doesn't currently have a persistent disk attached, so the SQLite
-database resets on every redeploy. Fix in the Render dashboard → the backend service → **Disks**
-→ add a disk mounted at `/var/data`, then set `DATABASE_PATH=/var/data/humanora.db`.
-
-To deploy elsewhere (Vercel/Netlify for the frontend, Railway/Fly.io for the backend), the same
-build/start commands apply — just set `VITE_API_URL` on the frontend and the vars from
-`server/.env.example` on the backend.
+Key environment variables: `JWT_SECRET`, `DATABASE_PATH`, `APP_URL`, `STRIPE_*`, `RESEND_API_KEY`,
+`EMAIL_FROM`, `MAINTENANCE_MODE`, `PREVIEW_ACCESS_SECRET`.
 
 ## Updating the live app
 
-There's no GitHub integration wired up in this environment, so shipping a change is a manual
-two-step:
-
-1. Upload the changed files to the `sventer667/psychsafe-web` GitHub repo (web UI drag-and-drop,
-   or `git push` if you have it set up locally).
-2. Trigger a redeploy of both Render services from the dashboard (or ask Claude to do it via the
-   Render connector).
+1. Commit the changed files to the `sventer667/psychsafe-web` repo (`main`).
+2. Frontend changes: trigger a redeploy of `connexus-app` on Render.
+3. Server changes: run the droplet update command above.
 
 ## Project layout notes
 
