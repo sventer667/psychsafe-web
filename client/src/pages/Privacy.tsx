@@ -2,7 +2,7 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Privacy() {
   return (
-    <LegalLayout title="Privacy Policy" version="1.2" effectiveDate="November 2026">
+    <LegalLayout title="Privacy Policy" version="1.3" effectiveDate="November 2026">
       <section>
         <h2>1. Scope</h2>
         <p>
@@ -104,7 +104,7 @@ export function Privacy() {
             <tr className="border-b border-border">
               <td className="py-2 pr-3 text-ink">Resend (email delivery)</td>
               <td className="py-2 pr-3">Name, email address and the content of emails we send you (for example Gap Check results, invitations, password resets and new-device sign-in alerts)</td>
-              <td className="py-2 pr-3">Sending transactional emails</td>
+              <td className="py-2 pr-3">Sending transactional emails, and tips and updates if you opt in (you can unsubscribe at any time)</td>
               <td className="py-2">United States, delivered from Japan (Tokyo)</td>
             </tr>
             <tr className="border-b border-border">
