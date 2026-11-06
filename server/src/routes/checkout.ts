@@ -25,6 +25,14 @@ const TIER_PRICE_ENV: Record<PlanTier, string> = {
   enterprise: 'STRIPE_PRICE_ENTERPRISE',
 }
 
+// Annual billing: one extra Stripe Price per tier (12 months for the price of
+// 11), created with server/scripts/setup-stripe-annual-prices.mjs.
+const TIER_ANNUAL_PRICE_ENV: Record<PlanTier, string> = {
+  starter: 'STRIPE_PRICE_STARTER_ANNUAL',
+  growth: 'STRIPE_PRICE_GROWTH_ANNUAL',
+  enterprise: 'STRIPE_PRICE_ENTERPRISE_ANNUAL',
+}
+
 // Placeholder values (from .env.example, never replaced with a real ID) must
 // be treated the same as "not set", otherwise a literal "price_..." gets
 // passed straight to the Stripe API as if it were real.
@@ -32,7 +40,11 @@ function isPlaceholder(value: string | undefined): boolean {
   return !value || value.endsWith('...')
 }
 
-function priceIdFor(tier: PlanTier): string | undefined {
+function priceIdFor(tier: PlanTier, interval: 'month' | 'year' = 'month'): string | undefined {
+  if (interval === 'year') {
+    const annual = process.env[TIER_ANNUAL_PRICE_ENV[tier]]
+    return isPlaceholder(annual) ? undefined : annual
+  }
   const tierSpecific = process.env[TIER_PRICE_ENV[tier]]
   if (!isPlaceholder(tierSpecific)) return tierSpecific
   if (tier === 'growth' && !isPlaceholder(process.env.STRIPE_PRICE_ID)) return process.env.STRIPE_PRICE_ID
@@ -60,10 +72,12 @@ checkoutRouter.post('/create-session', async (req: AuthedRequest, res) => {
   if (!PLAN_TIERS.includes(tier as PlanTier)) {
     return res.status(400).json({ error: 'Invalid plan tier' })
   }
-  const priceId = priceIdFor(tier as PlanTier)
+  const interval: 'month' | 'year' = req.body?.interval === 'year' ? 'year' : 'month'
+  const priceId = priceIdFor(tier as PlanTier, interval)
   if (!priceId) {
+    const envName = interval === 'year' ? TIER_ANNUAL_PRICE_ENV[tier as PlanTier] : TIER_PRICE_ENV[tier as PlanTier]
     return res.status(501).json({
-      error: `No Stripe price configured for the ${tier} tier. Run server/scripts/setup-stripe-prices.mjs and set ${TIER_PRICE_ENV[tier as PlanTier]} in server/.env.`,
+      error: `No Stripe ${interval === 'year' ? 'annual ' : ''}price configured for the ${tier} tier. Set ${envName} in the API environment.`,
     })
   }
 
@@ -86,8 +100,8 @@ checkoutRouter.post('/create-session', async (req: AuthedRequest, res) => {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${CLIENT_URL}/billing?checkout=success`,
       cancel_url: `${CLIENT_URL}/billing?checkout=cancelled`,
-      metadata: { orgId: String(org.id), tier },
-      subscription_data: { metadata: { orgId: String(org.id), tier } },
+      metadata: { orgId: String(org.id), tier, interval },
+      subscription_data: { metadata: { orgId: String(org.id), tier, interval } },
     })
 
     res.json({ url: session.url })
