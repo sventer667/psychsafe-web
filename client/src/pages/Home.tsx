@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
 import {
   ClipboardList,
@@ -69,6 +70,7 @@ const TIERS = [
   {
     label: 'Starter',
     price: '$89',
+    annual: '$979',
     seats: '1 seat',
     blurb: 'A single person running one assessment at a time.',
     features: ['Full hazard register & action plans', 'Management ready PDF export', 'Tamper-evident assessment sealing'],
@@ -76,6 +78,7 @@ const TIERS = [
   {
     label: 'Growth',
     price: '$179',
+    annual: '$1,969',
     seats: 'Up to 5 seats',
     blurb: 'A WHS/HR team collaborating across assessments.',
     features: ['Everything in Starter', 'Unlimited assessments', 'Priority email support'],
@@ -84,6 +87,7 @@ const TIERS = [
   {
     label: 'Enterprise',
     price: '$599',
+    annual: '$6,589',
     seats: 'Up to 20 seats',
     blurb: 'A larger organisation with a dedicated WHS function.',
     features: [
@@ -100,6 +104,7 @@ const TIERS = [
 export function Home() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
+  const [annual, setAnnual] = useState(false)
 
   // A signed-in visitor landing on "/" belongs in the app, not the pitch. Wait
   // for the auth check to resolve before deciding, so an already-logged-in
@@ -191,10 +196,28 @@ export function Home() {
       <section className="border-t border-border bg-surface py-16">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-serif text-2xl text-ink sm:text-3xl">Simple monthly pricing</h2>
+            <h2 className="font-serif text-2xl text-ink sm:text-3xl">Simple pricing</h2>
             <p className="mt-3 text-muted">Every plan includes the full hazard register, action plans, and sealed PDF export.</p>
           </div>
-          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
+          <div className="mt-6 flex justify-center">
+            <div className="inline-flex rounded-lg border border-border bg-canvas p-0.5 text-sm">
+              <button
+                type="button"
+                onClick={() => setAnnual(false)}
+                className={`rounded-md px-4 py-1.5 ${!annual ? 'bg-accent text-white' : 'text-muted'}`}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnnual(true)}
+                className={`rounded-md px-4 py-1.5 ${annual ? 'bg-accent text-white' : 'text-muted'}`}
+              >
+                Annual <span className="text-xs opacity-80">(pay for 11 months, get 12)</span>
+              </button>
+            </div>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
             {TIERS.map((t) => (
               <div
                 key={t.label}
@@ -202,8 +225,8 @@ export function Home() {
               >
                 <div className="font-serif text-lg text-ink">{t.label}</div>
                 <div className="mt-1 font-serif text-3xl text-ink">
-                  {t.price}
-                  <span className="text-base font-normal text-muted">/mo</span>
+                  {annual ? t.annual : t.price}
+                  <span className="text-base font-normal text-muted">{annual ? '/yr' : '/mo'}</span>
                 </div>
                 <div className="mt-1 text-xs text-muted">{t.seats}</div>
                 <p className="mt-3 text-sm text-muted">{t.blurb}</p>
