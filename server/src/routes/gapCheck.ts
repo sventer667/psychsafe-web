@@ -202,7 +202,7 @@ function buildResultsEmailHtml(input: {
       </ul>
       ${legislation ? `<h3>What ${state} requires</h3><p style="color:${MUTED};">${legislation}</p>` : ''}
       <h3 style="margin-top:28px;">Next step</h3>
-      <p>You don't need to fix all of this in a spreadsheet. Start a free 7-day trial and we'll pre-load your hazard register with the gaps we just found for ${industry} in ${state}.</p>
+      <p>You don't need to fix all of this in a spreadsheet. Start a free 7-day trial, add hazards from our built-in library, and get ${state} legislation references applied automatically.</p>
       <p style="margin:24px 0;">
         <a href="${appUrl}/signup" style="background:${ACCENT};color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Start your free trial</a>
       </p>
@@ -387,7 +387,7 @@ gapCheckRouter.get('/:id/pdf', async (req, res) => {
     .fontSize(11)
     .fillColor(MUTED)
     .text(
-      `Start your free 7-day trial. We'll pre-load your hazard register with ${lead.industry} hazards, apply ${lead.state} legislation automatically, and mark the gaps above as the first things to address.`,
+      `Start your free 7-day trial. Add hazards from the built-in library, with ${lead.state} legislation references applied automatically, and work through the gaps above as your first actions.`,
       { width: 495 }
     )
 
