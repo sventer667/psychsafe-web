@@ -252,6 +252,21 @@ try {
   // database this migration already ran against.
 }
 
+// Marketing consent for gap-check leads (Spam Act 2003): optional opt-in to
+// tips emails, plus a per-lead token used by the unsubscribe link.
+for (const col of [
+  'marketingConsent INTEGER NOT NULL DEFAULT 0',
+  'consentAt TEXT',
+  'unsubscribeToken TEXT',
+  'unsubscribedAt TEXT',
+]) {
+  try {
+    db.exec(`ALTER TABLE gap_check_leads ADD COLUMN ${col}`)
+  } catch {
+    // Column already exists.
+  }
+}
+
 // Backfill: any trialing org from before this feature existed gets a trial
 // window computed from its signup date, rather than being silently locked
 // out immediately or granted an indefinite free trial.
