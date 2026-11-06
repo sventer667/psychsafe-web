@@ -2,7 +2,7 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Privacy() {
   return (
-    <LegalLayout title="Privacy Policy" version="1.0" effectiveDate="November 2026">
+    <LegalLayout title="Privacy Policy" version="1.1" effectiveDate="November 2026">
       <section>
         <h2>1. Scope</h2>
         <p>
@@ -34,7 +34,19 @@ export function Privacy() {
           <li>Your organisation's name, industry, state or territory, and business unit</li>
           <li>If you enable two-factor authentication (required for admin accounts): an authenticator secret and bcrypt-hashed one-time backup codes</li>
           <li>Sign-in session details for each device signed in to your account: browser and operating system, IP address, and sign-in times. We also keep a record of the browser and operating system combinations you have signed in from, so we can email you when a new device signs in</li>
+          <li>Your role in the organisation (admin, member, or read-only viewer)</li>
+          <li>The name and email address of anyone an admin invites to join the organisation, including when many people are added at once from an uploaded CSV file, together with the invitation link we generate for them</li>
         </ul>
+        <h3>Activity (audit) log</h3>
+        <p>
+          We keep a log of significant actions taken in each organisation's account so that organisations can see who
+          did what. Each entry records the name of the user, the action (for example signing in, sealing, reopening
+          or deleting an assessment, exporting a PDF report, inviting someone, importing data from a CSV file,
+          changing a person's role, or changing the two-factor authentication requirement), a short detail (such as
+          the assessment number, the invited person's email address, or the reason given for reopening a sealed
+          assessment), the IP address the action came from, and the time. The log is recorded for every
+          organisation. Admins of organisations on the Enterprise plan can view it and download it as a CSV file.
+        </p>
         <h3>Assessment content</h3>
         <p>
           Whatever your organisation enters while running an assessment: hazard titles, categories, and free-text
@@ -63,7 +75,8 @@ export function Privacy() {
         <ul>
           <li><strong>Service delivery</strong>: to create and run your account, store your assessments, and generate PDF reports</li>
           <li><strong>Payments</strong>: to manage your subscription and trial period via Stripe</li>
-          <li><strong>Security</strong>: to authenticate sign-ins, support two-factor authentication, and investigate suspicious activity</li>
+          <li><strong>Security and accountability</strong>: to authenticate sign-ins, support two-factor authentication, keep an activity log of who did what in an organisation's account, and investigate suspicious activity</li>
+          <li><strong>Invitations</strong>: to email the people an admin invites to join the organisation, and to let the admin resend or revoke an invitation</li>
           <li><strong>Support</strong>: to respond if you contact us with a question or issue</li>
           <li><strong>Legal and accounting obligations</strong>: to keep records the law requires us to keep, such as financial records</li>
         </ul>
@@ -145,6 +158,8 @@ export function Privacy() {
         <ul>
           <li>Passwords are hashed with bcrypt and never stored or logged in plaintext</li>
           <li>Two-factor authentication (TOTP) is available on every account and required for admin accounts, with one-time backup codes stored as bcrypt hashes</li>
+          <li>Organisations on the Enterprise plan can require two-factor authentication for every user (not only admins) and can give people a read-only viewer role that cannot change anything</li>
+          <li>Significant actions are recorded in an activity log (see Section 3), so an organisation can review who did what</li>
           <li>Each account can be signed in on up to two devices at once, you can see and sign out your devices from the Security page, and we email you when your account is signed in from a new device</li>
           <li>All traffic between your browser and Humanora is encrypted in transit (HTTPS/TLS)</li>
           <li>Every API request is authenticated and scoped to your organisation, one organisation's data is never returned in response to another organisation's request</li>
@@ -187,7 +202,7 @@ export function Privacy() {
       <section>
         <h2>9. Data retention and deletion</h2>
         <p>
-          We keep your account and assessment data for as long as your account is active. We don't currently run an
+          We keep your account and assessment data, including the activity log described in Section 3, for as long as your account is active. We don't currently run an
           automated deletion pipeline for cancelled accounts, if you cancel and want your data deleted rather than
           simply left inactive, contact us (Section 11) and we'll action it manually. Financial records are kept for
           as long as Australian tax law requires (currently seven years).
