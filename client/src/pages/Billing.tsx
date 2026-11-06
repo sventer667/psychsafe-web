@@ -8,11 +8,12 @@ import { api, ApiError } from '../lib/api'
 import type { PlanTier } from '../lib/types'
 import { isTrialExpired, daysLeftInTrial } from '../lib/trial'
 
-const TIERS: { id: PlanTier; label: string; price: string; seats: string; blurb: string; features: string[] }[] = [
+const TIERS: { id: PlanTier; label: string; price: string; annual: string; seats: string; blurb: string; features: string[] }[] = [
   {
     id: 'starter',
     label: 'Starter',
     price: '$89/mo',
+    annual: '$979/yr',
     seats: '1 seat',
     blurb: 'A single person running one assessment at a time.',
     features: ['Full hazard register & action plans', 'One-click compliance report', 'Cryptographic case sealing'],
@@ -21,6 +22,7 @@ const TIERS: { id: PlanTier; label: string; price: string; seats: string; blurb:
     id: 'growth',
     label: 'Growth',
     price: '$179/mo',
+    annual: '$1,969/yr',
     seats: 'Up to 5 seats',
     blurb: 'A WHS/HR team collaborating across assessments.',
     features: ['Everything in Starter', 'Unlimited assessments', 'Priority email support'],
@@ -29,6 +31,7 @@ const TIERS: { id: PlanTier; label: string; price: string; seats: string; blurb:
     id: 'enterprise',
     label: 'Enterprise',
     price: '$599/mo',
+    annual: '$6,589/yr',
     seats: 'Up to 20 seats',
     blurb: 'A larger organisation with a dedicated WHS function.',
     features: [
@@ -73,6 +76,7 @@ export function Billing() {
   const [savingProfile, setSavingProfile] = useState(false)
   const [savedProfile, setSavedProfile] = useState(false)
   const [checkoutError, setCheckoutError] = useState('')
+  const [annual, setAnnual] = useState(false)
 
   useEffect(() => {
     setIndustry(org?.industry || '')
@@ -108,11 +112,11 @@ export function Billing() {
     }
   }
 
-  async function checkout(tier: PlanTier) {
+  async function checkout(tier: PlanTier, interval: 'month' | 'year') {
     setBusy(true)
     setCheckoutError('')
     try {
-      const data = await api<{ url: string }>('/checkout/create-session', { method: 'POST', body: { tier } })
+      const data = await api<{ url: string }>('/checkout/create-session', { method: 'POST', body: { tier, interval } })
       window.location.href = data.url
     } catch (err) {
       setCheckoutError(err instanceof ApiError ? err.message : 'Something went wrong starting checkout')
@@ -219,6 +223,22 @@ export function Billing() {
           Choose the tier that matches your team size. Your plan sets your seat limit on the Team page and changes when you
           subscribe or change plan through Stripe.
         </p>
+        <div className="mb-4 inline-flex rounded-lg border border-border p-0.5 text-sm">
+          <button
+            type="button"
+            onClick={() => setAnnual(false)}
+            className={`rounded-md px-3 py-1 ${!annual ? 'bg-accent text-white' : 'text-muted'}`}
+          >
+            Monthly
+          </button>
+          <button
+            type="button"
+            onClick={() => setAnnual(true)}
+            className={`rounded-md px-3 py-1 ${annual ? 'bg-accent text-white' : 'text-muted'}`}
+          >
+            Annual <span className="text-xs opacity-80">(1 month free)</span>
+          </button>
+        </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {TIERS.map((t) => {
             const current = org?.planTier === t.id
@@ -231,7 +251,7 @@ export function Billing() {
                   <div className="font-serif text-base text-ink">{t.label}</div>
                   {current && <Badge tone="accent">Current</Badge>}
                 </div>
-                <div className="text-lg font-serif text-ink">{t.price}</div>
+                <div className="text-lg font-serif text-ink">{annual ? t.annual : t.price}</div>
                 <div className="mb-2 text-xs text-muted">{t.seats}</div>
                 <p className="mb-3 text-xs text-muted">{t.blurb}</p>
                 <ul className="mb-4 flex-1 space-y-1.5">
@@ -246,8 +266,8 @@ export function Billing() {
                     {busy ? 'Opening…' : 'Manage subscription'}
                   </Button>
                 ) : (
-                  <Button variant="secondary" className="mt-2" onClick={() => checkout(t.id)} disabled={busy}>
-                    {busy ? 'Redirecting…' : `Subscribe for ${t.price}`}
+                  <Button variant="secondary" className="mt-2" onClick={() => checkout(t.id, annual ? 'year' : 'month')} disabled={busy}>
+                    {busy ? 'Redirecting…' : `Subscribe for ${annual ? t.annual : t.price}`}
                   </Button>
                 )}
               </div>
