@@ -274,8 +274,8 @@ export function GapCheck() {
           <div className="rounded-xl border border-border bg-surface p-8">
             <h2 className="text-xl font-semibold text-ink">Where should we send it?</h2>
             <p className="mt-2 text-sm text-muted">
-              Your personalised breakdown, plus the hazards and legislation specific to {state} and {industry}. No
-              spam, unsubscribe any time.
+              Your personalised breakdown, plus the hazards and legislation specific to {state} and {industry}. We'll
+              only use your email to send it.
             </p>
             <div className="mt-6 space-y-4">
               <div>
@@ -292,7 +292,7 @@ export function GapCheck() {
               {busy ? 'Sending…' : 'Send my breakdown'}
             </Button>
             <p className="mt-3 text-xs text-muted">
-              We'll only use this to send your result and occasional, relevant updates. See our{' '}
+              We'll only use this to send your result. See our{' '}
               <Link to="/privacy" className="text-accent hover:underline">
                 Privacy policy
               </Link>
@@ -311,7 +311,8 @@ export function GapCheck() {
               Start your free trial
             </Button>
             <p className="mt-2 text-xs text-muted">
-              We'll pre-load your hazard register with the gaps we just found for {industry} in {state}.
+              Add hazards from our built-in library, with {state} legislation references applied automatically. No
+              credit card required.
             </p>
             <p className="mt-4 text-sm">
               <a href={`https://api.humanora.com.au${result.pdfUrl}`} className="text-accent hover:underline">
