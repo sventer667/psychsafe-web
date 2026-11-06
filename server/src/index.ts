@@ -15,6 +15,7 @@ import { invitesRouter } from './routes/invites.js'
 import { gapCheckRouter } from './routes/gapCheck.js'
 import { onboardingRouter } from './routes/onboarding.js'
 import { enterpriseRouter } from './routes/enterprise.js'
+import { startNurtureScheduler } from './nurture.js'
 
 // Safety net: Node crashes the whole process on an unhandled promise
 // rejection by default. Every route that calls an external service (Stripe,
@@ -78,4 +79,5 @@ app.get('/api/health', (_req, res) => res.json({ ok: true }))
 const port = Number(process.env.PORT) || 4000
 app.listen(port, () => {
   console.log(`Humanora API listening on http://localhost:${port}`)
+  startNurtureScheduler()
 })
