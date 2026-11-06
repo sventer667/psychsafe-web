@@ -22,6 +22,7 @@ import { Billing } from './pages/Billing'
 import { Team } from './pages/Team'
 import { Security } from './pages/Security'
 import { GapCheck } from './pages/GapCheck'
+import { Unsubscribe } from './pages/Unsubscribe'
 
 // Pre-launch switch. Set VITE_MAINTENANCE_MODE=true as a build-time env var
 // on the connexus-app Render service (then redeploy) to take the whole site
@@ -36,7 +37,10 @@ const MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 // Checked against the raw URL rather than a route match, since this decision
 // happens before the router (and its Routes) is even rendered.
 function isGapCheckPath() {
-  return typeof window !== 'undefined' && window.location.pathname.startsWith('/gap-check')
+  return (
+    typeof window !== 'undefined' &&
+    (window.location.pathname.startsWith('/gap-check') || window.location.pathname.startsWith('/unsubscribe'))
+  )
 }
 
 export default function App() {
@@ -57,6 +61,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/sectors/:slug" element={<SectorGuide />} />
           <Route path="/gap-check" element={<GapCheck />} />
+          <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route path="/legal" element={<Legal />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />          
