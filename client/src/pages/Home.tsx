@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useNavigate, Navigate, useSearchParams } from 'react-router-dom'
 import {
   ClipboardList,
   ShieldCheck,
@@ -104,13 +104,16 @@ const TIERS = [
 export function Home() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+  // The app's globe icon links to "/?site=1" so signed-in users can view the website.
+  const viewingSite = params.get('site') === '1'
   const [annual, setAnnual] = useState(false)
 
   // A signed-in visitor landing on "/" belongs in the app, not the pitch. Wait
   // for the auth check to resolve before deciding, so an already-logged-in
   // visitor doesn't see a flash of marketing copy before being redirected.
   if (loading) return <div className="min-h-screen bg-canvas" />
-  if (user) return <Navigate to="/dashboard" replace />
+  if (user && !viewingSite) return <Navigate to="/dashboard" replace />
 
   return (
     <div className="bg-canvas">
@@ -122,10 +125,16 @@ export function Home() {
             <div className="font-serif text-lg font-semibold text-navy-contrast">Humanora</div>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/login')} className="text-sm font-medium text-navy-contrast/80 hover:text-navy-contrast">
-              Log in
-            </button>
-            <Button onClick={() => navigate('/signup')}>Start free trial</Button>
+            {user ? (
+              <Button onClick={() => navigate('/dashboard')}>Back to the app</Button>
+            ) : (
+              <>
+                <button onClick={() => navigate('/login')} className="text-sm font-medium text-navy-contrast/80 hover:text-navy-contrast">
+                  Log in
+                </button>
+                <Button onClick={() => navigate('/signup')}>Start free trial</Button>
+              </>
+            )}
           </div>
         </div>
       </header>
