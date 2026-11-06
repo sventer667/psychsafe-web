@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { randomUUID } from 'node:crypto'
 import PDFDocument from 'pdfkit'
 import { db } from '../db.js'
 import { sendEmail } from '../email.js'
@@ -164,8 +165,9 @@ function buildResultsEmailHtml(input: {
   tier: Tier
   gapIndices: number[]
   id: number
+  unsubscribeToken?: string
 }): string {
-  const { firstName, industry, state, tier, gapIndices, id } = input
+  const { firstName, industry, state, tier, gapIndices, id, unsubscribeToken } = input
   const tierCopy = TIER_COPY[tier]
   const greeting = firstName ? `Hi ${firstName},` : 'Hi,'
   const legislation = getLegislationForState(state)
@@ -213,13 +215,18 @@ function buildResultsEmailHtml(input: {
       <p style="font-size:12px;color:${MUTED};">
         You're receiving this because you completed the psychosocial risk gap check at Humanora.
         <a href="${appUrl}/privacy">Privacy policy</a>.
+        ${
+          unsubscribeToken
+            ? `You also asked for occasional tips and updates. <a href="${appUrl}/unsubscribe?token=${unsubscribeToken}">Unsubscribe</a> at any time.`
+            : ''
+        }
       </p>
     </div>
   `
 }
 
 gapCheckRouter.post('/', async (req, res) => {
-  const { email, firstName, state, industry, orgSize, answers } = req.body || {}
+  const { email, firstName, state, industry, orgSize, answers, marketingConsent } = req.body || {}
 
   if (typeof email !== 'string' || !email.includes('@')) {
     return res.status(400).json({ error: 'A valid email address is required.' })
@@ -239,12 +246,28 @@ gapCheckRouter.post('/', async (req, res) => {
 
   const tier = computeTier(answers)
 
+  // Marketing opt-in is explicit and optional: only an actual `true` counts.
+  const consent = marketingConsent === true
+  const unsubscribeToken = consent ? randomUUID() : null
+
   const result = db
     .prepare(
-      `INSERT INTO gap_check_leads (email, firstName, state, industry, orgSize, answers, tier)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO gap_check_leads
+         (email, firstName, state, industry, orgSize, answers, tier, marketingConsent, consentAt, unsubscribeToken)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, CASE WHEN ? = 1 THEN datetime('now') ELSE NULL END, ?)`
     )
-    .run(email, firstName || '', state, industry, orgSize, JSON.stringify(answers), tier)
+    .run(
+      email,
+      firstName || '',
+      state,
+      industry,
+      orgSize,
+      JSON.stringify(answers),
+      tier,
+      consent ? 1 : 0,
+      consent ? 1 : 0,
+      unsubscribeToken
+    )
 
   const id = Number(result.lastInsertRowid)
   const gapIndices = answers.reduce<number[]>((acc, a, i) => {
@@ -252,7 +275,15 @@ gapCheckRouter.post('/', async (req, res) => {
     return acc
   }, [])
 
-  const html = buildResultsEmailHtml({ firstName: firstName || '', industry, state, tier, gapIndices, id })
+  const html = buildResultsEmailHtml({
+    firstName: firstName || '',
+    industry,
+    state,
+    tier,
+    gapIndices,
+    id,
+    unsubscribeToken: unsubscribeToken || undefined,
+  })
 
   // Fire the email but don't fail the request if it doesn't send (e.g. no
   // RESEND_API_KEY configured yet) — the visitor still gets their on-screen
@@ -269,6 +300,23 @@ gapCheckRouter.post('/', async (req, res) => {
     tierLabel: TIER_COPY[tier].label,
     pdfUrl: `/api/gap-check/${id}/pdf`,
   })
+})
+
+// One-click unsubscribe from tips emails. POST (not GET) so that email security
+// scanners that pre-fetch links cannot unsubscribe someone by accident; the
+// /unsubscribe page in the app calls this when the person confirms.
+gapCheckRouter.post('/unsubscribe', (req, res) => {
+  const token = typeof req.body?.token === 'string' ? req.body.token : ''
+  if (!token) return res.status(400).json({ error: 'Missing token.' })
+  const r = db
+    .prepare(
+      `UPDATE gap_check_leads
+       SET marketingConsent = 0, unsubscribedAt = datetime('now')
+       WHERE unsubscribeToken = ?`
+    )
+    .run(token)
+  if (!r.changes) return res.status(404).json({ error: 'This unsubscribe link is not valid.' })
+  res.json({ ok: true })
 })
 
 gapCheckRouter.get('/:id/pdf', async (req, res) => {
