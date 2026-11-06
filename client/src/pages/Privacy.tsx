@@ -147,8 +147,10 @@ export function Privacy() {
             request details of visitors.
           </li>
           <li>
-            <strong>Stripe (United States).</strong> Processes payments, so the payment and billing details you
-            provide are handled outside Australia. We do not store your full card number.
+            <strong>Stripe.</strong> Payments are processed by Stripe through its Australian entity, Stripe Payments
+            Australia Pty Ltd. Stripe is a global provider and may process and store payment information in the
+            United States and other countries, so the payment and billing details you provide may be handled outside
+            Australia. We do not store your full card number.
           </li>
           <li>
             <strong>Resend (United States).</strong> Delivers our emails, which are sent from servers in Japan
