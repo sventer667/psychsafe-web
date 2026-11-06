@@ -36,7 +36,7 @@ const TIERS: { id: PlanTier; label: string; price: string; seats: string; blurb:
       'Audit log with CSV export',
       'Mandatory 2FA for every user',
       'Read-only viewer role',
-      'Dedicated onboarding & priority support SLA',
+      'Onboarding setup: we load your sites, teams and starting hazards',
     ],
   },
 ]
