@@ -51,7 +51,7 @@ export function Topbar() {
             <div className="text-xs text-navy-contrast/60">{org?.name}</div>
           </div>
           <Link
-            to="/"
+            to="/?site=1"
             title="Back to the Humanora website"
             className="flex h-8 w-8 items-center justify-center rounded-lg text-navy-contrast/70 transition hover:bg-white/10 hover:text-white"
           >
