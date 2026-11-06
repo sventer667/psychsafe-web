@@ -2,7 +2,7 @@ import { LegalLayout } from '../components/LegalLayout'
 
 export function Privacy() {
   return (
-    <LegalLayout title="Privacy Policy" version="1.1" effectiveDate="November 2026">
+    <LegalLayout title="Privacy Policy" version="1.2" effectiveDate="November 2026">
       <section>
         <h2>1. Scope</h2>
         <p>
@@ -137,13 +137,35 @@ export function Privacy() {
       <section>
         <h2>6. Overseas disclosure (Australian Privacy Principle 8)</h2>
         <p>
-          Our application database, including all assessment content, is hosted on cloud infrastructure located in
-          Australia (Sydney), so that information is not sent overseas as part of hosting. Our website's pages are served by Render in the United States, which logs the IP address and basic request details of visitors. Our payment processor,
-          Stripe, is based in the United States, so the payment information you provide is processed outside Australia. Our email delivery provider, Resend, is also based in the United States and sends our emails from Japan (Tokyo), so your name, email address and the content of emails we send you (such as Gap Check results, invitations, password resets and new-device sign-in alerts) are processed outside Australia. Our hosting provider and Stripe are each large, established providers that
-          publish their own security and compliance documentation, including SOC 2 reports, on request. We haven't
-          independently audited either provider's certifications ourselves, but if you need their current
-          data-processing terms to meet your own compliance obligations, contact us (Section 11) and we'll point you
-          to the relevant documentation, including Resend's own security and data-processing terms.
+          Our application database, including all assessment content, is hosted on DigitalOcean infrastructure in
+          Australia (Sydney), so that information is not sent overseas as part of hosting. Some service providers
+          do handle limited personal information outside Australia:
+        </p>
+        <ul>
+          <li>
+            <strong>Render (United States).</strong> Serves our website pages and may log the IP address and basic
+            request details of visitors.
+          </li>
+          <li>
+            <strong>Stripe (United States).</strong> Processes payments, so the payment and billing details you
+            provide are handled outside Australia. We do not store your full card number.
+          </li>
+          <li>
+            <strong>Resend (United States).</strong> Delivers our emails, which are sent from servers in Japan
+            (Tokyo). Your name, email address and the content of emails we send you (such as Gap Check results,
+            invitations, password resets and new-device sign-in alerts) are processed outside Australia. Resend
+            stores its account and delivery records in the United States.
+          </li>
+        </ul>
+        <p>
+          Each of these providers states that it holds independent security attestations: Render and Resend publish
+          SOC 2 Type II compliance, Stripe publishes SOC 2 and PCI DSS Level 1 certification, and DigitalOcean lists
+          SOC 2 Type II and ISO 27001 for its Sydney data centre. Their detailed reports are generally available only
+          on request or under NDA. We haven't independently audited these providers ourselves. We take reasonable
+          steps, including contractual terms and the security measures described in Section 7, to make sure
+          overseas providers handle your information consistently with the Australian Privacy Principles. If you
+          need their current data-processing terms to meet your own compliance obligations, contact us (Section 11)
+          and we'll point you to the relevant documentation.
         </p>
         <p>
           You can ask us what information about you has been disclosed overseas, or object to a specific disclosure,
