@@ -152,7 +152,7 @@ try {
         ownerName: o ? o.name : '',
         ownerId: o ? o.id : null,
         dueDate: a.due,
-        status: a.done ? 'completed' : 'pending',
+        status: a.done ? 'complete' : 'pending',
         createdAt: c.createdAt,
         completedAt: a.done ? iso(-12) : null,
       })
