@@ -129,7 +129,7 @@ function computeTier(answers: boolean[]): Tier {
   return 'high'
 }
 
-const TIER_COPY: Record<Tier, { label: string; headline: string; body: string }> = {
+export const TIER_COPY: Record<Tier, { label: string; headline: string; body: string }> = {
   solid: {
     label: 'Solid foundation, one gap worth closing',
     headline: 'Solid foundation, one gap worth closing',
