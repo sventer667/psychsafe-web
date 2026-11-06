@@ -1,2 +1,10 @@
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /dashboard
+Disallow: /cases
+Disallow: /team
+Disallow: /billing
+Disallow: /security
+Disallow: /enterprise
+Disallow: /invite/
+Disallow: /unsubscribe
