@@ -63,9 +63,10 @@ export function Privacy() {
         <h3>Technical information</h3>
         <p>
           Our hosting providers automatically log standard web request data (IP address, requested URL,
-          timestamp) for security and operational purposes, the same way any web host does. Our website's pages are served by Render (United States), and our application and database run in Australia (Sydney). Humanora doesn't run
-          Google Analytics, advertising pixels, or any other third-party tracking or analytics tool, and doesn't set
-          any cookies, your signed-in session is kept in your browser's session storage rather than a cookie, and is
+          timestamp) for security and operational purposes, the same way any web host does. Our website's pages are served by Render (United States), and our application and database run in Australia (Sydney). To count visits, we use Cloudflare
+          Web Analytics, a privacy-focused tool that records page views, referring sites and general device and
+          country information without cookies, without fingerprinting and without tracking you across other sites.
+          Humanora doesn't run Google Analytics or advertising pixels, and doesn't set any cookies, your signed-in session is kept in your browser's session storage rather than a cookie, and is
           cleared when you close the tab or log out.
         </p>
       </section>
@@ -128,8 +129,8 @@ export function Privacy() {
           </tbody>
         </table>
         <p className="mt-3">
-          We don't currently use any AI service, email marketing platform, or analytics provider, so none of your
-          information is shared with one. If that changes, we'll update this page and, for any material change,
+          We don't currently use any AI service or email marketing platform, so none of your
+          information is shared with one. Our only analytics provider is Cloudflare Web Analytics, described above. If that changes, we'll update this page and, for any material change,
           notify account holders directly.
         </p>
       </section>
@@ -145,6 +146,10 @@ export function Privacy() {
           <li>
             <strong>Render (United States).</strong> Serves our website pages and may log the IP address and basic
             request details of visitors.
+          </li>
+          <li>
+            <strong>Cloudflare (United States).</strong> Provides cookie-free website analytics (page views,
+            referring sites, general device and country). It does not receive your account or assessment content.
           </li>
           <li>
             <strong>Stripe.</strong> Payments are processed by Stripe through its Australian entity, Stripe Payments
