@@ -197,14 +197,14 @@ const HAZARD_CONTROLS: Record<string, string[]> = {
 const STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'] as const
 
 const LEGISLATION_BASE: Record<(typeof STATES)[number], string> = {
-  NSW: 'WHS Regulation 2017 (NSW) cl 55; Managing psychosocial hazards at work, Code of Practice 2021 (NSW)',
+  NSW: 'WHS Regulation 2025 (NSW) cl 55A to 55D; Managing psychosocial hazards at work, Code of Practice 2021 (NSW)',
   VIC: 'Occupational Health and Safety Act 2004 (Vic); Occupational Health and Safety (Psychological Health) Regulations 2025 (Vic), in effect from 1 December 2025',
-  QLD: 'WHS Regulation 2011 (Qld) cl 55; Managing the risk of psychosocial hazards at work, Code of Practice 2022 (Qld)',
-  WA: 'Work Health and Safety Act 2020 (WA); WHS (General) Regulations 2022 (WA) Part 3.2',
-  SA: 'WHS Regulations 2012 (SA) cl 55; SafeWork SA psychosocial hazard guidance',
-  TAS: 'WHS Regulations 2012 (Tas) cl 55; WorkSafe Tasmania psychosocial hazard guidance',
-  ACT: 'WHS Regulation 2011 (ACT) cl 55; WorkSafe ACT psychosocial hazard guidance',
-  NT: 'WHS (National Uniform Legislation) Regulations 2011 (NT) cl 55; NT WorkSafe psychosocial hazard guidance',
+  QLD: 'WHS Regulation 2011 (Qld) s 55A to 55D; Managing the risk of psychosocial hazards at work, Code of Practice 2022 (Qld)',
+  WA: 'Work Health and Safety Act 2020 (WA); WHS (General) Regulations 2022 (WA) Part 3.2; Psychosocial hazards in the workplace, Code of Practice (WA)',
+  SA: 'WHS Regulations 2012 (SA) reg 55A to 55D; Managing psychosocial hazards at work, Code of Practice (SA), in effect from February 2026',
+  TAS: 'WHS Regulations 2022 (Tas), psychosocial risk provisions; Managing psychosocial hazards at work, Code of Practice (Tas)',
+  ACT: 'WHS Regulation 2011 (ACT) s 55A to 55D; Managing psychosocial hazards at work, Code of Practice 2023 (ACT)',
+  NT: 'WHS (National Uniform Legislation) Regulations 2011 (NT) reg 55A to 55D; Managing psychosocial hazards at work, Code of Practice (NT)',
 }
 
 function legislationFor(hazard: string): Record<string, string> {
