@@ -341,6 +341,17 @@ db.exec(`
   )
 `)
 
+// Backfill: refresh per-state psychosocial legislation citations (regulation
+// numbering 55A to 55D, NSW Regulation 2025, Tasmania 2022 regulations, and
+// approved codes of practice). Stored per row, so each replace runs over all rows.
+db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS Regulation 2017 (NSW) cl 55; Managing psychosocial hazards at work, Code of Practice 2021 (NSW)', 'WHS Regulation 2025 (NSW) cl 55A to 55D; Managing psychosocial hazards at work, Code of Practice 2021 (NSW)')`)
+db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS Regulation 2011 (Qld) cl 55; Managing the risk of psychosocial hazards at work, Code of Practice 2022 (Qld)', 'WHS Regulation 2011 (Qld) s 55A to 55D; Managing the risk of psychosocial hazards at work, Code of Practice 2022 (Qld)')`)
+db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'Work Health and Safety Act 2020 (WA); WHS (General) Regulations 2022 (WA) Part 3.2', 'Work Health and Safety Act 2020 (WA); WHS (General) Regulations 2022 (WA) Part 3.2; Psychosocial hazards in the workplace, Code of Practice (WA)')`)
+db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS Regulations 2012 (SA) cl 55; SafeWork SA psychosocial hazard guidance', 'WHS Regulations 2012 (SA) reg 55A to 55D; Managing psychosocial hazards at work, Code of Practice (SA), in effect from February 2026')`)
+db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS Regulations 2012 (Tas) cl 55; WorkSafe Tasmania psychosocial hazard guidance', 'WHS Regulations 2022 (Tas), psychosocial risk provisions; Managing psychosocial hazards at work, Code of Practice (Tas)')`)
+db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS Regulation 2011 (ACT) cl 55; WorkSafe ACT psychosocial hazard guidance', 'WHS Regulation 2011 (ACT) s 55A to 55D; Managing psychosocial hazards at work, Code of Practice 2023 (ACT)')`)
+db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS (National Uniform Legislation) Regulations 2011 (NT) cl 55; NT WorkSafe psychosocial hazard guidance', 'WHS (National Uniform Legislation) Regulations 2011 (NT) reg 55A to 55D; Managing psychosocial hazards at work, Code of Practice (NT)')`)
+
 // Defensive migration: a database created before residual (post-control) risk
 // ratings existed has a `hazards` table without these columns.
 for (const stmt of [
