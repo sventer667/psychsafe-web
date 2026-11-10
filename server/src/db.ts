@@ -1,6 +1,6 @@
 import { DatabaseSync } from 'node:sqlite'
 import { existsSync } from 'node:fs'
-import { seedHazardLibrary, HAZARD_CONTROLS } from './seedHazardLibrary.js'
+import { seedHazardLibrary, syncHazardLibrary, HAZARD_CONTROLS } from './seedHazardLibrary.js'
 
 // Uses Node's built-in node:sqlite (stable-ish since Node 22.5, no native
 // build step required) rather than better-sqlite3, which needs a compiled
@@ -488,6 +488,11 @@ try {
     updateControls.run(JSON.stringify(controls), name)
   }
 }
+
+// Sync: adds hazards introduced after a database was first seeded (e.g.
+// Intrusive surveillance) and refreshes descriptions, controls and the
+// hazard-specific legislation citations. Idempotent, keyed by name.
+syncHazardLibrary(db)
 
 // Server-side login sessions (see sessions.ts). Each login inserts a row and the
 // signed token carries its id, so a session can be ended from the server.
