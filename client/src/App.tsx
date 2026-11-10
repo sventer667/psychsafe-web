@@ -25,6 +25,7 @@ import { GapCheck } from './pages/GapCheck'
 import { Unsubscribe } from './pages/Unsubscribe'
 import { GuideVictoria } from './pages/GuideVictoria'
 import { GuideNSW } from './pages/GuideNSW'
+import { GuideQLD } from './pages/GuideQLD'
 
 // Pre-launch switch. Set VITE_MAINTENANCE_MODE=true as a build-time env var
 // on the connexus-app Render service (then redeploy) to take the whole site
@@ -65,6 +66,7 @@ export default function App() {
           <Route path="/gap-check" element={<GapCheck />} />
           <Route path="/guides/victoria-psychosocial-hazards" element={<GuideVictoria />} />
           <Route path="/guides/nsw-psychosocial-hazards" element={<GuideNSW />} />
+          <Route path="/guides/queensland-psychosocial-hazards" element={<GuideQLD />} />
           <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route path="/legal" element={<Legal />} />
           <Route path="/privacy" element={<Privacy />} />
