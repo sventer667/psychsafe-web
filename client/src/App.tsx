@@ -29,6 +29,7 @@ import { GuideQLD } from './pages/GuideQLD'
 import { GuideTAS } from './pages/GuideTAS'
 import { GuideACT } from './pages/GuideACT'
 import { GuideWA } from './pages/GuideWA'
+import { GuideSA } from './pages/GuideSA'
 
 // Pre-launch switch. Set VITE_MAINTENANCE_MODE=true as a build-time env var
 // on the connexus-app Render service (then redeploy) to take the whole site
@@ -73,6 +74,7 @@ export default function App() {
           <Route path="/guides/tasmania-psychosocial-hazards" element={<GuideTAS />} />
           <Route path="/guides/act-psychosocial-hazards" element={<GuideACT />} />
           <Route path="/guides/wa-psychosocial-hazards" element={<GuideWA />} />
+          <Route path="/guides/sa-psychosocial-hazards" element={<GuideSA />} />
           <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route path="/legal" element={<Legal />} />
           <Route path="/privacy" element={<Privacy />} />
