@@ -8,3 +8,5 @@ Disallow: /security
 Disallow: /enterprise
 Disallow: /invite/
 Disallow: /unsubscribe
+
+Sitemap: https://humanora.com.au/sitemap.xml
