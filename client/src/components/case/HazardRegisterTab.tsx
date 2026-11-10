@@ -684,6 +684,9 @@ export function HazardRegisterTab({
                       <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
                         Recommended actions (hierarchy of controls)
                       </div>
+                      <p className="mb-2 text-xs text-muted">
+                        Most effective first. Support measures at the end do not replace the controls above them.
+                      </p>
                       <ol className="list-decimal space-y-2 pl-5 text-sm text-ink">
                         {libEntry.controls.map((c, i) => {
                           const alreadyLinked = existingActionTitles.has(c) || existingActionTitles.has(c.slice(0, 87) + '…')
