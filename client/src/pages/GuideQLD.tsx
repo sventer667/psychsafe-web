@@ -275,7 +275,11 @@ export function GuideQLD() {
         <div className="mt-12 border-t border-border pt-6">
           <h2 className="font-serif text-lg text-ink">Sources</h2>
           <ul className="mt-3 space-y-1.5 text-sm">
-            <li className="text-muted">Workplace Health and Safety Queensland: Managing the risk of sexual harassment and sex or gender-based harassment at work, Guide for PCBUs</li>
+            <li>
+              <a className="text-accent hover:underline" href="https://www.worksafe.qld.gov.au/__data/assets/pdf_file/0018/141921/guide-for-PCBUs.pdf" target="_blank" rel="noopener noreferrer">
+                Workplace Health and Safety Queensland: Managing the risk of sexual harassment and sex or gender-based harassment at work, Guide for PCBUs
+              </a>
+            </li>
             <li>
               <a className="text-accent hover:underline" href="https://www.worksafe.qld.gov.au/laws-and-compliance/codes-of-practice/managing-the-risk-of-psychosocial-hazards-at-work-code-of-practice-2022" target="_blank" rel="noopener noreferrer">
                 WorkSafe Queensland: Managing the risk of psychosocial hazards at work Code of Practice 2022
