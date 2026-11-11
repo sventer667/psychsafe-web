@@ -146,7 +146,7 @@ export function Home() {
           Psychosocial risk management
         </h1><h2 className="mx-auto mt-4 max-w-3xl font-serif text-xl text-ink sm:text-2xl">Identify and manage the Psychosocial risks in your organisation.</h2>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-muted">
-          Humanora is a self-serve system of record for psychosocial workplace risk. It's built for any
+          Humanora is a psychosocial risk management system. It's built for any
           organisation that needs to assess hazards, manage controls and keep a defensible record.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

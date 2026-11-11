@@ -7,7 +7,7 @@ export function Support() {
         <h2>1. Purpose</h2>
         <p>
           This policy explains how to get help with Humanora, what you can expect from us, and what falls outside
-          the scope of support. Humanora is a self-serve system of record for psychosocial workplace risk. We aim
+          the scope of support. Humanora is a psychosocial risk management system that you run yourself. We aim
           to be clear and honest about response times so you can plan around them.
         </p>
       </section>
