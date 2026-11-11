@@ -31,6 +31,7 @@ import { GuideACT } from './pages/GuideACT'
 import { GuideWA } from './pages/GuideWA'
 import { GuideSA } from './pages/GuideSA'
 import { GuideNT } from './pages/GuideNT'
+import { Guides } from './pages/Guides'
 
 // Pre-launch switch. Set VITE_MAINTENANCE_MODE=true as a build-time env var
 // on the connexus-app Render service (then redeploy) to take the whole site
@@ -69,6 +70,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/sectors/:slug" element={<SectorGuide />} />
           <Route path="/gap-check" element={<GapCheck />} />
+          <Route path="/guides" element={<Guides />} />
           <Route path="/guides/victoria-psychosocial-hazards" element={<GuideVictoria />} />
           <Route path="/guides/nsw-psychosocial-hazards" element={<GuideNSW />} />
           <Route path="/guides/queensland-psychosocial-hazards" element={<GuideQLD />} />
