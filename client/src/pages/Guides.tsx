@@ -140,6 +140,7 @@ export function Guides() {
             <span>© {new Date().getFullYear()} Humanora</span>
           </div>
           <div className="flex items-center gap-4">
+            <Link to="/blog" className="hover:text-ink">Blog</Link>
             <Link to="/legal" className="hover:text-ink">Legal</Link>
             <Link to="/privacy" className="hover:text-ink">Privacy</Link>
             <Link to="/terms" className="hover:text-ink">Terms</Link>

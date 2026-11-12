@@ -88,8 +88,8 @@ export function ArticleAssessment() {
       </header>
 
       <article className="mx-auto max-w-3xl px-6 py-16">
-        <Link to="/" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink">
-          <ArrowLeft size={14} /> Back to Humanora
+        <Link to="/blog" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink">
+          <ArrowLeft size={14} /> Back to Blog
         </Link>
 
         <div className="flex items-center gap-3">
@@ -240,6 +240,7 @@ export function ArticleAssessment() {
             <span>© {new Date().getFullYear()} Humanora</span>
           </div>
           <div className="flex items-center gap-4">
+            <Link to="/blog" className="hover:text-ink">Blog</Link>
             <Link to="/legal" className="hover:text-ink">Legal</Link>
             <Link to="/privacy" className="hover:text-ink">Privacy</Link>
             <Link to="/terms" className="hover:text-ink">Terms</Link>
