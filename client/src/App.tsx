@@ -32,6 +32,7 @@ import { GuideWA } from './pages/GuideWA'
 import { GuideSA } from './pages/GuideSA'
 import { GuideNT } from './pages/GuideNT'
 import { Guides } from './pages/Guides'
+import { Blog } from './pages/Blog'
 import { ArticleRiskRegister } from './pages/ArticleRiskRegister'
 import { ArticleConsultation } from './pages/ArticleConsultation'
 import { ArticleAssessment } from './pages/ArticleAssessment'
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="/sectors/:slug" element={<SectorGuide />} />
           <Route path="/gap-check" element={<GapCheck />} />
           <Route path="/guides" element={<Guides />} />
+          <Route path="/blog" element={<Blog />} />
           <Route path="/articles/psychosocial-risk-register" element={<ArticleRiskRegister />} />
           <Route path="/articles/recording-worker-consultation-psychosocial-hazards" element={<ArticleConsultation />} />
           <Route path="/articles/psychosocial-risk-assessment-four-steps" element={<ArticleAssessment />} />
