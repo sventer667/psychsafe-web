@@ -103,13 +103,20 @@ export function ArticleRiskRegister() {
           Last reviewed 12 November 2026. General information only, not legal advice.
         </p>
 
+        <Card className="mt-6 border-accent/30 bg-accent/5">
+          <p className="text-sm text-muted">
+            <strong className="text-ink">Rules differ by jurisdiction.</strong> Each state and territory has its own WHS regulator, and each regulator publishes its own codes of practice and regulations. Most are based on the Safe Work Australia model code, but they are not identical, and Victoria and Western Australia run their own frameworks. Always check the code and regulations that apply where you operate. Our{' '}
+            <Link to="/guides" className="text-accent hover:underline">state and territory guides</Link> link to each regulator’s material.
+          </p>
+        </Card>
+
         <p className="mt-6 text-lg text-muted">
           Ask ten workplaces for their psychosocial risk register and you’ll get ten different things. A spreadsheet with a tab nobody has opened since March. A policy document with “register” in the filename. A folder of survey results. This article sets out what a register needs to hold so that it’s useful on a normal Tuesday, and still holds up when someone asks to see it.
         </p>
 
         <h2 className="mt-10 font-serif text-2xl text-ink">Why the record matters</h2>
         <p className="mt-3 text-muted">
-          The codes of practice say you should record how you managed psychosocial risk. Two reasons come up again and again. It lets you show what you did to meet your duties, and it gives you something to look at when you review your controls next time. The codes also note that an inspector may ask to see these records. If the work happened but the only evidence is in people’s heads and inboxes, you’ve lost most of the benefit.
+          Codes of practice generally say to record how you managed psychosocial risk, but check your own regulator’s wording. Two reasons come up again and again. It lets you show what you did to meet your duties, and it gives you something to look at when you review your controls next time. The codes also note that an inspector may ask to see these records. If the work happened but the only evidence is in people’s heads and inboxes, you’ve lost most of the benefit.
         </p>
         <p className="mt-3 text-muted">
           No law prescribes one format. The regulators publish example registers, and they are good starting points. SafeWork NSW’s code has one, and so does Queensland’s. They differ in layout but cover the same ground.
