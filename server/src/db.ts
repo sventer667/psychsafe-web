@@ -540,3 +540,23 @@ try {
 } catch {
   // Column already exists.
 }
+
+// Source tracking: which page or campaign link brought a Gap Check lead or a new account
+// (see attribution.ts), plus the link from a lead to the account they later created and the
+// Gap Check "current setup" answers. Existing rows keep blank values.
+for (const table of ['gap_check_leads', 'organizations']) {
+  for (const col of ['utmSource', 'utmMedium', 'utmCampaign', 'utmContent', 'referrerHost', 'landingPath', 'ctaSource', 'ctaContent']) {
+    try {
+      db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} TEXT DEFAULT ''`)
+    } catch {
+      // Column already exists.
+    }
+  }
+}
+for (const col of ["currentSetup TEXT DEFAULT '[]'", 'convertedOrgId INTEGER', 'convertedAt TEXT']) {
+  try {
+    db.exec(`ALTER TABLE gap_check_leads ADD COLUMN ${col}`)
+  } catch {
+    // Column already exists.
+  }
+}
