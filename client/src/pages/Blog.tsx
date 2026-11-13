@@ -19,6 +19,11 @@ const GAP_CHECK = '/gap-check?utm_source=blog&utm_medium=seo&utm_campaign=blog&u
 
 const POSTS: { title: string; summary: string; path: string }[] = [
   {
+    title: 'How often should you review psychosocial controls?',
+    summary: 'The model code says to review controls regularly and lists when a review is required. How to turn that into a schedule.',
+    path: '/articles/how-often-to-review-psychosocial-controls',
+  },
+  {
     title: 'Psychosocial hazards at work: four examples and the controls that fit them',
     summary: 'Four common psychosocial hazards, what they look like at work, and example controls from the model code.',
     path: '/articles/psychosocial-hazard-examples-and-controls',
