@@ -1,3 +1,4 @@
+import { getAttribution } from '../lib/attribution'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
@@ -118,6 +119,7 @@ export function GapCheck() {
           orgSize,
           marketingConsent,
           currentSetup,
+          attribution: getAttribution(),
           answers: answers.map((a) => Boolean(a)),
         },
       })

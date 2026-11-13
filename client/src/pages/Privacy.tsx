@@ -69,6 +69,9 @@ export function Privacy() {
           Humanora doesn't run Google Analytics or advertising pixels, and doesn't set any cookies, your signed-in session is kept in your browser's session storage rather than a cookie, and is
           cleared when you close the tab or log out.
         </p>
+        <p>
+          When you complete the Gap Check or create an account, we record which page or link brought you to Humanora, so we can understand which content is useful.
+        </p>
       </section>
 
       <section>
