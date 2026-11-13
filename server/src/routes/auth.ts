@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import crypto from 'node:crypto'
 import { authenticator } from 'otplib'
 import QRCode from 'qrcode'
+import { readAttribution } from '../attribution.js'
 import { db } from '../db.js'
 import { requireAuth, signPendingTwoFactorToken, verifyPendingTwoFactorToken, type AuthedRequest } from '../auth.js'
 import { startSession } from '../sessions.js'
@@ -52,6 +53,7 @@ function verifyAndConsumeBackupCode(user: UserRow, code: string): boolean {
 
 authRouter.post('/register', (req, res) => {
   const { name, email, password, orgName } = req.body as Record<string, string>
+  const attribution = readAttribution((req.body as Record<string, unknown>).attribution)
   if (!name || !email || !password || !orgName) {
     return res.status(400).json({ error: 'All fields are required' })
   }
@@ -69,6 +71,30 @@ authRouter.post('/register', (req, res) => {
     .prepare('INSERT INTO organizations (name, planStatus, trialEndsAt) VALUES (?, ?, ?)')
     .run(orgName, 'trialing', trialEndsAt)
   const orgId = Number(orgResult.lastInsertRowid)
+
+  // Source tracking must never block a signup: failures are logged and ignored.
+  try {
+    db.prepare(
+      `UPDATE organizations SET utmSource = ?, utmMedium = ?, utmCampaign = ?, utmContent = ?,
+         referrerHost = ?, landingPath = ?, ctaSource = ?, ctaContent = ? WHERE id = ?`
+    ).run(
+      attribution.utmSource,
+      attribution.utmMedium,
+      attribution.utmCampaign,
+      attribution.utmContent,
+      attribution.referrerHost,
+      attribution.landingPath,
+      attribution.ctaSource,
+      attribution.ctaContent,
+      orgId
+    )
+    db.prepare(
+      `UPDATE gap_check_leads SET convertedOrgId = ?, convertedAt = datetime('now')
+       WHERE lower(email) = lower(?) AND convertedOrgId IS NULL`
+    ).run(orgId, email)
+  } catch (err) {
+    console.error('[register] attribution not recorded:', err)
+  }
 
   const passwordHash = bcrypt.hashSync(password, 10)
   const userResult = db

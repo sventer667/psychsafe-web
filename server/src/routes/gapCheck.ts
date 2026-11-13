@@ -1,3 +1,4 @@
+import { readAttribution, readCurrentSetup } from '../attribution.js'
 import { Router } from 'express'
 import { randomUUID } from 'node:crypto'
 import PDFDocument from 'pdfkit'
@@ -226,7 +227,7 @@ function buildResultsEmailHtml(input: {
 }
 
 gapCheckRouter.post('/', async (req, res) => {
-  const { email, firstName, state, industry, orgSize, answers, marketingConsent } = req.body || {}
+  const { email, firstName, state, industry, orgSize, answers, marketingConsent, attribution, currentSetup } = req.body || {}
 
   if (typeof email !== 'string' || !email.includes('@')) {
     return res.status(400).json({ error: 'A valid email address is required.' })
@@ -248,13 +249,15 @@ gapCheckRouter.post('/', async (req, res) => {
 
   // Marketing opt-in is explicit and optional: only an actual `true` counts.
   const consent = marketingConsent === true
+  const attr = readAttribution(attribution)
   const unsubscribeToken = consent ? randomUUID() : null
 
   const result = db
     .prepare(
       `INSERT INTO gap_check_leads
-         (email, firstName, state, industry, orgSize, answers, tier, marketingConsent, consentAt, unsubscribeToken)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, CASE WHEN ? = 1 THEN datetime('now') ELSE NULL END, ?)`
+         (email, firstName, state, industry, orgSize, answers, tier, marketingConsent, consentAt, unsubscribeToken,
+          currentSetup, utmSource, utmMedium, utmCampaign, utmContent, referrerHost, landingPath, ctaSource, ctaContent)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, CASE WHEN ? = 1 THEN datetime('now') ELSE NULL END, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       email,
@@ -266,7 +269,16 @@ gapCheckRouter.post('/', async (req, res) => {
       tier,
       consent ? 1 : 0,
       consent ? 1 : 0,
-      unsubscribeToken
+      unsubscribeToken,
+      readCurrentSetup(currentSetup),
+      attr.utmSource,
+      attr.utmMedium,
+      attr.utmCampaign,
+      attr.utmContent,
+      attr.referrerHost,
+      attr.landingPath,
+      attr.ctaSource,
+      attr.ctaContent
     )
 
   const id = Number(result.lastInsertRowid)
