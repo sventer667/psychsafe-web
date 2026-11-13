@@ -1,18 +1,18 @@
 import { DatabaseSync } from 'node:sqlite'
 import { existsSync } from 'node:fs'
-import { seedHazardLibrary, syncHazardLibrary, HAZARD_CONTROLS } from './seedHazardLibrary.js'
+import { seedHazardLibrary, HAZARD_CONTROLS, legislationFor } from './seedHazardLibrary.js'
 
 // Uses Node's built-in node:sqlite (stable-ish since Node 22.5, no native
 // build step required) rather than better-sqlite3, which needs a compiled
 // binary that isn't available in every deploy environment.
-const DB_PATH = process.env.DATABASE_PATH || './humanora.db'
+const DB_PATH = process.env.DATABASE_PATH || './connexus.db'
 const isNew = !existsSync(DB_PATH)
 
 export const db = new DatabaseSync(DB_PATH)
 db.exec('PRAGMA foreign_keys = ON')
 
 db.exec(`
--- An Organization is the employer using Humanora to manage its own psychosocial
+-- An Organization is the employer using Connexus to manage its own psychosocial
 -- risks directly (self-service model), not a third-party consultant's client list.
 CREATE TABLE IF NOT EXISTS organizations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS hazard_library (
 
 -- A Case is one psychosocial risk assessment engagement for the organization.
 -- An organization can have multiple cases over time (e.g. annual reassessments,
--- or separate cases per business unit/site). Each case carries its own
+-- or separate assessments per business unit/site). Each case carries its own
 -- state/territory (defaulted from the org's at creation, editable after), so
 -- an org with sites in more than one state can run one assessment per site
 -- and get the right legislation citations for each, instead of being limited
@@ -116,9 +116,7 @@ CREATE TABLE IF NOT EXISTS cases (
 -- (a survey, incident reports, consultation feedback), how and when workers
 -- are actually exposed to it, and who or how many of them. All optional free
 -- text, since the point is to capture whatever reasoning the assessor
--- actually has rather than force a rigid structure. The hazard_evidence table
--- below supplements this with itemized, typed, linkable records for anyone
--- who wants to cite specific sources rather than a single summary paragraph.
+-- actually has rather than force a rigid structure.
 CREATE TABLE IF NOT EXISTS hazards (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   caseId INTEGER NOT NULL REFERENCES cases(id),
@@ -153,26 +151,6 @@ CREATE TABLE IF NOT EXISTS existing_controls (
   createdAt TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Itemized, typed evidence backing a hazard's rating: an incident report, an
--- exit interview theme, a survey result, or something else, each recorded
--- with a title, an optional date the source material relates to, an optional
--- link to where the actual document lives (the app doesn't store files
--- itself), and a short note on what it shows. This is deliberately separate
--- from the single free-text 'evidence' field on hazards above: that field
--- stays a short summary/basis statement, while this table lets an assessor
--- cite as many specific sources as they actually have, each traceable back
--- to where it came from, which is what actually holds up under review.
-CREATE TABLE IF NOT EXISTS hazard_evidence (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  hazardId INTEGER NOT NULL REFERENCES hazards(id),
-  type TEXT NOT NULL DEFAULT 'other',
-  title TEXT NOT NULL,
-  sourceDate TEXT,
-  link TEXT DEFAULT '',
-  description TEXT DEFAULT '',
-  createdAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
 CREATE TABLE IF NOT EXISTS action_items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   caseId INTEGER NOT NULL REFERENCES cases(id),
@@ -180,7 +158,6 @@ CREATE TABLE IF NOT EXISTS action_items (
   title TEXT NOT NULL,
   description TEXT DEFAULT '',
   ownerName TEXT DEFAULT '',
-  ownerId INTEGER REFERENCES users(id),
   dueDate TEXT,
   status TEXT NOT NULL DEFAULT 'pending',
   createdAt TEXT NOT NULL DEFAULT (datetime('now')),
@@ -217,28 +194,6 @@ CREATE TABLE IF NOT EXISTS case_seal_events (
   sealTimestampTime TEXT,
   createdAt TEXT NOT NULL DEFAULT (datetime('now'))
 );
-
--- Leads captured by the public, pre-signup "psychosocial risk gap check"
--- quiz (see routes/gapCheck.ts). Deliberately its own table rather than
--- reusing organizations/users, since a gap-check respondent hasn't created
--- an account and may never sign up at all. answers stores the six yes/no
--- answers as a JSON array so the PDF/email can be regenerated on demand
--- (GET /api/gap-check/:id/pdf) without asking the visitor to fill the quiz
--- out twice. tier is computed server-side at submission time and stored
--- rather than recomputed from answers on every read, so a later change to
--- the tiering logic doesn't retroactively rewrite what an earlier visitor
--- was actually told.
-CREATE TABLE IF NOT EXISTS gap_check_leads (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  email TEXT NOT NULL,
-  firstName TEXT DEFAULT '',
-  state TEXT NOT NULL,
-  industry TEXT NOT NULL,
-  orgSize TEXT NOT NULL,
-  answers TEXT NOT NULL,
-  tier TEXT NOT NULL,
-  createdAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
 `)
 
 // Defensive migration: a database created before the trial-lockout feature
@@ -250,23 +205,6 @@ try {
 } catch {
   // Column already exists, either a fresh DB (created with it above) or a
   // database this migration already ran against.
-}
-
-// Marketing consent for gap-check leads (Spam Act 2003): optional opt-in to
-// tips emails, plus a per-lead token used by the unsubscribe link.
-for (const col of [
-  'marketingConsent INTEGER NOT NULL DEFAULT 0',
-  'consentAt TEXT',
-  'unsubscribeToken TEXT',
-  'unsubscribedAt TEXT',
-  'nurtureStep INTEGER NOT NULL DEFAULT 0',
-  'lastNurtureAt TEXT',
-]) {
-  try {
-    db.exec(`ALTER TABLE gap_check_leads ADD COLUMN ${col}`)
-  } catch {
-    // Column already exists.
-  }
 }
 
 // Backfill: any trialing org from before this feature existed gets a trial
@@ -341,17 +279,6 @@ db.exec(`
   )
 `)
 
-// Backfill: refresh per-state psychosocial legislation citations (regulation
-// numbering 55A to 55D, NSW Regulation 2025, Tasmania 2022 regulations, and
-// approved codes of practice). Stored per row, so each replace runs over all rows.
-db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS Regulation 2017 (NSW) cl 55; Managing psychosocial hazards at work, Code of Practice 2021 (NSW)', 'WHS Regulation 2025 (NSW) cl 55A to 55D; Managing psychosocial hazards at work, Code of Practice 2021 (NSW)')`)
-db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS Regulation 2011 (Qld) cl 55; Managing the risk of psychosocial hazards at work, Code of Practice 2022 (Qld)', 'WHS Regulation 2011 (Qld) s 55A to 55D; Managing the risk of psychosocial hazards at work, Code of Practice 2022 (Qld)')`)
-db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'Work Health and Safety Act 2020 (WA); WHS (General) Regulations 2022 (WA) Part 3.2', 'Work Health and Safety Act 2020 (WA); WHS (General) Regulations 2022 (WA) Part 3.2; Psychosocial hazards in the workplace, Code of Practice (WA)')`)
-db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS Regulations 2012 (SA) cl 55; SafeWork SA psychosocial hazard guidance', 'WHS Regulations 2012 (SA) reg 55A to 55D; Managing psychosocial hazards at work, Code of Practice (SA), in effect from February 2026')`)
-db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS Regulations 2012 (Tas) cl 55; WorkSafe Tasmania psychosocial hazard guidance', 'WHS Regulations 2022 (Tas), psychosocial risk provisions; Managing psychosocial hazards at work, Code of Practice (Tas)')`)
-db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS Regulation 2011 (ACT) cl 55; WorkSafe ACT psychosocial hazard guidance', 'WHS Regulation 2011 (ACT) s 55A to 55D; Managing psychosocial hazards at work, Code of Practice 2023 (ACT)')`)
-db.exec(`UPDATE hazard_library SET legislation = REPLACE(legislation, 'WHS (National Uniform Legislation) Regulations 2011 (NT) cl 55; NT WorkSafe psychosocial hazard guidance', 'WHS (National Uniform Legislation) Regulations 2011 (NT) reg 55A to 55D; Managing psychosocial hazards at work, Code of Practice (NT)')`)
-
 // Defensive migration: a database created before residual (post-control) risk
 // ratings existed has a `hazards` table without these columns.
 for (const stmt of [
@@ -406,57 +333,6 @@ db.exec(`
   )
 `)
 
-// Defensive migration: a database created before the structured hazard
-// evidence log existed doesn't have this table.
-db.exec(`
-  CREATE TABLE IF NOT EXISTS hazard_evidence (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hazardId INTEGER NOT NULL REFERENCES hazards(id),
-    type TEXT NOT NULL DEFAULT 'other',
-    title TEXT NOT NULL,
-    sourceDate TEXT,
-    link TEXT DEFAULT '',
-    description TEXT DEFAULT '',
-    createdAt TEXT NOT NULL DEFAULT (datetime('now'))
-  )
-`)
-
-// Defensive migration: a database created before action items could be
-// assigned to a specific team member has an `action_items` table without
-// this column (CREATE TABLE IF NOT EXISTS above is a no-op against an
-// existing table).
-try {
-  db.exec('ALTER TABLE action_items ADD COLUMN ownerId INTEGER REFERENCES users(id)')
-} catch {
-  // Column already exists, either a fresh DB (created with it above) or a
-  // database this migration already ran against.
-}
-
-// Defensive migration: a database created before the public gap-check quiz
-// existed doesn't have this table.
-db.exec(`
-  CREATE TABLE IF NOT EXISTS gap_check_leads (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT NOT NULL,
-    firstName TEXT DEFAULT '',
-    state TEXT NOT NULL,
-    industry TEXT NOT NULL,
-    orgSize TEXT NOT NULL,
-    answers TEXT NOT NULL,
-    tier TEXT NOT NULL,
-    createdAt TEXT NOT NULL DEFAULT (datetime('now'))
-  )
-`)
-
-// Defensive migration: a database created before firstName was added to the
-// gap-check leads table doesn't have this column.
-try {
-  db.exec("ALTER TABLE gap_check_leads ADD COLUMN firstName TEXT DEFAULT ''")
-} catch {
-  // Column already exists, either a fresh DB (created with it above) or a
-  // database this migration already ran against.
-}
-
 if (isNew) {
   console.log(`Created new SQLite database at ${DB_PATH}`)
   seedHazardLibrary(db)
@@ -481,7 +357,7 @@ try {
 // the "Eliminate" line's noun phrase varied by hazard). Rewrites every
 // already-seeded row's `controls` column in place with the tailored text
 // from HAZARD_CONTROLS, keyed by name, since hazard_library is only ever
-// seeded once per database.
+// seeded once per database and a re-seed would duplicate rows.
 {
   const updateControls = db.prepare('UPDATE hazard_library SET controls = ? WHERE name = ?')
   for (const [name, controls] of Object.entries(HAZARD_CONTROLS)) {
@@ -489,74 +365,17 @@ try {
   }
 }
 
-// Sync: adds hazards introduced after a database was first seeded (e.g.
-// Intrusive surveillance) and refreshes descriptions, controls and the
-// hazard-specific legislation citations. Idempotent, keyed by name.
-syncHazardLibrary(db)
-
-// Server-side login sessions (see sessions.ts). Each login inserts a row and the
-// signed token carries its id, so a session can be ended from the server.
-// known_devices remembers which browser + OS combinations each user has signed
-// in from, so a sign-in from an unfamiliar one can trigger a notification email.
-db.exec(`
-CREATE TABLE IF NOT EXISTS sessions (
-  id TEXT PRIMARY KEY,
-  userId INTEGER NOT NULL REFERENCES users(id),
-  createdAt TEXT NOT NULL,
-  lastSeenAt TEXT NOT NULL,
-  ip TEXT DEFAULT '',
-  userAgent TEXT DEFAULT '',
-  deviceLabel TEXT DEFAULT ''
-);
-CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(userId);
-
-CREATE TABLE IF NOT EXISTS known_devices (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  userId INTEGER NOT NULL REFERENCES users(id),
-  deviceHash TEXT NOT NULL,
-  deviceLabel TEXT DEFAULT '',
-  firstSeenAt TEXT NOT NULL,
-  UNIQUE(userId, deviceHash)
-);
-`)
-
-// Enterprise: organisation-wide audit log, and an org-level switch that makes
-// two-factor authentication mandatory for every user (not just admins).
-db.exec(`
-CREATE TABLE IF NOT EXISTS audit_log (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  orgId INTEGER NOT NULL,
-  userId INTEGER,
-  userName TEXT NOT NULL DEFAULT '',
-  action TEXT NOT NULL,
-  detail TEXT NOT NULL DEFAULT '',
-  ip TEXT NOT NULL DEFAULT '',
-  createdAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
-CREATE INDEX IF NOT EXISTS idx_audit_log_org ON audit_log(orgId, id DESC);
-`)
-try {
-  db.exec('ALTER TABLE organizations ADD COLUMN require2fa INTEGER NOT NULL DEFAULT 0')
-} catch {
-  // Column already exists.
-}
-
-// Source tracking: which page or campaign link brought a Gap Check lead or a new account
-// (see attribution.ts), plus the link from a lead to the account they later created and the
-// Gap Check "current setup" answers. Existing rows keep blank values.
-for (const table of ['gap_check_leads', 'organizations']) {
-  for (const col of ['utmSource', 'utmMedium', 'utmCampaign', 'utmContent', 'referrerHost', 'landingPath', 'ctaSource', 'ctaContent']) {
-    try {
-      db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} TEXT DEFAULT ''`)
-    } catch {
-      // Column already exists.
-    }
-  }
-}
-for (const col of ["currentSetup TEXT DEFAULT '[]'", 'convertedOrgId INTEGER', 'convertedAt TEXT']) {
-  try {
-    db.exec(`ALTER TABLE gap_check_leads ADD COLUMN ${col}`)
-  } catch {
-    // Column already exists.
+// Backfill: add the Victoria regulator note to the Violence and aggression
+// entry's VIC citation in already-seeded databases. Sets only the VIC key,
+// from the same source as the seed, so it is safe to repeat.
+{
+  const name = 'Violence and aggression'
+  const row = db.prepare('SELECT legislation FROM hazard_library WHERE name = ?').get(name) as
+    | { legislation: string }
+    | undefined
+  if (row) {
+    const leg = JSON.parse(row.legislation) as Record<string, string>
+    leg.VIC = legislationFor(name).VIC
+    db.prepare('UPDATE hazard_library SET legislation = ? WHERE name = ?').run(JSON.stringify(leg), name)
   }
 }
