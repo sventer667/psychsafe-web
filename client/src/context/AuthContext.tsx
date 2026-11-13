@@ -1,3 +1,4 @@
+import { getAttribution } from '../lib/attribution'
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { api, setToken, clearToken, getToken } from '../lib/api'
 import type { User, Organization } from '../lib/types'
@@ -76,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function register(name: string, email: string, password: string, orgName: string) {
     const data = await api<{ token: string; user: User; org: Organization }>('/auth/register', {
       method: 'POST',
-      body: { name, email, password, orgName },
+      body: { name, email, password, orgName, attribution: getAttribution() },
     })
     setToken(data.token)
     setUser(data.user)
