@@ -13,6 +13,7 @@ import { checkoutRouter } from './routes/checkout.js'
 import { stripeWebhookRouter } from './routes/stripeWebhook.js'
 import { invitesRouter } from './routes/invites.js'
 import { gapCheckRouter } from './routes/gapCheck.js'
+import { contactRouter } from './routes/contact.js'
 import { onboardingRouter } from './routes/onboarding.js'
 import { enterpriseRouter } from './routes/enterprise.js'
 import { startNurtureScheduler } from './nurture.js'
@@ -49,6 +50,7 @@ if (MAINTENANCE_MODE) {
   app.use((req, res, next) => {
     if (req.path === '/api/health') return next()
     if (req.path.startsWith('/api/gap-check')) return next()
+    if (req.path.startsWith('/api/contact')) return next()
     if (req.path === '/api/stripe/webhook') return next()
     if (PREVIEW_ACCESS_SECRET && req.get('X-Preview-Access') === PREVIEW_ACCESS_SECRET) return next()
     res.status(503).json({ error: 'Service temporarily unavailable' })
@@ -71,6 +73,7 @@ app.use('/api/reports', reportsRouter)
 app.use('/api/checkout', checkoutRouter)
 app.use('/api', invitesRouter)
 app.use('/api/gap-check', gapCheckRouter)
+app.use('/api/contact', contactRouter)
 app.use('/api/onboarding', onboardingRouter)
 app.use('/api/enterprise', enterpriseRouter)
 
