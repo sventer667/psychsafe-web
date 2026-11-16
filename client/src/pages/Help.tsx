@@ -126,7 +126,7 @@ export function Help() {
         </div>
 
         <p className="mt-6 text-lg text-muted">
-          Find answers to common questions below. If you can’t find what you need, email us.
+          Find answers to common questions below. If you can’t find what you need, use our <Link to="/contact" className="text-accent hover:underline">contact form</Link> or email us.
         </p>
 
         <Card className="mt-8 border-accent/30 bg-accent/5">
@@ -175,6 +175,7 @@ export function Help() {
             <Link to="/privacy" className="hover:text-ink">Privacy</Link>
             <Link to="/terms" className="hover:text-ink">Terms</Link>
             <Link to="/help" className="hover:text-ink">Help</Link>
+            <Link to="/contact" className="hover:text-ink">Contact</Link>
             <Link to="/support" className="hover:text-ink">Support</Link>
             {user ? (
               <button onClick={() => navigate('/dashboard')} className="hover:text-ink">Go to dashboard</button>
