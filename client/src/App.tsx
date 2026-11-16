@@ -10,6 +10,7 @@ import { Privacy } from './pages/Privacy'
 import { Terms } from './pages/Terms'
 import { Support } from './pages/Support'
 import { Help } from './pages/Help'
+import { Contact } from './pages/Contact'
 import { Login } from './pages/Login'
 import { Signup } from './pages/Signup'
 import { ForgotPassword } from './pages/ForgotPassword'
@@ -98,6 +99,7 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />          
           <Route path="/support" element={<Support />} />
           <Route path="/help" element={<Help />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
