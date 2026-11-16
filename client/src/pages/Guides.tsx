@@ -144,6 +144,7 @@ export function Guides() {
             <Link to="/legal" className="hover:text-ink">Legal</Link>
             <Link to="/privacy" className="hover:text-ink">Privacy</Link>
             <Link to="/terms" className="hover:text-ink">Terms</Link>
+            <Link to="/help" className="hover:text-ink">Help</Link>
             <Link to="/support" className="hover:text-ink">Support</Link>
             {user ? (
               <button onClick={() => navigate('/dashboard')} className="hover:text-ink">Go to dashboard</button>
