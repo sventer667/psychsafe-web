@@ -45,7 +45,7 @@ export function ArticleReview() {
     ld.text = JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'Article',
-      headline: 'Psychosocial hazards at work: four examples and the controls that fit them',
+      headline: 'How often should you review psychosocial controls?',
       description: DESCRIPTION,
       dateModified: '2026-11-12',
       mainEntityOfPage: `https://humanora.com.au${PATH}`,
