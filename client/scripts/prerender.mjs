@@ -124,7 +124,10 @@ function render(r) {
   h = h.replace(/<meta property="og:description"[^>]*>/, `<meta property="og:description" content="${esc(r.description)}" />`)
   h = h.replace(/<meta property="og:url"[^>]*>/, `<meta property="og:url" content="${url}" />`)
   h = h.replace(/<meta property="og:image:alt"[^>]*>/, `<meta property="og:image:alt" content="${esc(r.title)}" />`)
-  let extra = `<link rel="canonical" href="${url}" data-prerender="canonical" />`
+  // The root file is also the fallback served for every other route, so it must
+  // not claim a canonical URL or og:url of its own.
+  if (r.path === '/') h = h.replace(/\s*<meta property="og:url"[^>]*>/, '')
+  let extra = r.path === '/' ? '' : `<link rel="canonical" href="${url}" data-prerender="canonical" />`
   for (const o of ld[r.path] ?? []) extra += `\n    <script type="application/ld+json" data-prerender="ld">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`
   return h.replace('</head>', `    ${extra}\n  </head>`)
 }
