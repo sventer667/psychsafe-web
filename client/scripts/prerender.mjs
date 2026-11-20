@@ -41,6 +41,7 @@ const pageFiles = {
   '/articles/psychosocial-risk-assessment-four-steps': 'ArticleAssessment.tsx',
   '/articles/psychosocial-hazard-examples-and-controls': 'ArticleHazards.tsx',
   '/articles/how-often-to-review-psychosocial-controls': 'ArticleReview.tsx',
+  '/articles/officers-due-diligence-psychosocial-hazards': 'ArticleOfficers.tsx',
 }
 for (const [path, file] of Object.entries(pageFiles)) {
   if (!file) continue
