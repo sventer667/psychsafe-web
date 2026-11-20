@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { getSector, SECTORS } from '../lib/sectors'
 import logo from '../assets/humanora-logo.png'
+import { usePageMeta } from '../lib/seo'
 
 // Public per-sector guide page, linked from the sector cards on Home. Same
 // standalone header/footer treatment as Home (not the in-app Topbar/Layout),
@@ -16,6 +17,14 @@ export function SectorGuide() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const sector = getSector(slug)
+  const hz = (sector?.hazards ?? []).slice(0, 2).map((h) => h.name.toLowerCase())
+  usePageMeta(
+    sector ? `Psychosocial Hazards in ${sector.name}: Risk Assessment | Humanora` : 'Humanora',
+    sector
+      ? `The psychosocial hazards most common in ${sector.name.toLowerCase()} work, such as ${hz[0]} and ${hz[1]}, and how to assess and record them under WHS law.`
+      : '',
+    `/sectors/${slug ?? ''}`,
+  )
 
   if (!sector) return <Navigate to="/" replace />
 

@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button'
 import { Input, Label, Select } from '../components/ui/Input'
 import { api, ApiError } from '../lib/api'
 import logo from '../assets/humanora-logo.png'
+import { usePageMeta } from '../lib/seo'
 
 const STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT']
 const INDUSTRIES = [
@@ -70,6 +71,11 @@ interface SubmitResponse {
 }
 
 export function GapCheck() {
+  usePageMeta(
+    'Free Psychosocial Risk Gap Check (3 Minutes) | Humanora',
+    'A free three minute check of your psychosocial risk records against what Australian WHS law requires. No credit card, and no email needed until you want your result.',
+    '/gap-check',
+  )
   const [screen, setScreen] = useState<Screen>('landing')
 
   // Step 1

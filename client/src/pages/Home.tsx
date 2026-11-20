@@ -14,6 +14,7 @@ import { useAuth } from '../context/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import logo from '../assets/humanora-logo.png'
+import { usePageMeta } from '../lib/seo'
 
 // Public marketing page, the front door for visitors who aren't signed in
 // yet. Deliberately its own layout (not the in-app Topbar/Layout), since it
@@ -102,6 +103,11 @@ const TIERS = [
 ]
 
 export function Home() {
+  usePageMeta(
+    'Psychosocial Risk Assessment Software for Australian Workplaces | Humanora',
+    'Humanora is psychosocial risk management software for Australian employers. Assess hazards, assign actions, log worker consultation and seal a tamper-evident record.',
+    '/',
+  )
   const { user, loading } = useAuth()
   const navigate = useNavigate()
   const [params] = useSearchParams()
