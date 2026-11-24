@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Navigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, Navigate, useSearchParams, Link } from 'react-router-dom'
 import {
   ClipboardList,
   ShieldCheck,
@@ -277,15 +277,64 @@ export function Home() {
         </div>
       </section>
 
+      {/* Free resources: real links so crawlers can reach the guides, sector pages and articles */}
+      <section className="border-t border-border bg-canvas py-14">
+        <div className="mx-auto max-w-5xl px-6">
+          <h2 className="font-serif text-2xl text-ink">Free resources for employers</h2>
+          <div className="mt-6 space-y-5 text-sm text-muted">
+            <p>
+              <strong className="text-ink">Check your records.</strong> Run the free three-minute{' '}
+              <Link to="/gap-check" className="text-accent hover:underline">Gap Check</Link> to see where your psychosocial risk records fall short.
+            </p>
+            <p>
+              <strong className="text-ink">State and territory guides.</strong>{' '}
+              <Link to="/guides/victoria-psychosocial-hazards" className="text-accent hover:underline">Victoria</Link> ·{' '}
+              <Link to="/guides/nsw-psychosocial-hazards" className="text-accent hover:underline">New South Wales</Link> ·{' '}
+              <Link to="/guides/queensland-psychosocial-hazards" className="text-accent hover:underline">Queensland</Link> ·{' '}
+              <Link to="/guides/wa-psychosocial-hazards" className="text-accent hover:underline">Western Australia</Link> ·{' '}
+              <Link to="/guides/sa-psychosocial-hazards" className="text-accent hover:underline">South Australia</Link> ·{' '}
+              <Link to="/guides/tasmania-psychosocial-hazards" className="text-accent hover:underline">Tasmania</Link> ·{' '}
+              <Link to="/guides/act-psychosocial-hazards" className="text-accent hover:underline">ACT</Link> ·{' '}
+              <Link to="/guides/nt-psychosocial-hazards" className="text-accent hover:underline">Northern Territory</Link>
+            </p>
+            <p>
+              <strong className="text-ink">By industry.</strong>{' '}
+              <Link to="/sectors/construction" className="text-accent hover:underline">Construction</Link> ·{' '}
+              <Link to="/sectors/education" className="text-accent hover:underline">Education</Link> ·{' '}
+              <Link to="/sectors/emergency-services" className="text-accent hover:underline">Emergency Services</Link> ·{' '}
+              <Link to="/sectors/healthcare-aged-care" className="text-accent hover:underline">Healthcare &amp; Aged Care</Link> ·{' '}
+              <Link to="/sectors/mining-resources" className="text-accent hover:underline">Mining &amp; Resources</Link> ·{' '}
+              <Link to="/sectors/transport-logistics" className="text-accent hover:underline">Transport &amp; Logistics</Link>
+            </p>
+            <p>
+              <strong className="text-ink">Latest articles.</strong>{' '}
+              <Link to="/articles/officers-due-diligence-psychosocial-hazards" className="text-accent hover:underline">What officers must do about psychosocial hazards</Link> ·{' '}
+              <Link to="/articles/psychosocial-risk-register" className="text-accent hover:underline">What a psychosocial risk register should contain</Link> ·{' '}
+              <Link to="/articles/psychosocial-risk-assessment-four-steps" className="text-accent hover:underline">The four steps of a psychosocial risk assessment</Link> ·{' '}
+              <Link to="/blog" className="text-accent hover:underline">All articles</Link>
+            </p>
+          </div>
+        </div>
+      </section>
+
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 text-sm text-muted">
           <div className="flex items-center gap-2">
             
             <span>© {new Date().getFullYear()} Humanora</span>
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/guides')} className="hover:text-ink">Guides</button><button onClick={() => navigate('/blog')} className="hover:text-ink">Blog</button><button onClick={() => navigate('/legal')} className="hover:text-ink">Legal</button><button onClick={() => navigate('/privacy')} className="hover:text-ink">Privacy</button><button onClick={() => navigate('/terms')} className="hover:text-ink">Terms</button><button onClick={() => navigate('/help')} className="hover:text-ink">Help</button><button onClick={() => navigate('/contact')} className="hover:text-ink">Contact</button><button onClick={() => navigate('/support')} className="hover:text-ink">Support</button><button onClick={() => navigate('/login')} className="hover:text-ink">Log in</button>
-            <button onClick={() => navigate('/signup')} className="hover:text-ink">Sign up</button>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link to="/guides" className="hover:text-ink">Guides</Link>
+            <Link to="/blog" className="hover:text-ink">Blog</Link>
+            <Link to="/gap-check" className="hover:text-ink">Free Gap Check</Link>
+            <Link to="/help" className="hover:text-ink">Help</Link>
+            <Link to="/contact" className="hover:text-ink">Contact</Link>
+            <Link to="/support" className="hover:text-ink">Support</Link>
+            <Link to="/legal" className="hover:text-ink">Legal</Link>
+            <Link to="/privacy" className="hover:text-ink">Privacy</Link>
+            <Link to="/terms" className="hover:text-ink">Terms</Link>
+            <Link to="/login" className="hover:text-ink">Log in</Link>
+            <Link to="/signup" className="hover:text-ink">Sign up</Link>
           </div>
         </div>
       </footer>
