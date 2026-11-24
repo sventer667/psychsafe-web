@@ -41,6 +41,7 @@ import { ArticleAssessment } from './pages/ArticleAssessment'
 import { ArticleHazards } from './pages/ArticleHazards'
 import { ArticleReview } from './pages/ArticleReview'
 import { ArticleOfficers } from './pages/ArticleOfficers'
+import { ArticleVictoriaChecklist } from './pages/ArticleVictoriaChecklist'
 
 // Pre-launch switch. Set VITE_MAINTENANCE_MODE=true as a build-time env var
 // on the connexus-app Render service (then redeploy) to take the whole site
@@ -87,6 +88,7 @@ export default function App() {
           <Route path="/articles/psychosocial-hazard-examples-and-controls" element={<ArticleHazards />} />
           <Route path="/articles/how-often-to-review-psychosocial-controls" element={<ArticleReview />} />
           <Route path="/articles/officers-due-diligence-psychosocial-hazards" element={<ArticleOfficers />} />
+          <Route path="/articles/victoria-psychological-health-regulations-checklist" element={<ArticleVictoriaChecklist />} />
           <Route path="/guides/victoria-psychosocial-hazards" element={<GuideVictoria />} />
           <Route path="/guides/nsw-psychosocial-hazards" element={<GuideNSW />} />
           <Route path="/guides/queensland-psychosocial-hazards" element={<GuideQLD />} />
