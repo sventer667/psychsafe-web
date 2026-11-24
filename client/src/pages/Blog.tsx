@@ -19,6 +19,11 @@ const GAP_CHECK = '/gap-check?utm_source=blog&utm_medium=seo&utm_campaign=blog&u
 
 const POSTS: { title: string; summary: string; path: string }[] = [
   {
+    title: 'Victoria’s psychological health regulations: what to do, and what to keep',
+    summary: 'What the Regulations ask for, an illustrated example of a review, and the record to keep.',
+    path: '/articles/victoria-psychological-health-regulations-checklist',
+  },
+  {
     title: 'What officers must do about psychosocial hazards',
     summary: 'The officer duty in WHS law, the six elements of due diligence, and the records that show an officer took reasonable steps.',
     path: '/articles/officers-due-diligence-psychosocial-hazards',
