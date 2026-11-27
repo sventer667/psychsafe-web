@@ -19,6 +19,11 @@ const GAP_CHECK = '/gap-check?utm_source=blog&utm_medium=seo&utm_campaign=blog&u
 
 const POSTS: { title: string; summary: string; path: string }[] = [
   {
+    title: 'Choosing psychosocial controls in Humanora',
+    summary: 'How the suggested controls work, why they’re ordered most effective first, and how to turn them into actions with an owner and a date.',
+    path: '/articles/choosing-psychosocial-controls-humanora',
+  },
+  {
     title: 'Your first psychosocial risk assessment in Humanora',
     summary: 'A walk through the Getting started steps, from setting your state to a sealed report, with screenshots of a sample assessment.',
     path: '/articles/first-psychosocial-risk-assessment-humanora',
