@@ -19,6 +19,11 @@ const GAP_CHECK = '/gap-check?utm_source=blog&utm_medium=seo&utm_campaign=blog&u
 
 const POSTS: { title: string; summary: string; path: string }[] = [
   {
+    title: 'Making psychosocial actions get done in Humanora',
+    summary: 'Owners, due dates, statuses, overdue flags and the reminder each owner sees on their dashboard.',
+    path: '/articles/psychosocial-actions-owners-due-dates-humanora',
+  },
+  {
     title: 'Choosing psychosocial controls in Humanora',
     summary: 'How the suggested controls work, why they’re ordered most effective first, and how to turn them into actions with an owner and a date.',
     path: '/articles/choosing-psychosocial-controls-humanora',
