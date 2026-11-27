@@ -19,6 +19,11 @@ const GAP_CHECK = '/gap-check?utm_source=blog&utm_medium=seo&utm_campaign=blog&u
 
 const POSTS: { title: string; summary: string; path: string }[] = [
   {
+    title: 'Victorian psychosocial risk: template or system?',
+    summary: 'When a template or spreadsheet is enough, where it starts to struggle, and three questions to help you decide.',
+    path: '/articles/victoria-psychosocial-risk-template-or-system',
+  },
+  {
     title: 'Victoria’s psychological health regulations: what to do, and what to keep',
     summary: 'What the Regulations ask for, an illustrated example of a review, and the record to keep.',
     path: '/articles/victoria-psychological-health-regulations-checklist',

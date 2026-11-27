@@ -172,7 +172,8 @@ export function ArticleVictoriaChecklist() {
         <p className="mt-3 text-muted">
           If you want to see where your records stand, the free three-minute{' '}
           <Link to="/gap-check" className="text-accent hover:underline">Gap Check</Link> asks a few questions and shows the legislation for your state. To test the process on one real hazard, you can start a free 7-day trial and take a single assessment from start to finish. Our{' '}
-          <Link to="/guides/victoria-psychosocial-hazards" className="text-accent hover:underline">Victoria employer guide</Link> covers the rules in plain language.
+          <Link to="/guides/victoria-psychosocial-hazards" className="text-accent hover:underline">Victoria employer guide</Link> covers the rules in plain language. If you are weighing a template or spreadsheet against a system, read{' '}
+          <Link to="/articles/victoria-psychosocial-risk-template-or-system" className="text-accent hover:underline">Victorian psychosocial risk: template or system?</Link>
         </p>
 
         <Card className="mt-8 border-accent/30 bg-accent/5">
