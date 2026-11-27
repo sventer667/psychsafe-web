@@ -43,6 +43,7 @@ import { ArticleReview } from './pages/ArticleReview'
 import { ArticleOfficers } from './pages/ArticleOfficers'
 import { ArticleFirstAssessment } from './pages/ArticleFirstAssessment'
 import { ArticleChoosingControls } from './pages/ArticleChoosingControls'
+import { ArticleActionsDone } from './pages/ArticleActionsDone'
 import { ArticleVictoriaTemplate } from './pages/ArticleVictoriaTemplate'
 import { ArticleVictoriaChecklist } from './pages/ArticleVictoriaChecklist'
 
@@ -93,6 +94,7 @@ export default function App() {
           <Route path="/articles/officers-due-diligence-psychosocial-hazards" element={<ArticleOfficers />} />
           <Route path="/articles/first-psychosocial-risk-assessment-humanora" element={<ArticleFirstAssessment />} />
           <Route path="/articles/choosing-psychosocial-controls-humanora" element={<ArticleChoosingControls />} />
+          <Route path="/articles/psychosocial-actions-owners-due-dates-humanora" element={<ArticleActionsDone />} />
           <Route path="/articles/victoria-psychosocial-risk-template-or-system" element={<ArticleVictoriaTemplate />} />
           <Route path="/articles/victoria-psychological-health-regulations-checklist" element={<ArticleVictoriaChecklist />} />
           <Route path="/guides/victoria-psychosocial-hazards" element={<GuideVictoria />} />
