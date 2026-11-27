@@ -42,6 +42,7 @@ const pageFiles = {
   '/articles/psychosocial-hazard-examples-and-controls': 'ArticleHazards.tsx',
   '/articles/how-often-to-review-psychosocial-controls': 'ArticleReview.tsx',
   '/articles/officers-due-diligence-psychosocial-hazards': 'ArticleOfficers.tsx',
+  '/articles/first-psychosocial-risk-assessment-humanora': 'ArticleFirstAssessment.tsx',
   '/articles/victoria-psychosocial-risk-template-or-system': 'ArticleVictoriaTemplate.tsx',
   '/articles/victoria-psychological-health-regulations-checklist': 'ArticleVictoriaChecklist.tsx',
 }
