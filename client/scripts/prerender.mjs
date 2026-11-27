@@ -44,6 +44,7 @@ const pageFiles = {
   '/articles/officers-due-diligence-psychosocial-hazards': 'ArticleOfficers.tsx',
   '/articles/first-psychosocial-risk-assessment-humanora': 'ArticleFirstAssessment.tsx',
   '/articles/choosing-psychosocial-controls-humanora': 'ArticleChoosingControls.tsx',
+  '/articles/psychosocial-actions-owners-due-dates-humanora': 'ArticleActionsDone.tsx',
   '/articles/victoria-psychosocial-risk-template-or-system': 'ArticleVictoriaTemplate.tsx',
   '/articles/victoria-psychological-health-regulations-checklist': 'ArticleVictoriaChecklist.tsx',
 }
