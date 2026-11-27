@@ -42,6 +42,7 @@ const pageFiles = {
   '/articles/psychosocial-hazard-examples-and-controls': 'ArticleHazards.tsx',
   '/articles/how-often-to-review-psychosocial-controls': 'ArticleReview.tsx',
   '/articles/officers-due-diligence-psychosocial-hazards': 'ArticleOfficers.tsx',
+  '/articles/victoria-psychosocial-risk-template-or-system': 'ArticleVictoriaTemplate.tsx',
   '/articles/victoria-psychological-health-regulations-checklist': 'ArticleVictoriaChecklist.tsx',
 }
 for (const [path, file] of Object.entries(pageFiles)) {
