@@ -19,6 +19,11 @@ const GAP_CHECK = '/gap-check?utm_source=blog&utm_medium=seo&utm_campaign=blog&u
 
 const POSTS: { title: string; summary: string; path: string }[] = [
   {
+    title: 'Your first psychosocial risk assessment in Humanora',
+    summary: 'A walk through the Getting started steps, from setting your state to a sealed report, with screenshots of a sample assessment.',
+    path: '/articles/first-psychosocial-risk-assessment-humanora',
+  },
+  {
     title: 'Victorian psychosocial risk: template or system?',
     summary: 'When a template or spreadsheet is enough, where it starts to struggle, and three questions to help you decide.',
     path: '/articles/victoria-psychosocial-risk-template-or-system',
