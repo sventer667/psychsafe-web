@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Compass } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
@@ -18,9 +18,59 @@ const PATH = '/articles/first-psychosocial-risk-assessment-humanora'
 const SIGNUP = '/signup?utm_source=article&utm_medium=seo&utm_campaign=articles&utm_content=first-assessment'
 
 function Shot({ src, alt }: { src: string; alt: string }) {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [open])
+
   return (
     <figure className="mt-5">
-      <img src={src} alt={alt} width={1200} height={499} loading="lazy" className="w-full rounded-xl border border-border" />
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={`Enlarge screenshot: ${alt}`}
+        className="group relative block w-full cursor-zoom-in"
+      >
+        <img src={src} alt={alt} width={1200} height={499} loading="lazy" className="w-full rounded-xl border border-border" />
+        <span className="absolute bottom-2 right-2 rounded-md bg-ink/80 px-2 py-1 text-xs text-white opacity-90 group-hover:opacity-100">
+          Click to enlarge
+        </span>
+      </button>
+      {open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={alt}
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-50 flex cursor-zoom-out items-start justify-center overflow-auto bg-black/85 p-4 sm:items-center"
+        >
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Close"
+            className="fixed right-4 top-4 rounded-full bg-white px-3 py-1 text-sm font-medium text-ink shadow"
+          >
+            Close ✕
+          </button>
+          <img
+            src={src}
+            alt={alt}
+            style={{ width: 'min(1200px, 100%)', minWidth: '900px', maxWidth: 'none' }}
+            className="rounded-lg"
+          />
+        </div>
+      )}
     </figure>
   )
 }
